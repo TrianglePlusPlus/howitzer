@@ -19,6 +19,8 @@ if [ ! -d /vagrant/square_connect/square_connect/virt_env ]; then
 	pip install django
 	deactivate
 fi
+
+chmod +x /vagrant/vagrant_bootstrap/apache_configure.sh
 	
 # Configure apache so it doesn't freak out
 /vagrant/vagrant_bootstrap/apache_configure.sh
