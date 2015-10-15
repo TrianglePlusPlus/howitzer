@@ -71,5 +71,6 @@ Vagrant.configure(2) do |config|
 
   # CUSTOM VAGRANTFILE LINES
   config.vm.provision :shell, path: "vagrant_bootstrap/bootstrap.sh"
+  config.vm.network :forwarded_port, guest: 8000, host: 8111
   config.vm.network :forwarded_port, guest: 80, host:1972
 end

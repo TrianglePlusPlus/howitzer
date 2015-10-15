@@ -1,6 +1,7 @@
 # Our Stuff
 .vagrant/*
 ptvs_virtualenv_proxy.py
+virt_env/
 
 #################################
 #		Visual Studio			#
