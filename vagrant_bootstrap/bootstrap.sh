@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
+# First we update all packages to make sure everything is good to go
 apt-get update
+
 apt-get install -y apache2
 
 if ! [ -L /var/www ]; then
@@ -24,3 +26,6 @@ chmod +x /vagrant/vagrant_bootstrap/apache_configure.sh
 	
 # Configure apache so it doesn't freak out
 /vagrant/vagrant_bootstrap/apache_configure.sh
+
+# Install git for convenience
+apt-get -y install git
