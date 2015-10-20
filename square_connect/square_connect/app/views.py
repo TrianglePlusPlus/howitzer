@@ -16,7 +16,7 @@ def home(request):
         context_instance = RequestContext(request,
         {
             'title':'Home Page',
-            'year':datetime.now().year,
+            'year':'Remember never give up.',
         })
     )
 
@@ -30,7 +30,7 @@ def contact(request):
         {
             'title':'Contact',
             'message':'Your contact page.',
-            'year':datetime.now().year,
+            'year':'Remember never give up.',
         })
     )
 
@@ -44,6 +44,6 @@ def about(request):
         {
             'title':'About',
             'message':'Your application description page.',
-            'year':datetime.now().year,
+            'year':'Remember never give up.',
         })
     )
