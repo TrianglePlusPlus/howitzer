@@ -4,14 +4,14 @@ from io import StringIO
 # This is "The Corp" access token
 access_token = "zLAjMnTYdAqbbN-L6bxfMQ"
 
-# For currency reasons
-locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-
 # Convert cent-based transactions to dollars and cents
 def format_money(cents):
     return locale.currency(cents / 100.0)
 
-url = 'https://connect.squareup.com/v1/me/locations'
+base_path = "https://connect.squareup.com"
+
+request_path = "/v1/me/locations"
+
 headers = {'Authorization' : 'Bearer ' + access_token,
            'Accept' : 'application/json',
            'Content-Type' : 'application/json' }
@@ -21,9 +21,9 @@ headers = {'Authorization' : 'Bearer ' + access_token,
 #         'location' : 'Northampton',
 #         'language' : 'Python' }
 # url_values = urllib.parse.urlencode(data)
-# full_url = url + '?' + url_values
+full_url = base_path + request_path + '?' + url_values
 
-req = urllib.request.Request(url)
+req = urllib.request.Request(full_url)
 for key, value in headers.items():
     req.add_header(key, value)
 
