@@ -60,7 +60,7 @@ class LocationsRequest(SquareRequest):
         
         self.request_path = "/v1/me/locations"
 
-    def get_locations(self):
+    def get_merchant_ids(self):
         if self.response_json is None:
             raise ReferenceError("Attempted to access response data without first running a request")
         locations = {}
@@ -74,7 +74,31 @@ class LocationsRequest(SquareRequest):
     def auto(self):
         self.create_request()
         self.send_request()
-        return self.get_locations()
+        return self.get_merchant_ids()
 
-req = LocationsRequest()
-print(req.auto())
+class PaymentRequest(SquareRequest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
+        if "merchant_id" in kwargs:
+            self.merchant_id = kwargs["merchant_id"]
+            self.request_path = "/v1/" + self.merchant_id + "/payments"
+        else:
+            self.merchant_id = None
+            self.request_path = None
+
+    def set_merchant_id(self, merchant_id):
+        self.merchant_id = merchant_id
+        self.request_path = "/v1/" + self.merchant_id + "/payments"
+
+    def auto(self):
+        self.create_request()
+        self.send_request()
+        # TODO: Return the appropriate data
+        return self.response_json
+
+stores = LocationsRequest().auto()
+print(stores)
+req = PaymentRequest(merchant_id=stores["ug"])
+req.auto()
+print(req.response_json)
