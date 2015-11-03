@@ -1,5 +1,12 @@
-﻿import urllib.request, json, locale
+﻿# For everything
+import urllib.request, json
 from io import StringIO
+# For the Payment Requests
+import datetime
+# For currency manipulation
+import locale
+# For pretty printing!
+import pprint
 
 # Convert cent-based transactions to dollars and cents
 def format_money(cents):
@@ -91,14 +98,34 @@ class PaymentRequest(SquareRequest):
         self.merchant_id = merchant_id
         self.request_path = "/v1/" + self.merchant_id + "/payments"
 
+    def set_response_limit(self, limit=200):
+        self.add_parameter("limit", limit)
+
+    def set_begin_time(self, time=None):
+        """Sets the start time to now
+           Do not attempt to enter your own time unless you know what you're doing"""
+        if time is None:
+            current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.add_parameter("begin_time", current_time)
+        else:
+            self.add_parameter("begin_time", time)
+
+    def set_end_time(self, time=None):
+        """Sets the end time to 24 hours ago
+           Do not attempt to enter your own time unless you know what you're doing"""
+        if time is None:
+            time = datetime.datetime.utcnow()
+            delta = datetime.timedelta(days=1)
+            time = time - delta
+            time_formatted = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.add_parameter("end_time", time_formatted)
+        else:
+            self.add_parameter("end_time", time)
+
     def auto(self):
+        self.set_begin_time()
+        self.set_end_time()
+        self.set_response_limit()
         self.create_request()
         self.send_request()
-        # TODO: Return the appropriate data
         return self.response_json
-
-stores = LocationsRequest().auto()
-print(stores)
-req = PaymentRequest(merchant_id=stores["ug"])
-req.auto()
-print(req.response_json)
