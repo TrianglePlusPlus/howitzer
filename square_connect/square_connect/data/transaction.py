@@ -10,6 +10,10 @@ import pprint
 
 # Convert cent-based transactions to dollars and cents
 def format_money(cents):
+    """ Formats money into actual dollars and cents instead of just cents
+    @param cents The number of cents to convert
+    """
+    locale.setlocale(locale.LC_ALL, 'en_US.utf8')
     return locale.currency(cents / 100.0)
 
 class SquareRequest:
@@ -112,8 +116,15 @@ class LocationsRequest(SquareRequest):
         return self.get_merchant_ids()
 
 class PaymentRequest(SquareRequest):
-    """  """
+    """ Gets sales information from Square
+   
+   Can retrieve up to 200 records at a time, the limit is imposed by square
+   When used automatically it will the 200 most recent sales from a store in thelast hour 
+   """
     def __init__(self, *args, **kwargs):
+        """ Constructor for the request
+        @param merchant_id The location ID for the store you want information about, KWARG
+        """
         super().__init__(args, kwargs)
 
         if "merchant_id" in kwargs:
@@ -124,15 +135,27 @@ class PaymentRequest(SquareRequest):
             self.request_path = None
 
     def set_merchant_id(self, merchant_id):
+        """ Set or change the merchant ID
+        @param merchant_id The location ID for the store you want information about
+        """
         self.merchant_id = merchant_id
         self.request_path = "/v1/" + self.merchant_id + "/payments"
 
     def set_response_limit(self, limit=200):
-        self.add_parameter("limit", limit)
+        """ Sets the number of responses that square will return, max 200
+        @param limit The number of responses you want from Square, max 200
+        @exception OverflowError Raised when the limit entered is not between 1 and 200 inclusive
+        """
+        if limit <= 0 or limit > 200:
+            raise OverflowError("The limit must be from 1 to 200")
+        else:
+            self.add_parameter("limit", limit, True)
 
     def set_begin_time(self, time=None):
         """Sets the start time to now
-           Do not attempt to enter your own time unless you know what you're doing"""
+        Do not attempt to enter your own time unless you know what you're doing
+        @param time Formatted time string
+        """
         if time is None:
             current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             self.add_parameter("begin_time", current_time)
@@ -141,7 +164,9 @@ class PaymentRequest(SquareRequest):
 
     def set_end_time(self, time=None):
         """Sets the end time to 24 hours ago
-           Do not attempt to enter your own time unless you know what you're doing"""
+        Do not attempt to enter your own time unless you know what you're doing
+        @param time Formatted time string
+        """
         if time is None:
             time = datetime.datetime.utcnow()
             delta = datetime.timedelta(days=1)
@@ -152,6 +177,10 @@ class PaymentRequest(SquareRequest):
             self.add_parameter("end_time", time)
 
     def auto(self):
+        """ Builds a request, sends the request, and returns the sales information 
+        Gets information from the last 200 sales from the last 24 hours
+        @returns The json sales data
+        """
         self.set_begin_time()
         self.set_end_time()
         self.set_response_limit()
