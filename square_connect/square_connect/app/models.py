@@ -8,16 +8,15 @@ class SpoilageReport(models.Model):
     # TODO
     # This contains all of the SpoilageItems for a given day
 
-    # Gets the spoilage items from a Json report
 
     spoiledList = []
 
+    # Gets the spoilage items from a Json report
     def getReport(self, report):
 
-   
-
-        for item in range(0, len(report)):
-            if report[item]['itemizations'][0]['discounts'][0]['name'] == 'Spoilage':
+        # Runs through report to populate a list of spoiled items with relevant fields
+        for item in report:
+            if item['itemizations'][0]['discounts'][0]['name'] == 'Spoilage':
 
                 spoiledItem = SpoilageItem()
                 
@@ -28,6 +27,7 @@ class SpoilageReport(models.Model):
 
                 self.spoiledList.append(spoiledItem)
 
+    # TODO Convert to Hash table
 
     pass
 
