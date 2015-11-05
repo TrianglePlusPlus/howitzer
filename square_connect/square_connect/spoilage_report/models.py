@@ -8,7 +8,6 @@ class SpoilageReport(models.Model):
     # TODO
     # This contains all of the SpoilageItems for a given day
 
-
     spoiledList = []
 
     # Gets the spoilage items from a Json report
@@ -29,22 +28,19 @@ class SpoilageReport(models.Model):
 
     # TODO Convert to Hash table
 
-    pass
+    def find_items(self):
+        # TODO, check this next line
+        spoilage_items = SpoilageItem.objects.filter(pk=self.id)
 
 class SpoilageItem(models.Model):
     # TODO
     # Need to figure out what this needs
     # I think it needs:
-    #   - its own id
     #   - Item/product id
     #   - quantity, ie the number of this item that were spoiled on a given day
 
     # Name of 
     name = models.CharField(max_length=50)
-
-    # Unique own id
-    
-    id = models.CharField(max_length=50)
 
     # In case we need to be more specific 
     sku = models.CharField(max_length=50)
@@ -55,6 +51,6 @@ class SpoilageItem(models.Model):
     # Quantity
     quantity = models.IntegerField()
 
-    pass
+    report = models.ForeignKey('SpoilageReport')
 
 
