@@ -1,15 +1,11 @@
-﻿"""
-Definition of models.
-"""
-
-from django.db import models
+﻿from django.db import models
+# Importing models from other apps
+from square_connect.app.models import Service
 
 class SpoilageReport(models.Model):
     # TODO
-    # This contains all of the SpoilageItems for a given day
-
-    spoiledList = []
-
+    date = models.DateField()
+    service = models.ForeignKey("Service")
     # Gets the spoilage items from a Json report
     def getReport(self, report):
 
@@ -26,31 +22,14 @@ class SpoilageReport(models.Model):
 
                 self.spoiledList.append(spoiledItem)
 
-    # TODO Convert to Hash table
-
     def find_items(self):
-        # TODO, check this next line
-        spoilage_items = SpoilageItem.objects.filter(pk=self.id)
+        spoilage_items = SpoilageItem.objects.filter(pk=self.pk)
 
 class SpoilageItem(models.Model):
     # TODO
-    # Need to figure out what this needs
-    # I think it needs:
-    #   - Item/product id
-    #   - quantity, ie the number of this item that were spoiled on a given day
-
-    # Name of 
     name = models.CharField(max_length=50)
-
-    # In case we need to be more specific 
-    sku = models.CharField(max_length=50)
-
-    # Price
-    price = models.IntegerField()
-
-    # Quantity
+    sku = models.CharField(max_length=12)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
-
+    # The report is the SpoilageReport which the item belongs to
     report = models.ForeignKey('SpoilageReport')
-
-
