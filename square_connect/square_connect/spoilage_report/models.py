@@ -1,11 +1,9 @@
 ﻿from django.db import models
-# Importing models from other apps
-from square_connect.app.models import Service
 
 class SpoilageReport(models.Model):
     # TODO
-    date = models.DateField()
-    service = models.ForeignKey("Service")
+    #date = models.DateField() # SQLite is garbage
+    #service = models.ForeignKey("Service") # We deleted this soooooo
     # Gets the spoilage items from a Json report
     def getReport(self, report):
 
@@ -27,8 +25,8 @@ class SpoilageReport(models.Model):
 
 class SpoilageItem(models.Model):
     # TODO
-    name = models.CharField(max_length=50)
-    sku = models.CharField(max_length=12)
+    name = models.CharField() # Max length 50
+    sku = models.CharField() # Max length 12
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
     # The report is the SpoilageReport which the item belongs to
