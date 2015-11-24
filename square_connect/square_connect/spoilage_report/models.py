@@ -25,8 +25,8 @@ class SpoilageReport(models.Model):
 
 class SpoilageItem(models.Model):
     # TODO
-    name = models.CharField() # Max length 50
-    sku = models.CharField() # Max length 12
+    name = models.CharField(max_length=50) # Max length 50
+    sku = models.CharField(max_length=12) # Max length 12
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
     # The report is the SpoilageReport which the item belongs to
