@@ -1,9 +1,11 @@
 ﻿from django.db import models
+# Importing models from other apps
+from square_connect.app.models import Service
 
 class SpoilageReport(models.Model):
     # TODO
-    #date = models.DateField() # SQLite is garbage
-    #service = models.ForeignKey("Service") # We deleted this soooooo
+    date = models.DateField()
+    service = models.ForeignKey("Service")
     # Gets the spoilage items from a Json report
     def getReport(self, report):
 
@@ -25,8 +27,13 @@ class SpoilageReport(models.Model):
 
 class SpoilageItem(models.Model):
     # TODO
+<<<<<<< HEAD
     name = models.CharField(max_length=50) # Max length 50
     sku = models.CharField(max_length=12) # Max length 12
+=======
+    name = models.CharField(max_length=50)
+    sku = models.CharField(max_length=12)
+>>>>>>> parent of 67c3cb2... Shit is getting out of control
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
     # The report is the SpoilageReport which the item belongs to
