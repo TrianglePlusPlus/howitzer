@@ -8,37 +8,40 @@ echo "INSTALLING apache2..."
 apt-get install -y apache2
 
 # Installing Nginx
-apt-get install nginx -y
+apt-get install -y nginx
 
 # Installing helpers for PHP install
 echo "UPDATING PHP REPOSITORY..."
-apt-get install python-software-properties build-essential -y
-add-apt-repository ppa:ondrej/php5 -y
+apt-get install -y python-software-properties build-essential
+add-apt-repository -y ppa:ondrej/php5
 apt-get update	
 
 # Installing PHP for phpmyadmin
 echo "INSTALLING PHP..."
-apt-get install php5-common php5-dev php5-cli php5-fpm -y
+apt-get install -y php5-common php5-dev php5-cli php5-fpm
 echo "INSTALLING EXTENSIONS..."
-apt-get install curl php5-curl php5-gd php5-mcrypt php5-mysql -y
+apt-get install -y curl php5-curl php5-gd php5-mcrypt php5-mysql
 
 # Installing debconf-utils for MySQL install
-apt-get isntall debconf-utils -y
+apt-get install -y debconf-utils
 
 # Installing MySQL
 echo "CONFIGURING MYSQL INSTALL..."
-debconf-set-selections <<< "mysql-server mysql-server/root_password password S89ydkH6rnwh9GNm2Um"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password S89ydkH6rnwh9GNm2Um"
+echo "mysql-server mysql-server/root_password password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
 echo "INSTALLING MYSQL..."
-apt-get install mysql-server -y
+apt-get install -y mysql-server
 
+
+# THIS DOESN'T WORK CORRECTLY, TODO
 # Installing PHPMyAdmin
-debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password bkOpQa0g7d"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password bkOpQa0g7d"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password bkOpQa0g7d"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none"
-apt-get install phpmyadmin -y
+#echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
+#echo "phpmyadmin phpmyadmin/app-password-confirm password bkOpQa0g7d" | debconf-set-selections
+#echo "phpmyadmin phpmyadmin/mysql/admin-pass password bkOpQa0g7d" | debconf-set-selections
+#echo "phpmyadmin phpmyadmin/mysql/app-pass password bkOpQa0g7d" | debconf-set-selections
+#echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | debconf-set-selections
+#apt-get install -y phpmyadmin
+
 
 # Restructuring for serving web content
 
