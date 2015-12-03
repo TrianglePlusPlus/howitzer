@@ -71,3 +71,12 @@ chmod +x /vagrant/vagrant_bootstrap/apache_configure.sh
 
 # Install git for convenience
 apt-get -y install git
+
+# Installing mysqlclient
+echo "INSTALLING MYSQLCLIENT HEADERS..."
+apt-get install python-dev libmysqlclient-dev
+echo "INSTALLING PYTHON 3 DEV..."
+apt-get install python3-dev
+echo "INSTALLING MYSQLCLIENT..."
+pip install mysqlclient
+
