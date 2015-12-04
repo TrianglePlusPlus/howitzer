@@ -25,14 +25,6 @@ apt-get install -y curl php5-curl php5-gd php5-mcrypt php5-mysql
 # Installing debconf-utils for MySQL install
 apt-get install -y debconf-utils
 
-# Installing MySQL
-echo "CONFIGURING MYSQL INSTALL..."
-echo "mysql-server mysql-server/root_password password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
-echo "INSTALLING MYSQL..."
-apt-get install -y mysql-server
-
-
 # THIS DOESN'T WORK CORRECTLY, TODO
 # Installing PHPMyAdmin
 #echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
@@ -59,7 +51,22 @@ if [ ! -d /vagrant/square_connect/square_connect/virt_env ]; then
 	mkdir /vagrant/square_connect/square_connect/virt_env
 	virtualenv /vagrant/square_connect/square_connect/virt_env --always-copy
 	source /vagrant/square_connect/square_connect/virt_env/bin/activate
-	pip install django
+	pip3 install django
+	
+	# Installing MySQL
+	echo "CONFIGURING MYSQL INSTALL..."
+	echo "mysql-server mysql-server/root_password password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
+	echo "mysql-server mysql-server/root_password_again password S89ydkH6rnwh9GNm2Um" | debconf-set-selections
+	echo "INSTALLING MYSQL..."
+	apt-get install -y mysql-server
+
+	
+	# Installing mysqlclient
+	echo "INSTALLING MYSQLCLIENT HEADERS..."
+	apt-get install -y libmysqlclient-dev python3-dev
+	echo "INSTALLING PYTHON 3 DEV..."
+	echo "INSTALLING MYSQLCLIENT..."
+	pip3 install mysqlclient
 	deactivate
 fi
 
@@ -71,3 +78,5 @@ chmod +x /vagrant/vagrant_bootstrap/apache_configure.sh
 
 # Install git for convenience
 apt-get -y install git
+
+
