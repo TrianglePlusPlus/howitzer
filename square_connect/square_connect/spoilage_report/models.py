@@ -1,12 +1,12 @@
 ﻿from django.db import models
 # Importing models from other apps
-from square_connect.app.models import Service
-from square_connect.data.transaction import 
+from app.models import Service
+from data.transaction import LocationsRequest, PaymentRequest
 
 class SpoilageReport(models.Model):
     # TODO
     date = models.DateField()
-    service = models.ForeignKey("Service")
+    service = models.ForeignKey("app.Service")
     
     def add_items_from_json_data(self, json_data):
         for item in report:
