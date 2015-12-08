@@ -19,9 +19,25 @@
         <p><a class="btn btn-default" href="http://www.djangobook.com/en/2.0/index.html">Learn more &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
+        <h2>Data!</h2>
+        <table>
+            <tr>
+                <th>Storefront</th>
+                <th>Quantity</th>
+                <th>Item</th>
+            </tr>
+            <tr>
+                <td>sup</td>
+                <td>sup3</td>
+            </tr>
+            {% for item in query_results %}
+            <tr>
+                <td>{{ item.field1 }}</td>
+                ...
+                <td>{{ item.fieldN }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     <div class="col-md-4">
         <h2>Microsoft Azure</h2>
