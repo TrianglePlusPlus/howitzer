@@ -13,8 +13,9 @@ def format_money(cents):
     """ Formats money into actual dollars and cents instead of just cents
     @param cents The number of cents to convert
     """
-    locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-    return locale.currency(cents / 100.0)
+    #locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+    #return locale.currency(cents / 100.0)
+    return cents / 100.0
 
 class SquareRequest:
     """ Base class for communicating with Square. Includes the basic connection information. """

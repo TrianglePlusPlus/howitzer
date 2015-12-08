@@ -1,4 +1,4 @@
-"""
+﻿"""
 Definition of views.
 """
 
@@ -6,6 +6,9 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
+from data.transaction import PaymentRequest, LocationsRequest
+from spoilage_report.models import SpoilageReport, SpoilageItem
+from app.models import Service
 
 def home(request):
     """Renders the home page."""
