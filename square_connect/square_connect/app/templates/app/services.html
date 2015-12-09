@@ -1,0 +1,34 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Services</h1>
+    <h3>Active Services:</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <th>Service</th>
+                <th>Merchant ID</th>
+            </tr>
+            {% for service in services %}
+                <tr>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.merchant_id }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <form role="form" class="form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <center>
+                Regenerate Services and Merchant IDs<br />
+                <button type="submit" class="btn btn-default">Regenerate</button>
+            </center>
+        </div>
+        <input type="hidden" name="regenerate" value="yes" />
+    </form>
+</div>
+
+{% endblock %}

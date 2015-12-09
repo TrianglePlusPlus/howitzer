@@ -50,3 +50,21 @@ def about(request):
             'year':'Remember never give up.',
         })
     )
+
+def services(request):
+    """Shows the services and their associated merchant IDs
+    Can be used to refresh the merchant IDs
+    """
+    assert isinstance(request, HttpRequest)
+    if request.POST.get('regenerate', False):
+        Service.regenerate_services()
+    return render(
+        request,
+        'app/services.html',
+        context_instance = RequestContext(request,
+        {
+            'title':'Services',
+            'services':Service.objects.all(),
+        })
+
+    )

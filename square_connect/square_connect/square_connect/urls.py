@@ -1,10 +1,11 @@
-"""
+﻿"""
 Definition of urls for square_connect.
 """
 
 from datetime import datetime
 from django.conf.urls import patterns, url
 from app.forms import BootstrapAuthenticationForm
+# My imports
 import app.views
 import django.contrib.auth.views
 from django.contrib import admin
@@ -18,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),
+    url(r'^services', app.views.services, name='services'),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {

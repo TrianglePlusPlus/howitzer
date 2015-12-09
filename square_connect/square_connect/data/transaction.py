@@ -106,15 +106,17 @@ class LocationsRequest(SquareRequest):
             locations[name] = id
         return locations
 
-    def auto(self):
+    @staticmethod
+    def auto():
         """ Builds a request, sends the request, and returns the merchant IDs 
         
         Takes care of almost everything for you
         @returns A dictionary of the store merchant IDs with the store names as the keys
         """
-        self.create_request()
-        self.send_request()
-        return self.get_merchant_ids()
+        temp_request = LocationsRequest()
+        temp_request.create_request()
+        temp_request.send_request()
+        return temp_request.get_merchant_ids()
 
 class PaymentRequest(SquareRequest):
     """ Gets sales information from Square

@@ -9,6 +9,7 @@ class SpoilageReport(models.Model):
     service = models.ForeignKey("app.Service")
     
     def add_items_from_json_data(self, json_data):
+        # TODO
         for item in json_data:
             try:
                 if item['itemizations'][0]['discounts'][0]['name'] == 'Spoil':
