@@ -6,6 +6,9 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
+# For security
+from django.template.context_processors import csrf
+# Our imports
 from data.transaction import PaymentRequest, LocationsRequest
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from app.models import Service
