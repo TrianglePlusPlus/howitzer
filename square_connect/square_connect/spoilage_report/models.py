@@ -10,29 +10,33 @@ class SpoilageReport(models.Model):
     
     def add_items_from_json_data(self, json_data):
         # TODO
-        for item in json_data:
-            try:
-                if item['itemizations'][0]['discounts'][0]['name'] == 'Spoil':
-                    spoiled_item = SpoilageItem.objects.create(report_id=self.id)
-                    spoiled_item.name = item['itemizations'][0]['name']
-                    try:
+        for transaction in json_data:
+            for item in transaction['itemizations']:
+                try:
+                    spoiled = False
+                    for discount in item['discounts']:
+                        if discount['name'] == 'Spoil': spoiled = True
+                    if spoiled:
+                        spoiled_item = SpoilageItem()
+                        spoiled_item.report_id=self.id
+                        spoiled_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
-                        if len(item['itemizations'][0]['item_variation_name']) > 1:
-                            spoiled_item.variant = item['itemizations'][0]['item_variation_name']
-                    except:
-                        spoiled_item.variant = ''
-                    try:
+                        if len(item['item_variation_name']) > 1:
+                            spoiled_item.variant = item['item_variation_name']
+                        else:
+                            spoiled_item.variant = ''
                         # 2 is an arbitrary cut off, normal SKUs should be 12
-                        if len(item['itemizations'][0]['item_detail']['sku']) > 2:
-                            spoiled_item.sku = item['itemizations'][0]['item_detail']['sku']
-                    except:
-                        spoiled_item.sku = ''
-                    spoiled_item.price = format_money(item['itemizations'][0]['single_quantity_money']['amount'])
-                    spoiled_item.save()
-            except IndexError:
-                # Nothing to do
-                pass
+                        if len(item['item_detail']['sku']) > 2:
+                            spoiled_item.sku = item['item_detail']['sku']
+                        else:
+                            spoiled_item.sku = ''
+                        spoiled_item.price = format_money(item['single_quantity_money']['amount'])
+                        spoiled_item.quantity = int(item['quantity'])
+                        spoiled_item.save()
+                except IndexError:
+                    # There's nothing to do
+                    pass
 
     def get_report(self, report_id):
         return SpoilageReport.objects.get(id=report_id)
@@ -41,6 +45,8 @@ class SpoilageReport(models.Model):
         return SpoilageItem.objects.filter(pk=self.id)
 
 class SpoilageItem(models.Model):
+    """ A single spoiled item
+    Part of a spoilage report """
     name = models.CharField(max_length=50, default='') 
     variant = models.CharField(max_length=100, default='')
     sku = models.CharField(max_length=12, default='') 
@@ -48,3 +54,9 @@ class SpoilageItem(models.Model):
     quantity = models.IntegerField(default=1)
     # The report is the SpoilageReport which the item belongs to
     report = models.ForeignKey('SpoilageReport')
+
+class ReportScheduler():
+    """ Runs automated tasks """
+    
+    def generate_report():
+        pass
