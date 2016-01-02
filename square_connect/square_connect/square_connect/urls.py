@@ -8,12 +8,13 @@ from app.forms import BootstrapAuthenticationForm
 # My imports
 import app.views
 import django.contrib.auth.views
+from django.views.generic.base import RedirectView # For the favicon
 from django.contrib import admin
 
 # Uncomment the next lines to enable the admin:
-# from django.conf.urls import include
-# from django.contrib import admin
-# admin.autodiscover()
+from django.conf.urls import include
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', app.views.home, name='home'),
@@ -44,4 +45,5 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls), 
+    url(r'^favicon\.ico$', RedirectView.as_view(url='static/favicon.ico')),
 )

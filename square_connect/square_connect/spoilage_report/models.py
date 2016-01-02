@@ -62,9 +62,3 @@ class SpoilageItem(models.Model):
     quantity = models.IntegerField(default=1)
     # The report is the SpoilageReport which the item belongs to
     report = models.ForeignKey('SpoilageReport')
-
-class ReportScheduler():
-    """ Runs automated tasks """
-    
-    def generate_report():
-        pass
