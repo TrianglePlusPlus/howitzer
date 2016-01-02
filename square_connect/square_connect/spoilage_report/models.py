@@ -9,7 +9,7 @@ class SpoilageReport(models.Model):
     service = models.ForeignKey("app.Service")
     
     def add_items_from_json_data(self, json_data):
-        # TODO
+        # TODO: Test this
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
@@ -40,9 +40,17 @@ class SpoilageReport(models.Model):
 
     def get_report(self, report_id):
         return SpoilageReport.objects.get(id=report_id)
-
+        
     def get_associated_items(self):
         return SpoilageItem.objects.filter(pk=self.id)
+
+    @staticmethod
+    def search_reports(start_date, end_date, service=None):
+        if service is not None:
+            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service__name=service)
+        else:
+            SpoilageReport.objects.filter(date__range=(start_date, end_date))
+
 
 class SpoilageItem(models.Model):
     """ A single spoiled item
