@@ -1,4 +1,4 @@
-"""
+﻿"""
 Definition of views.
 """
 
@@ -6,6 +6,12 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
+# For security
+from django.template.context_processors import csrf
+# Our imports
+from data.transaction import PaymentRequest, LocationsRequest
+from spoilage_report.models import SpoilageReport, SpoilageItem
+from app.models import Service
 
 def home(request):
     """Renders the home page."""
@@ -46,4 +52,22 @@ def about(request):
             'message':'Your application description page.',
             'year':'Remember never give up.',
         })
+    )
+
+def services(request):
+    """Shows the services and their associated merchant IDs
+    Can be used to refresh the merchant IDs
+    """
+    assert isinstance(request, HttpRequest)
+    if request.POST.get('regenerate', False):
+        Service.regenerate_services()
+    return render(
+        request,
+        'app/services.html',
+        context_instance = RequestContext(request,
+        {
+            'title':'Services',
+            'services':Service.objects.all(),
+        })
+
     )
