@@ -17,8 +17,14 @@ class SpoilageReport(models.Model):
                     for discount in item['discounts']:
                         if discount['name'] == 'Spoil': spoiled = True
                     if spoiled:
+                        # Check to see if that item is already in the database
+                        if SpoilageItem.objects.filter(transaction_id=transaction["id"],  
+                                name=item['name'], variant=item['item_variation_name']).count() > 0:
+                            # The item already exists, don't save a new one
+                            continue
                         spoiled_item = SpoilageItem()
-                        spoiled_item.report_id=self.id
+                        spoiled_item.report_id = self.id
+                        spoiled_item.transaction_id = transaction['id']
                         spoiled_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
@@ -51,6 +57,20 @@ class SpoilageReport(models.Model):
         else:
             SpoilageReport.objects.filter(date__range=(start_date, end_date))
 
+    @staticmethod
+    def get_associated_date(date_string):
+        """ Gets the sales date for the input date string 
+        @param dt: The date string in question, formatted in zulu time"""
+        # Get the packages we need for this
+        # We inject this package because it's not typically in use
+        import datetime
+        dt = datetime.datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%SZ")
+        if dt.hour < 9:
+            # These sales are associated with the previous day
+            return dt.date() - datetime.timedelta(days=1)
+        else:
+            # They are associated with the stated day
+            return dt.date()
 
 class SpoilageItem(models.Model):
     """ A single spoiled item
@@ -60,5 +80,6 @@ class SpoilageItem(models.Model):
     sku = models.CharField(max_length=12, default='') 
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     quantity = models.IntegerField(default=1)
+    transaction_id = models.CharField(max_length=30, default='')
     # The report is the SpoilageReport which the item belongs to
     report = models.ForeignKey('SpoilageReport')
