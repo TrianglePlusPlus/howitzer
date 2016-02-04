@@ -8,7 +8,8 @@ class SpoilageReport(models.Model):
     date = models.DateField()
     service = models.ForeignKey("app.Service")
     
-    def add_items_from_json_data(self, json_data):
+    @staticmethod
+    def add_items_from_json_data(json_data, service):
         # TODO: Test this
         for transaction in json_data:
             for item in transaction['itemizations']:
@@ -22,8 +23,15 @@ class SpoilageReport(models.Model):
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
                             # The item already exists, don't save a new one
                             continue
+                        # Get the report that the item should go on
+                        transaction_date = SpoilageReport.get_associated_date(transaction["created_at"])
+                        # Get or make the corresponding report
+                        if SpoilageReport.objects.filter(date=report_date, service=service).count() > 0:
+                            report = SpoilageReport.objects.get(service=service, date=report_date)
+                        else:
+                            report = SpoilageReport.objects.create(service=service, date=report_date)
                         spoiled_item = SpoilageItem()
-                        spoiled_item.report_id = self.id
+                        spoiled_item.report_id = report.id
                         spoiled_item.transaction_id = transaction['id']
                         spoiled_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
@@ -38,7 +46,7 @@ class SpoilageReport(models.Model):
                         else:
                             spoiled_item.sku = ''
                         spoiled_item.price = format_money(item['single_quantity_money']['amount'])
-                        spoiled_item.quantity = int(item['quantity'])
+                        spoiled_item.quantity = int(float(item['quantity']))
                         spoiled_item.save()
                 except IndexError:
                     # There's nothing to do
@@ -55,7 +63,7 @@ class SpoilageReport(models.Model):
         if service is not None:
             return SpoilageReport.objects.filter(date__range=(start_date, end_date), service__name=service)
         else:
-            SpoilageReport.objects.filter(date__range=(start_date, end_date))
+            return SpoilageReport.objects.filter(date__range=(start_date, end_date))
 
     @staticmethod
     def get_associated_date(date_string):
