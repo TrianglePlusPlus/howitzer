@@ -155,18 +155,7 @@ class PaymentRequest(SquareRequest):
             self.add_parameter("limit", limit, True)
 
     def set_begin_time(self, time=None):
-        """Sets the start time to now
-        Do not attempt to enter your own time unless you know what you're doing
-        @param time Formatted time string
-        """
-        if time is None:
-            current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-            self.add_parameter("begin_time", current_time)
-        else:
-            self.add_parameter("begin_time", time)
-
-    def set_end_time(self, time=None):
-        """Sets the end time to 24 hours ago
+        """Sets the begin time to 24 hours ago
         Do not attempt to enter your own time unless you know what you're doing
         @param time Formatted time string
         """
@@ -175,9 +164,32 @@ class PaymentRequest(SquareRequest):
             delta = datetime.timedelta(days=1)
             time = time - delta
             time_formatted = time.strftime("%Y-%m-%dT%H:%M:%SZ")
-            self.add_parameter("end_time", time_formatted)
+            self.add_parameter("begin_time", time_formatted)
+        else:
+            self.add_parameter("begin_time", time)
+
+    def set_end_time(self, time=None):
+        """Sets the end time to now
+        Do not attempt to enter your own time unless you know what you're doing
+        @param time Formatted time string
+        """
+        if time is None:
+            current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.add_parameter("end_time", current_time)
         else:
             self.add_parameter("end_time", time)
+
+    def set_order_asc(self):
+        """ Sets the payments order to chronological
+        Use for getting the first transactions in a timeframe
+        """
+        self.add_parameter("order", "ASC", True)
+
+    def set_order_desc(self):
+        """ Sets the payments order to reverse-chronological
+        Use for getting the most recent transactions in the timeframe
+        """
+        self.add_parameter("order", "DESC", True)
 
     def auto(self):
         """ Builds a request, sends the request, and returns the sales information 
@@ -187,6 +199,7 @@ class PaymentRequest(SquareRequest):
         self.set_begin_time()
         self.set_end_time()
         self.set_response_limit()
+        self.set_order_desc() # Gets the most recent transactions in the timeframe
         self.create_request()
         self.send_request()
         return self.response_json

@@ -10,7 +10,10 @@ class SpoilageReport(models.Model):
     
     @staticmethod
     def add_items_from_json_data(json_data, service):
-        # TODO: Test this
+        """ Extracts spoilage items from sales json and saves to a report
+        @param json_data: The JSON object containing all of the transaction data
+        @param service: A service object correspondinng to the sales data
+        """
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
@@ -26,10 +29,10 @@ class SpoilageReport(models.Model):
                         # Get the report that the item should go on
                         transaction_date = SpoilageReport.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
-                        if SpoilageReport.objects.filter(date=report_date, service=service).count() > 0:
-                            report = SpoilageReport.objects.get(service=service, date=report_date)
+                        if SpoilageReport.objects.filter(date=transaction_date, service=service).count() > 0:
+                            report = SpoilageReport.objects.get(service=service, date=transaction_date)
                         else:
-                            report = SpoilageReport.objects.create(service=service, date=report_date)
+                            report = SpoilageReport.objects.create(service=service, date=transaction_date)
                         spoiled_item = SpoilageItem()
                         spoiled_item.report_id = report.id
                         spoiled_item.transaction_id = transaction['id']
@@ -52,23 +55,41 @@ class SpoilageReport(models.Model):
                     # There's nothing to do
                     pass
 
-    def get_report(self, report_id):
+    @staticmethod
+    def get_report(report_id):
+        """ A shorthand method for getting reports by their ID
+        @param report_id: The ID of the report to fetch
+        @returns The report with the specified id
+        """
         return SpoilageReport.objects.get(id=report_id)
         
     def get_associated_items(self):
-        return SpoilageItem.objects.filter(pk=self.id)
+        """ Finds the SpoilageItems associated with this report
+        @returns The QuerySet containing all of the items associated with this report
+        """
+        # TODO: Test this 
+        return SpoilageItem.objects.filter(report=self)
 
     @staticmethod
     def search_reports(start_date, end_date, service=None):
+        """ Searches for reports in a given timeframe, service optional
+        @param start_date: A datetime.date corresponding to the start date
+        @param end_date: A datetime.date corresponding to the end date
+        @param service: (Optional) The service to pull reports for
+        @rerturns A QuerySet containing all of the reports from the date range (for a specified service)
+        """
         if service is not None:
-            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service__name=service)
+            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service=service)
         else:
             return SpoilageReport.objects.filter(date__range=(start_date, end_date))
 
     @staticmethod
     def get_associated_date(date_string):
         """ Gets the sales date for the input date string 
-        @param dt: The date string in question, formatted in zulu time"""
+        Sales before 4/5 am EST belong to the previous day
+        @param dt: The date string in question, FORMATTED IN ZULU TIME (UTC)
+        @returns The 'sales' date that a date string belongs to
+        """
         # Get the packages we need for this
         # We inject this package because it's not typically in use
         import datetime

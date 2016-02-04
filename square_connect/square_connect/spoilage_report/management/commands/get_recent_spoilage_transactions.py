@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandError
 from app.models import Service
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from data.transaction import PaymentRequest
-import datetime
 
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds spoiled items"
