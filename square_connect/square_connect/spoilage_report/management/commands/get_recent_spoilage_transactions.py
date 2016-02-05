@@ -10,6 +10,10 @@ class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds spoiled items"
 
     def handle(self, *args, **options):
+        # Refresh the Services if necessary
+        if Service.objects.count() == 0:
+                Service.regenerate_services()
+
         # Run for each service with spoilage
         """ Service names in backend, exclude the * ones from the services list: 
                 midnight                            

@@ -1,7 +1,10 @@
 ﻿from django.db import models
+from django.utils.timezone import now as DjangoCurrentTime
+import datetime
 # Importing models from other apps
 from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
+
 
 class SpoilageReport(models.Model):
     # TODO
@@ -36,6 +39,7 @@ class SpoilageReport(models.Model):
                         spoiled_item = SpoilageItem()
                         spoiled_item.report_id = report.id
                         spoiled_item.transaction_id = transaction['id']
+                        spoiled_item.transaction_time = datetime.datetime.strptime(transaction['created_at'], "%Y-%m-%dT%H:%M:%SZ")
                         spoiled_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
@@ -110,5 +114,6 @@ class SpoilageItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     quantity = models.IntegerField(default=1)
     transaction_id = models.CharField(max_length=30, default='')
+    transaction_time = models.DateTimeField(default=DjangoCurrentTime)
     # The report is the SpoilageReport which the item belongs to
     report = models.ForeignKey('SpoilageReport')
