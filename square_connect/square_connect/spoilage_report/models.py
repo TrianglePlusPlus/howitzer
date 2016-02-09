@@ -41,6 +41,7 @@ class SpoilageReport(models.Model):
     def get_report(self, report_id):
         return SpoilageReport.objects.get(id=report_id)
         
+    @property
     def get_associated_items(self):
         return SpoilageItem.objects.filter(pk=self.id)
 
