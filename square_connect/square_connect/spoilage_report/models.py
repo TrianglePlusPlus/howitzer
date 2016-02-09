@@ -39,7 +39,12 @@ class SpoilageReport(models.Model):
                         spoiled_item = SpoilageItem()
                         spoiled_item.report_id = report.id
                         spoiled_item.transaction_id = transaction['id']
-                        spoiled_item.transaction_time = datetime.datetime.strptime(transaction['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                        # This next bit with the timezones is to that the database doesn't
+                        # raise errors about naive datetimes. We set the timezone to UTC
+                        utc_tz = datetime.timezone(datetime.timedelta(hours=0))
+                        transaction_time = datetime.datetime.strptime(transaction['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                        transaction_time = transaction_time.replace(tzinfo=utc_tz)
+                        spoiled_item.transaction_time = transaction_time
                         spoiled_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
