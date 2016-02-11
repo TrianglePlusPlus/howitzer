@@ -6,3 +6,4 @@ echo -e "\n************** Preparing migrations **************\n"
 python /vagrant/square_connect/square_connect/manage.py makemigrations
 echo -e "\n************** Performing migrations **************\n"
 python /vagrant/square_connect/square_connect/manage.py migrate
+

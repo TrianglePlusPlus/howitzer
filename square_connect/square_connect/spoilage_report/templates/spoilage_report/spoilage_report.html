@@ -48,7 +48,6 @@
                 <th>Quantity</th>
                 <th>Transaction ID</th>
                 <th>Time</th>
-                <th>Service</th>
             </tr>
             {% for item in report.get_associated_items %}
                 <tr>
@@ -57,9 +56,8 @@
                     <td>{{ item.sku }}</td>
                     <td>{{ item.price }}</td>
                     <td>{{ item.quantity }}</td>
-                    <td><a href="https://squareup.com/receipt/preview/nJwBfQV2IsGjRDyRLlo5S" target="_blank">id goes here</a></td>
-                    <td>time goes here</td>
-                    <td>{{ report.service }}</td>
+                    <td><a href="https://squareup.com/receipt/preview/{{ item.transaction_id }}" target="_blank">View receipt</a></td>
+                    <td>{{ item.transaction_time }}</td>
                 </tr>
             {% endfor %}
         </table>

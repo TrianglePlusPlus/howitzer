@@ -9,18 +9,19 @@ from app.forms import BootstrapAuthenticationForm
 import django.contrib.auth.views
 from django.views.generic.base import RedirectView # For the favicon
 from django.contrib import admin
-
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
 from django.contrib import admin
+import app.views as app_views
+import spoilage_report.views as spoilage_report_views
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'app.views.home', name='home'),
-    url(r'^contact$', 'app.views.contact', name='contact'),
-    url(r'^about', 'app.views.about', name='about'),
-    url(r'^services', 'app.views.services', name='services'),
-    url(r'^spoilage_report', 'spoilage_report.views.spoilage_report', name='spoilage_report'),
+    url(r'^$', app_views.home, name='home'),
+    url(r'^contact$', app_views.contact, name='contact'),
+    url(r'^about', app_views.about, name='about'),
+    url(r'^services', app_views.services, name='services'),
+    url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {
