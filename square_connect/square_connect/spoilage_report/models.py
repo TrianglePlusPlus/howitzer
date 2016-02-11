@@ -43,7 +43,7 @@ class SpoilageReport(models.Model):
         
     @property
     def get_associated_items(self):
-        return SpoilageItem.objects.filter(pk=self.id)
+        return SpoilageItem.objects.filter(report=self)
 
     @staticmethod
     def search_reports(start_date, end_date, service=None):
