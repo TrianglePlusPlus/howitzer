@@ -72,6 +72,7 @@ class SpoilageReport(models.Model):
         """
         return SpoilageReport.objects.get(id=report_id)
         
+    @property
     def get_associated_items(self):
         """ Finds the SpoilageItems associated with this report
         @returns The QuerySet containing all of the items associated with this report

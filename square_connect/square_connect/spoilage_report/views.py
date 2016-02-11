@@ -1,28 +1,33 @@
 from django.shortcuts import render
+from django.http import HttpRequest
+from django.template import RequestContext
+from django.db import models
 from spoilage_report.models import SpoilageReport, SpoilageItem
+import datetime
 
-def reports(request):
+def spoilage_report(request):
     """Renders the reports page.
     request.POST dictionary keys:
-        start_date
-        end_date
+        date
         service"""
     assert isinstance(request, HttpRequest)
     # Check if they are searching for a report
-    if request.POST.get('start_date', False):
+    if request.POST.get('date', False):
         # They are searching for a report
-        start_date = request.POST.get('start_date', None)
-        end_date = request.POST.get('end_date', None)
+        date = request.POST.get('date', None)
+        date = datetime.datetime.strptime(date, "%m/%d/%Y").date()
         service = request.POST.get('service', None)
-        reports = SpoilageReport.search_reports(start_date, end_date, service)
+        report = SpoilageReport.objects.filter(date=date, service__name=service)
+        if report.count() > 0:
+            report = SpoilageReport.objects.get(date=date, service__name=service)
     else:
-        reports = None
+        report = None
     return render(
         request,
-        'spoilage_report/reports.html',
+        'spoilage_report/spoilage_report.html',
         context_instance = RequestContext(request,
         {
-            'reports':reports,
+            'report':report,
             'title':'Report Viewer',
             'year':'Remember never give up.',
         })
