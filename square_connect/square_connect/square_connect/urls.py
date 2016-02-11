@@ -6,7 +6,6 @@ from datetime import datetime
 from django.conf.urls import patterns, url
 from app.forms import BootstrapAuthenticationForm
 # My imports
-import app.views
 import django.contrib.auth.views
 from django.views.generic.base import RedirectView # For the favicon
 from django.contrib import admin
@@ -17,10 +16,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', app.views.home, name='home'),
-    url(r'^contact$', app.views.contact, name='contact'),
-    url(r'^about', app.views.about, name='about'),
-    url(r'^services', app.views.services, name='services'),
+    url(r'^$', 'app.views.home', name='home'),
+    url(r'^contact$', 'app.views.contact', name='contact'),
+    url(r'^about', 'app.views.about', name='about'),
+    url(r'^services', 'app.views.services', name='services'),
+    url(r'^spoilage_report', 'spoilage_report.views.spoilage_report', name='spoilage_report'),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {

@@ -15,6 +15,7 @@ from app.models import Service
 
 def home(request):
     """Renders the home page."""
+    query_results = SpoilageReport.objects.all(),
     assert isinstance(request, HttpRequest)
     return render(
         request,
