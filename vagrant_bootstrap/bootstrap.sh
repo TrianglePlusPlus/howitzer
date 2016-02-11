@@ -104,6 +104,15 @@ echo -e "************* CONFIGURING APACHE *************"
 echo -e "************* INSTALLING GIT *************"
 apt-get -y install git
 
+# Apply database migrations
+chmod +x /vagrant/vagrant_bootstrap/make_migrations.sh
+/vagrant/vagrant_bootstrap/make_migrations.sh
+
+# Make the half hourly cron tasks script runable
+chmod +x /vagrant/square_connect/square_connect/half_hour_cron.sh
+
+# Set the crontab for tasks that run every 30 minutes
+(crontab -l 2>/dev/null; echo "*/30 * * * * /vagrant/square_connect/square_connect/half_hour_cron.sh") | crontab -
+
 echo -e "THE SETUP PROCESS HAS COMPLETED.\nMAKE SURE TO ADDRESS ANY ERROR MESSAGES."
-echo -e "IF YOU NEED AN ACTIVE DATABASE RUN:\n\t/vagrant/vagrant_bootstrap/make_migrations.sh\nON YOUR MACHINE"
 echo -e "\a\a\a\a"
