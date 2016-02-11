@@ -13,8 +13,9 @@ def format_money(cents):
     """ Formats money into actual dollars and cents instead of just cents
     @param cents The number of cents to convert
     """
-    locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-    return locale.currency(cents / 100.0)
+    #locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+    #return locale.currency(cents / 100.0)
+    return cents / 100.0
 
 class SquareRequest:
     """ Base class for communicating with Square. Includes the basic connection information. """
@@ -105,15 +106,17 @@ class LocationsRequest(SquareRequest):
             locations[name] = id
         return locations
 
-    def auto(self):
+    @staticmethod
+    def auto():
         """ Builds a request, sends the request, and returns the merchant IDs 
         
         Takes care of almost everything for you
         @returns A dictionary of the store merchant IDs with the store names as the keys
         """
-        self.create_request()
-        self.send_request()
-        return self.get_merchant_ids()
+        temp_request = LocationsRequest()
+        temp_request.create_request()
+        temp_request.send_request()
+        return temp_request.get_merchant_ids()
 
 class PaymentRequest(SquareRequest):
     """ Gets sales information from Square
@@ -152,18 +155,7 @@ class PaymentRequest(SquareRequest):
             self.add_parameter("limit", limit, True)
 
     def set_begin_time(self, time=None):
-        """Sets the start time to now
-        Do not attempt to enter your own time unless you know what you're doing
-        @param time Formatted time string
-        """
-        if time is None:
-            current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-            self.add_parameter("begin_time", current_time)
-        else:
-            self.add_parameter("begin_time", time)
-
-    def set_end_time(self, time=None):
-        """Sets the end time to 24 hours ago
+        """Sets the begin time to 24 hours ago
         Do not attempt to enter your own time unless you know what you're doing
         @param time Formatted time string
         """
@@ -172,9 +164,32 @@ class PaymentRequest(SquareRequest):
             delta = datetime.timedelta(days=1)
             time = time - delta
             time_formatted = time.strftime("%Y-%m-%dT%H:%M:%SZ")
-            self.add_parameter("end_time", time_formatted)
+            self.add_parameter("begin_time", time_formatted)
+        else:
+            self.add_parameter("begin_time", time)
+
+    def set_end_time(self, time=None):
+        """Sets the end time to now
+        Do not attempt to enter your own time unless you know what you're doing
+        @param time Formatted time string
+        """
+        if time is None:
+            current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.add_parameter("end_time", current_time)
         else:
             self.add_parameter("end_time", time)
+
+    def set_order_asc(self):
+        """ Sets the payments order to chronological
+        Use for getting the first transactions in a timeframe
+        """
+        self.add_parameter("order", "ASC", True)
+
+    def set_order_desc(self):
+        """ Sets the payments order to reverse-chronological
+        Use for getting the most recent transactions in the timeframe
+        """
+        self.add_parameter("order", "DESC", True)
 
     def auto(self):
         """ Builds a request, sends the request, and returns the sales information 
@@ -184,6 +199,7 @@ class PaymentRequest(SquareRequest):
         self.set_begin_time()
         self.set_end_time()
         self.set_response_limit()
+        self.set_order_desc() # Gets the most recent transactions in the timeframe
         self.create_request()
         self.send_request()
         return self.response_json

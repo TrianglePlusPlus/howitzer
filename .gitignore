@@ -2,6 +2,7 @@
 .vagrant/*
 ptvs_virtualenv_proxy.py
 virt_env/
+.bundle/
 
 #################################
 #		Visual Studio			#
