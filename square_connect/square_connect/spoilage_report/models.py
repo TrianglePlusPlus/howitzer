@@ -80,6 +80,16 @@ class SpoilageReport(models.Model):
         # TODO: Test this 
         return SpoilageItem.objects.filter(report=self)
 
+    @property
+    def get_total(self):
+        """ Finds the total cost of all the itmes in this report
+        @returns The total cost of all the items in the report (price * quantity)
+        """
+        total = 0
+        for item in SpoilageItem.objects.filter(report=self):
+            total += item.price * item.quantity
+        return total
+
     @staticmethod
     def search_reports(start_date, end_date, service=None):
         """ Searches for reports in a given timeframe, service optional
