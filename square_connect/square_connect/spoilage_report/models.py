@@ -81,6 +81,13 @@ class SpoilageReport(models.Model):
         return SpoilageItem.objects.filter(report=self)
 
     @property
+    def get_size(self):
+        """ Finds the size of the report in # of items
+        @returns The size of the report
+        """
+        return SpoilageItem.objects.filter(report=self).count
+
+    @property
     def get_total(self):
         """ Finds the total cost of all the itmes in this report
         @returns The total cost of all the items in the report (price * quantity)
@@ -96,10 +103,10 @@ class SpoilageReport(models.Model):
         @param start_date: A datetime.date corresponding to the start date
         @param end_date: A datetime.date corresponding to the end date
         @param service: (Optional) The service to pull reports for
-        @rerturns A QuerySet containing all of the reports from the date range (for a specified service)
+        @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if service is not None:
-            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service=service)
+            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service__name=service)
         else:
             return SpoilageReport.objects.filter(date__range=(start_date, end_date))
 
