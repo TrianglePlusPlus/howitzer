@@ -8,10 +8,12 @@
         $.noConflict();
         // Creates sticky date in form
 	if( "{{ report }}" == "None" || "{{ report }}" == "[]" ){
-		$( "#datepicker" ).datepicker({});
+		$( "#start_datepicker" ).datepicker().val("{{ today }}");
+        $( "#end_datepicker" ).datepicker().val("{{ today }}");
 	}	
 	else {
-		$( "#datepicker" ).datepicker().val("{{ report.date|date:"m/d/Y" }}");
+        $( "#start_datepicker" ).datepicker().val("{{ report.date|date:"m/d/Y" }}");
+		$( "#end_datepicker" ).datepicker().val("{{ report.date|date:"m/d/Y" }}");
 	}
 	// Creates sticky dropdown in form
 	if( "{{ report }}" != "[]" && "{{ report }}" != "None" ) {
@@ -28,7 +30,7 @@
             <tr>
                 <th>
                     <select id="service_select" name="service">
-                        <option>-- Select Service --</option>
+                        <option selected="selected">-- Select Service --</option>
                         <option value="mug">MUG</option>
                         <option value="vittles">Vital Vittles</option>
                         <option value="snaxa">Hoya Snaxa</option>
@@ -38,7 +40,10 @@
                     </select>
                 </th>
                 <th>
-                    <p>Date: <input name="date" type="text" id="datepicker"></p>
+                    <p>Start Date: <input name="start_date" type="text" id="start_datepicker"></p>
+                </th>
+                <th>
+                    <p>End Date: <input name="end_date" type="text" id="end_datepicker"></p>
                 </th>
                 <th>
                     <button type="submit" class="btn btn-default">Retrieve report</button>
@@ -69,6 +74,7 @@
                     <td>{{ item.transaction_time }}</td>
                 </tr>
             {% endfor %}
+            {% if report.get_size > 0 %}
             <tr>
                 <td/>
                 <td/>
@@ -79,6 +85,10 @@
                 <td/>
             </tr>
         </table>
+            {% else %}
+        </table>
+        <center><b>No results found!</b></center>
+        {% endif %}
     </div>
     <!--
     <form role="form" class="form-horizontal" method="post">
