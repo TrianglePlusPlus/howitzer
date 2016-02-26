@@ -13,6 +13,7 @@ def spoilage_report(request):
         service"""
     assert isinstance(request, HttpRequest)
     today = datetime.today().strftime("%m/%d/%Y")
+    sum_total = 0
     # Check if they are searching for a report
     if request.POST.get('start_date', False) and request.POST.get('end_date', False):
         # They are searching for a report
@@ -23,15 +24,22 @@ def spoilage_report(request):
         service = request.POST.get('service', None)
         reports = SpoilageReport.search_reports(start_date, end_date, service)
         if reports.count() > 0:
-            reports = SpoilageReport.objects.get(date__gte=start_date, date__lte=end_date, service__name=service)
+            first_report = reports[0]
+            for report in reports:
+                sum_total += report.get_total
+        else:
+            first_report = None
     else:
-        report = None
+        first_report = None
+        reports = None
     return render(
         request,
         'spoilage_report/spoilage_report.html',
         context_instance = RequestContext(request,
         {
-            'report':reports,
+            'first_report':first_report,
+            'reports':reports,
+            'sum_total':sum_total,
             'today':today,
             'title':'Report Viewer',
             'year':'Remember never give up.',

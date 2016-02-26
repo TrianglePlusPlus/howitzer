@@ -6,18 +6,18 @@
 <script>
     $( document ).ready(function() {
         $.noConflict();
-        // Creates sticky date in form
-	if( "{{ report }}" == "None" || "{{ report }}" == "[]" ){
+    // Creates sticky dates in form
+	if( "{{ first_report }}" == "None" || "{{ first_report }}" == "[]" ){
 		$( "#start_datepicker" ).datepicker().val("{{ today }}");
         $( "#end_datepicker" ).datepicker().val("{{ today }}");
 	}	
 	else {
-        $( "#start_datepicker" ).datepicker().val("{{ report.date|date:"m/d/Y" }}");
-		$( "#end_datepicker" ).datepicker().val("{{ report.date|date:"m/d/Y" }}");
+        $( "#start_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
+		$( "#end_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
 	}
 	// Creates sticky dropdown in form
-	if( "{{ report }}" != "[]" && "{{ report }}" != "None" ) {
-		$( "#service_select" ).val("{{ report.service.name }}");
+	if( "{{ first_report }}" != "[]" && "{{ first_report }}" != "None" ) {
+		$( "#service_select" ).val("{{ first_report.service.name }}");
 	}
     });
 </script>
@@ -54,41 +54,64 @@
     <h3>Search Results:</h3>
     <div class="table-responsive">
         <table class="table">
-            <tr>
-                <th>Item</th>
-                <th>Variant</th>
-                <th>SKU</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Transaction ID</th>
-                <th>Time</th>
-            </tr>
-            {% for item in report.get_associated_items %}
+            {% if reports.count > 0 %}
                 <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.variant }}</td>
-                    <td>{{ item.sku }}</td>
-                    <td>{{ item.price }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td><a href="https://squareup.com/receipt/preview/{{ item.transaction_id }}" target="_blank">View receipt</a></td>
-                    <td>{{ item.transaction_time }}</td>
+                    <th>Item</th>
+                    <th>Variant</th>
+                    <th>SKU</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Transaction ID</th>
+                    <th>Time</th>
                 </tr>
-            {% endfor %}
-            {% if report.get_size > 0 %}
-            <tr>
-                <td/>
-                <td/>
-                <td><b>Total:</b></td>
-                <td>{{ report.get_total }}</td>
-                <td/>
-                <td/>
-                <td/>
-            </tr>
-        </table>
             {% else %}
+                <center><b>No results found!</b></center>
+            {% endif %}
+            {% for report in reports %}
+                {% for item in report.get_associated_items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.variant }}</td>
+                        <td>{{ item.sku }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td><a href="https://squareup.com/receipt/preview/{{ item.transaction_id }}" target="_blank">View receipt</a></td>
+                        <td>{{ item.transaction_time }}</td>
+                    </tr>
+                {% endfor %}
+                {% if report.get_size > 0 %}
+                <tr>
+                    <td/>
+                    <td/>
+                    <td><b>Total:</b></td>
+                    <td>{{ report.get_total }}</td>
+                    <td/>
+                    <td/>
+                    <td/>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            {% if reports.count > 0 %}
+                <tr>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td/>
+                </tr>
+                <tr>
+                    <td/>
+                    <td/>
+                    <td><b>Sum Total:</b></td>
+                    <td>{{ sum_total }}</td>
+                    <td/>
+                    <td/>
+                    <td/>
+                </tr>
+            {% endif %}
         </table>
-        <center><b>No results found!</b></center>
-        {% endif %}
     </div>
     <!--
     <form role="form" class="form-horizontal" method="post">

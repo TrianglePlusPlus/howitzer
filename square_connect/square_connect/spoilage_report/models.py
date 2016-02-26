@@ -85,7 +85,7 @@ class SpoilageReport(models.Model):
         """ Finds the size of the report in # of items
         @returns The size of the report
         """
-        return SpoilageItem.objects.filter(report=self).count
+        return self.get_associated_items.count()
 
     @property
     def get_total(self):
