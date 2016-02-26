@@ -6,19 +6,20 @@
 <script>
     $( document ).ready(function() {
         $.noConflict();
-    // Creates sticky dates in form
-	if( "{{ first_report }}" == "None" || "{{ first_report }}" == "[]" ){
-		$( "#start_datepicker" ).datepicker().val("{{ today }}");
-        $( "#end_datepicker" ).datepicker().val("{{ today }}");
-	}	
-	else {
-        $( "#start_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
-		$( "#end_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
-	}
-	// Creates sticky dropdown in form
-	if( "{{ first_report }}" != "[]" && "{{ first_report }}" != "None" ) {
-		$( "#service_select" ).val("{{ first_report.service.name }}");
-	}
+
+        // Creates sticky dates in form
+    	if( "{{ first_report }}" == "None" || "{{ first_report }}" == "[]" ){
+    		$( "#start_datepicker" ).datepicker().val("{{ today }}");
+            $( "#end_datepicker" ).datepicker().val("{{ today }}");
+    	}	
+    	else {
+            $( "#start_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
+    		$( "#end_datepicker" ).datepicker().val("{{ first_report.date|date:"m/d/Y" }}");
+    	}
+    	// Creates sticky dropdown in form
+    	if( "{{ first_report }}" != "[]" && "{{ first_report }}" != "None" ) {
+    		$( "#service_select" ).val("{{ first_report.service.name }}");
+    	}
     });
 </script>
 
