@@ -20,12 +20,40 @@
     	if( "{{ first_report }}" != "[]" && "{{ first_report }}" != "None" ) {
     		$( "#service_select" ).val("{{ first_report.service.name }}");
     	}
+
+        // AJAX for requesting report
+        function submit_form() {
+            $.ajax({
+                url : "{% url 'request_report' %}",
+                type : "POST", // http method
+                data : { service : $('#service_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+
+                // handle a successful response
+                success : function(json) {
+                    console.log(json); // log the returned json to the console
+                    console.log("success"); // sanity check
+                },
+
+                // handle a non-successful response
+                error : function(xhr, errmsg, err) {
+                    /*$('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console*/
+                    console.log("something got fucked up");
+                }
+            });
+        };
+
+        $('#report-form').on('submit', function(event) {
+            event.preventDefault();
+            submit_form();
+        });
     });
 </script>
 
 <div class="jumbotron">
     <h1>Spoilage Reports</h1>
-    <form role="form" class="form-horizontal" method="post">
+    <form id="report-form" role="form" class="form-horizontal" method="post">
         {% csrf_token %}
         <table class="table">
             <tr>
