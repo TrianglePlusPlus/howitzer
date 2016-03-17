@@ -41,7 +41,7 @@ def spoilage_date(request, service_location, year, month, day):
 	date = year + '-' + month + '-' + day
 	service = service_location
 	
-	report = SpoilageReport.objects.filter(date=date, service__nam=service)
+	report = SpoilageReport.objects.filter(date=date, service__name=service)
 	if report.count() > 0:
             report = SpoilageReport.objects.get(date=date, service__name=service)
 	return render(
@@ -50,7 +50,7 @@ def spoilage_date(request, service_location, year, month, day):
         context_instance = RequestContext(request,
         {
             'report':report,
-            'title':'Report Viewer',
+            'title':service + ' Report Viewer',
             'year':'Remember never give up.',
         })
     )
