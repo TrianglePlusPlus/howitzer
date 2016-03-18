@@ -5,6 +5,7 @@ from django.db import models
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+from django.core.serializers.json import DjangoJSONEncoder
 
 import json
 
@@ -51,6 +52,7 @@ def spoilage_report(request):
     )
 
 @csrf_exempt
+# @require_POST ?
 def request_report(request):
     """Requests the spoilage data.
     request.POST dictionary keys:
@@ -75,14 +77,15 @@ def request_report(request):
             if reports.count() > 0:
                 for report in reports:
                     sum_total += report.get_total
+                report_data = {
+                    "reports": reports.values().get(),
+                    "sum_total": sum_total
+                }
         else:
             reports = None
 
-        report_data['reports'] = reports
-        report_data['sum_total'] = sum_total
-
         return HttpResponse(
-            json.dumps(report_data),
+            json.dumps(report_data, cls=DjangoJSONEncoder),
             content_type="application/json"
         )
     else:
