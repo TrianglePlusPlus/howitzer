@@ -55,27 +55,3 @@ def spoilage_date(request, service_location, year, month, day):
         })
     )
 	
-	
-def test_spoilage_report(request):
-    assert isinstance(request, HttpRequest)
-    # Check if they are searching for a report
-    if request.POST.get('date', False):
-        # They are searching for a report
-        date = request.POST.get('date', None)
-        date = datetime.datetime.strptime(date, "%m/%d/%Y").date()
-        service = request.POST.get('service', None)
-        report = SpoilageReport.objects.filter(date=date, service__name=service)
-        if report.count() > 0:
-            report = SpoilageReport.objects.get(date=date, service__name=service)
-    else:
-        report = None
-    return render(
-        request,
-        'spoilage_report/test_spoilage_report.html',
-        context_instance = RequestContext(request,
-        {
-            'report':report,
-            'title':'Report Viewer',
-            'year':'Test: Remember never give up.',
-        })
-    )
