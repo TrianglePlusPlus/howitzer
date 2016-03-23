@@ -33,12 +33,12 @@
                     console.log(json); // log the returned json to the console
                 },
 
-                // handle a non-successful response
+                // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
                     /*$('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
                         " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
                     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console*/
-                    console.log("something got fucked up");
+                    console.log("Something got fucked up.");
                 }
             });
         };
@@ -51,6 +51,7 @@
 </script>
 
 <div class="jumbotron">
+    <div id="results"/>
     <h1>Spoilage Reports</h1>
     <form id="report-form" role="form" class="form-horizontal" method="post">
         {% csrf_token %}

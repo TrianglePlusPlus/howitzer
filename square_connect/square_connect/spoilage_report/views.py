@@ -62,7 +62,7 @@ def request_report(request):
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
-        report_data = {}
+        return_data = {}
         sum_total = 0
 
         # Check if they are searching for a report
@@ -77,15 +77,15 @@ def request_report(request):
             if reports.count() > 0:
                 for report in reports:
                     sum_total += report.get_total
-                report_data = {
-                    "reports": reports.values().get(),
+                return_data = {
+                    "reports": reports.values(),
                     "sum_total": sum_total
                 }
         else:
-            reports = None
+            reports = None # is this really necessary?
 
         return HttpResponse(
-            json.dumps(report_data, cls=DjangoJSONEncoder),
+            json.dumps(reports.values()[0], cls=DjangoJSONEncoder), # can serialize dictionary, but need to serialize list of dictionaries, and also dictionary including list of dictionaries (possibly)
             content_type="application/json"
         )
     else:
