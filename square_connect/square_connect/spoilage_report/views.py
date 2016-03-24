@@ -78,14 +78,14 @@ def request_report(request):
                 for report in reports:
                     sum_total += report.get_total
                 return_data = {
-                    "reports": reports.values(),
+                    "reports": list(reports.values()), # bad idea?
                     "sum_total": sum_total
                 }
         else:
             reports = None # is this really necessary?
 
         return HttpResponse(
-            json.dumps(reports.values()[0], cls=DjangoJSONEncoder), # can serialize dictionary, but need to serialize list of dictionaries, and also dictionary including list of dictionaries (possibly)
+            json.dumps(return_data, cls=DjangoJSONEncoder), # can serialize dictionary, but need to serialize list of dictionaries, and also dictionary including list of dictionaries (possibly)
             content_type="application/json"
         )
     else:
