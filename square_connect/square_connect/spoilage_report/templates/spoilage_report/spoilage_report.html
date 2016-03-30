@@ -31,8 +31,10 @@
                 // handle a successful response
                 success : function(json) {
                     console.log(json); // log the returned json to the console
-                    var data = JSON.parse(json);
-                    if (data.count > 0) {
+                    var parsed_data = json;
+                    console.log(parsed_data);
+                    // console.log(parsed_data.reports.count);
+                    if (parsed_data.reports.length > 0) {
                         $("#reports-table").html("\
                             <tr>\
                                 <th>Item</th>\
@@ -49,55 +51,54 @@
                         $("#reports-table").html("<center><b>No results found!</b></center>");
                     }
                     // for report in reports
-                    /*for () {
-                        $("#reports-table").append("
-                            {% for item in report.get_associated_items %}
-                                <tr>
-                                    <td>{{ item.name }}</td>
-                                    <td>{{ item.variant }}</td>
-                                    <td>{{ item.sku }}</td>
-                                    <td>{{ item.price }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td><a href=\"https://squareup.com/receipt/preview/{{ item.transaction_id }}\" target=\"_blank\">View receipt</a></td>
-                                    <td>{{ item.transaction_time }}</td>
+                    /*for (int i = 0; i < parsed_data.reports.length; i++) {
+                        for (int i =0; i < parsed_data.reports[i].get_size) {
+                            $("#reports-table").append("\
+                                <tr>\
+                                    <td>{{ item.name }}</td>\
+                                    <td>{{ item.variant }}</td>\
+                                    <td>{{ item.sku }}</td>\
+                                    <td>{{ item.price }}</td>\
+                                    <td>{{ item.quantity }}</td>\
+                                    <td><a href=\"https://squareup.com/receipt/preview/{{ item.transaction_id }}\" target=\"_blank\">View receipt</a></td>\
+                                    <td>{{ item.transaction_time }}</td>\
                                 </tr>
-                            {% endfor %}
+                            ");
+                        }
+                        $("#reports-table").append("\
+                            <tr>\
+                                <td/>\
+                                <td/>\
+                                <td><b>Total:</b></td>\
+                                <td>{{ report.get_total }}</td>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                            </tr>\
+                        ");
+                    }*/
+                    if (parsed_data.reports.length > 0) {
+                        $("#reports-table").append("\
+                            <tr>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                            </tr>\
+                            <tr>\
+                                <td/>\
+                                <td/>\
+                                <td><b>Sum Total:</b></td>\
+                                <td>" + parsed_data.sum_total + "</td>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
+                            </tr>\
                         ");
                     }
-                    // if report.get_size > 0
-                    $("#reports-table").append("
-                        <tr>
-                            <td/>
-                            <td/>
-                            <td><b>Total:</b></td>
-                            <td>{{ report.get_total }}</td>
-                            <td/>
-                            <td/>
-                            <td/>
-                        </tr>
-                    ");
-                    // end for
-                    // if reports.count > 0
-                    $("#reports-table").append("
-                        <tr>
-                            <td/>
-                            <td/>
-                            <td/>
-                            <td/>
-                            <td/>
-                            <td/>
-                            <td/>
-                        </tr>
-                        <tr>
-                            <td/>
-                            <td/>
-                            <td><b>Sum Total:</b></td>
-                            <td>{{ sum_total }}</td>
-                            <td/>
-                            <td/>
-                            <td/>
-                        </tr>
-                    ");*/
                 },
 
                 // handle an unsuccessful response
