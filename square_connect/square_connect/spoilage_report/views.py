@@ -74,18 +74,20 @@ def request_report(request):
             end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
             service = request.POST.get('service', None)
             reports = SpoilageReport.search_reports(start_date, end_date, service)
+            reports_list = []
             if reports.count() > 0:
                 for report in reports:
                     sum_total += report.get_total
+                    reports_list.append(report.dictionary_form())
                 return_data = {
-                    "reports": list(reports.values()), # bad idea?
+                    "reports": reports_list,
                     "sum_total": sum_total
                 }
         else:
             reports = None # is this really necessary?
 
         return HttpResponse(
-            json.dumps(return_data, cls=DjangoJSONEncoder), # can serialize dictionary, but need to serialize list of dictionaries, and also dictionary including list of dictionaries (possibly)
+            json.dumps(return_data, cls=DjangoJSONEncoder),
             content_type="application/json"
         )
     else:

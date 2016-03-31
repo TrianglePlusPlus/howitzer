@@ -128,6 +128,17 @@ class SpoilageReport(models.Model):
             # They are associated with the stated day
             return dt.date()
 
+    def dictionary_form(self):
+        """ Turns a report into a json-friendly dictionary that includes date, service, id, size, total, and a list of all items
+        @returns a dictionary
+        """
+        return_data =  {
+            "size": self.get_size,
+            "total": self.get_total,
+            "items": list(self.get_associated_items.values()),
+        }
+        return return_data
+
 class SpoilageItem(models.Model):
     """ A single spoiled item
     Part of a spoilage report """

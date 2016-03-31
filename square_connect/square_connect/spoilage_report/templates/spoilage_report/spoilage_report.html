@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <script>
     $( document ).ready(function() {
         $.noConflict();
@@ -21,6 +20,9 @@
     		$( "#service_select" ).val("{{ first_report.service.name }}");
     	}
 
+        $( "#start_datepicker" ).datepicker().val("{{ today }}");
+        $( "#end_datepicker" ).datepicker().val("{{ today }}");
+
         // AJAX for requesting report
         function submit_form() {
             $.ajax({
@@ -30,11 +32,15 @@
 
                 // handle a successful response
                 success : function(json) {
-                    console.log(json); // log the returned json to the console
                     var parsed_data = json;
                     console.log(parsed_data);
-                    // console.log(parsed_data.reports.count);
+                    if (typeof parsed_data.reports == 'undefined') {
+                        $("#reports-table").html("<center><b>No results found!</b></center>");
+                        return;
+                    }
+
                     if (parsed_data.reports.length > 0) {
+                        // Title row
                         $("#reports-table").html("\
                             <tr>\
                                 <th>Item</th>\
@@ -46,38 +52,37 @@
                                 <th>Time</th>\
                             </tr>\
                         ");
-                    }
-                    else {
-                        $("#reports-table").html("<center><b>No results found!</b></center>");
-                    }
-                    // for report in reports
-                    /*for (int i = 0; i < parsed_data.reports.length; i++) {
-                        for (int i =0; i < parsed_data.reports[i].get_size) {
+
+                        for (i = 0; i < parsed_data.reports.length; i++) {
+                            for (j = 0; j < parsed_data.reports[i]['size']; j++) {
+                                datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
+                                datetimeStr = (datetime.getMonth() + 1) + '/' + datetime.getDate() + '/' +  datetime.getFullYear() + ", " + datetime.getHours() + ":" + datetime.getMinutes() + ":" + datetime.getSeconds();
+                                $("#reports-table").append("\
+                                    <tr>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['name'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['variant'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['sku'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['price'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['quantity'] + "</td>\
+                                        <td><a href=\"https://squareup.com/receipt/preview/" + parsed_data.reports[i]['items'][j]['transaction_id'] + "\" target=\"_blank\">View receipt</a></td>\
+                                        <td>" + datetimeStr + "</td>\
+                                    </tr>\
+                                ");
+                            }
                             $("#reports-table").append("\
                                 <tr>\
-                                    <td>{{ item.name }}</td>\
-                                    <td>{{ item.variant }}</td>\
-                                    <td>{{ item.sku }}</td>\
-                                    <td>{{ item.price }}</td>\
-                                    <td>{{ item.quantity }}</td>\
-                                    <td><a href=\"https://squareup.com/receipt/preview/{{ item.transaction_id }}\" target=\"_blank\">View receipt</a></td>\
-                                    <td>{{ item.transaction_time }}</td>\
-                                </tr>
+                                    <td/>\
+                                    <td/>\
+                                    <td><b>Total:</b></td>\
+                                    <td>" + parsed_data.reports[i]['total'] + "</td>\
+                                    <td/>\
+                                    <td/>\
+                                    <td/>\
+                                </tr>\
                             ");
                         }
-                        $("#reports-table").append("\
-                            <tr>\
-                                <td/>\
-                                <td/>\
-                                <td><b>Total:</b></td>\
-                                <td>{{ report.get_total }}</td>\
-                                <td/>\
-                                <td/>\
-                                <td/>\
-                            </tr>\
-                        ");
-                    }*/
-                    if (parsed_data.reports.length > 0) {
+
+                        // Sum Total row
                         $("#reports-table").append("\
                             <tr>\
                                 <td/>\
