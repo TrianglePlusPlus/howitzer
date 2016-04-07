@@ -16,14 +16,15 @@ import app.views as app_views
 import spoilage_report.views as spoilage_report_views
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', app_views.home, name='home'),
     url(r'^contact$', app_views.contact, name='contact'),
     url(r'^about', app_views.about, name='about'),
     url(r'^services', app_views.services, name='services'),
+    url(r'^spoilage_report/$', spoilage_report_views.spoilage_report, name='spoilage_report'),
+	url(r'^spoilage_report/([a-zA-Z]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})', spoilage_report_views.spoilage_date, name='spoilage_date'),
     url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
-    url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
-    url(r'^login/$',
+	url(r'^login/$',
         django.contrib.auth.views.login,
         {
             'template_name': 'app/login.html',
@@ -46,6 +47,6 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', admin.site.urls), 
+    url(r'^admin/', admin.site.urls),
     url(r'^favicon\.ico$', RedirectView.as_view(url='static/favicon.ico')),
-)
+]

@@ -69,3 +69,25 @@ def request_report(request):
             json.dumps({"nothing to see": "this isn't happening"}),
             content_type="application/json"
         )
+
+def spoilage_date(request, service_location, year, month, day):
+	"""Renders the reports for a given date"""
+
+	assert isinstance(request, HttpRequest)
+
+	date = year + '-' + month + '-' + day
+	service = service_location
+
+	report = SpoilageReport.objects.filter(date=date, service__name=service)
+	if report.count() > 0:
+            report = SpoilageReport.objects.get(date=date, service__name=service)
+	return render(
+        request,
+        'spoilage_report/spoilage_report.html',
+        context_instance = RequestContext(request,
+        {
+            'report':report,
+            'title':service + ' Report Viewer',
+            'year':'Remember never give up.',
+        })
+    )
