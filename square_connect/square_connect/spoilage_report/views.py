@@ -70,16 +70,30 @@ def request_report(request):
             content_type="application/json"
         )
 
-def spoilage_date(request, service_location, year, month, day):
+def spoilage_date(request, service_location, startYear, startMonth, startDay, endYear = None, endMonth = None, endDay = None):
 	"""Renders the reports for a given date"""
 
+	# If end year is not set, it is assumed that none of them are set
+	if endYear == None:
+		endYear = startYear
+		endMonth = startMonth
+		endDay = startDay
+		
 	assert isinstance(request, HttpRequest)
 
-	date = year + '-' + month + '-' + day
+	startDate = startYear + '-' + startMonth + '-' + startDay
+	endDate = endYear + '-' + endMonth + '-' + endDay
 	service = service_location
 
-	report = SpoilageReport.objects.filter(date=date, service__name=service)
+	report = SpoilageReport.search_reports(startDate, endDate, service)
 	if report.count() > 0:
+	    for report in reports:
+            sum_total += report.get_total
+            reports_list.append(report.dictionary_form())
+        return_data = {
+            "reports": reports_list,
+            "sum_total": sum_total
+        }    
             report = SpoilageReport.objects.get(date=date, service__name=service)
 	return render(
         request,
