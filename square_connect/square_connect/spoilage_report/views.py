@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
@@ -20,6 +20,28 @@ def spoilage_report(request):
         context_instance = RequestContext(request,
         {
             'today':today,
+            'title':'Report Viewer',
+            'year':'Remember never give up.',
+        })
+    )
+
+
+def spoilage_report_date(request, service_location, start_year, start_month, start_day, end_year, end_month, end_day):
+    """Renders the reports for a given date range and service, embedded in the url."""
+    assert isinstance(request, HttpRequest)
+
+    start_date = start_month + '/' + start_day + '/' + start_year
+    end_date = end_month + '/' + end_day + '/' + end_year
+    service = service_location
+
+    return render(
+        request,
+        'spoilage_report/spoilage_report.html',
+        context_instance = RequestContext(request,
+        {
+            'start_date': start_date,
+            'end_date': end_date,
+            'service': service,
             'title':'Report Viewer',
             'year':'Remember never give up.',
         })
@@ -66,28 +88,6 @@ def request_report(request):
         )
     else:
         return HttpResponse(
-            json.dumps({"nothing to see": "this isn't happening"}),
+            json.dumps({"POST method failed": "we have no data for you"}),
             content_type="application/json"
         )
-
-def spoilage_date(request, service_location, year, month, day):
-	"""Renders the reports for a given date"""
-
-	assert isinstance(request, HttpRequest)
-
-	date = year + '-' + month + '-' + day
-	service = service_location
-
-	report = SpoilageReport.objects.filter(date=date, service__name=service)
-	if report.count() > 0:
-            report = SpoilageReport.objects.get(date=date, service__name=service)
-	return render(
-        request,
-        'spoilage_report/spoilage_report.html',
-        context_instance = RequestContext(request,
-        {
-            'report':report,
-            'title':service + ' Report Viewer',
-            'year':'Remember never give up.',
-        })
-    )
