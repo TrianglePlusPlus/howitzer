@@ -7,14 +7,14 @@
         $.noConflict();
 
         if ("{{ today }}" == "") {
-            $( "#start_datepicker" ).datepicker().val("{{ start_date }}");
-            $( "#end_datepicker" ).datepicker().val("{{ end_date }}");
-            $( "#service_select" ).val("{{ service }}");
+            $("#start_datepicker").datepicker().val("{{ start_date }}");
+            $("#end_datepicker").datepicker().val("{{ end_date }}");
+            $("#service_select").val("{{ service }}");
             submit_form();
         }
         else {
-            $( "#start_datepicker" ).datepicker().val("{{ today }}");
-            $( "#end_datepicker" ).datepicker().val("{{ today }}");
+            $("#start_datepicker").datepicker().val("{{ today }}");
+            $("#end_datepicker").datepicker().val("{{ today }}");
         }
 
         // AJAX for requesting report
@@ -27,7 +27,16 @@
                 // handle a successful response
                 success : function(json) {
                     var parsed_data = json;
-                    
+
+                    var start_date_input = $('#start_datepicker').val().split('/');
+                    var end_date_input = $('#end_datepicker').val().split('/');
+                    var start_date = new Date(start_date_input[2], start_date_input[0] - 1, start_date_input[1]); // -1 necessary as js months are 0-based
+                    var end_date = new Date(end_date_input[2], end_date_input[0] - 1, end_date_input[1]); // see above comment
+                    var start_date_str = start_date.getFullYear() + '/' + (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_date_str = end_date.getFullYear() + '/' + (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+
+                    history.replaceState(null, null, '/spoilage_report/' + $('#service_select').val() + '/' + start_date_str + '/' + end_date_str);
+
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
                         return;
