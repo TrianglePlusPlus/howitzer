@@ -6,8 +6,16 @@
     $( document ).ready(function() {
         $.noConflict();
 
-        $( "#start_datepicker" ).datepicker().val("{{ today }}");
-        $( "#end_datepicker" ).datepicker().val("{{ today }}");
+        if ("{{ today }}" == "") {
+            $( "#start_datepicker" ).datepicker().val("{{ start_date }}");
+            $( "#end_datepicker" ).datepicker().val("{{ end_date }}");
+            $( "#service_select" ).val("{{ service }}");
+            submit_form();
+        }
+        else {
+            $( "#start_datepicker" ).datepicker().val("{{ today }}");
+            $( "#end_datepicker" ).datepicker().val("{{ today }}");
+        }
 
         // AJAX for requesting report
         function submit_form() {
@@ -19,7 +27,7 @@
                 // handle a successful response
                 success : function(json) {
                     var parsed_data = json;
-                    console.log(json);
+                    
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
                         return;
