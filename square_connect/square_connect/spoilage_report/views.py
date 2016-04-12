@@ -10,7 +10,10 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 
 def spoilage_report(request):
-    """Renders the reports page."""
+    """Renders the reports page.
+	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date
+	@returns filtered spoilage data for today
+	"""
     assert isinstance(request, HttpRequest)
     today = datetime.today().strftime("%m/%d/%Y")
 
@@ -32,7 +35,10 @@ def request_report(request):
     request.POST dictionary keys:
         start_date
         end_date
-        service"""
+        service
+	@param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
+	@returns filtered spoilage data based on a date
+	"""
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
@@ -71,7 +77,14 @@ def request_report(request):
         )
 
 def spoilage_date(request, service_location, year, month, day):
-	"""Renders the reports for a given date"""
+	"""Renders the reports for a given date. Takes in URL regex as parameters. This should only be called from urls.py
+	@param request: Takes a request for spoilage
+	@param service_location: Takes in Corp Service E.X. "mug"
+	@param year: Takes in the year of the spoilage
+	@param month: Takes in the month of the spoilage
+	@param day: Takes in the day of the spoilage
+	@returns filtered spoilage data based on date and service
+	"""
 
 	assert isinstance(request, HttpRequest)
 

@@ -14,7 +14,10 @@ from spoilage_report.models import SpoilageReport, SpoilageItem
 from app.models import Service
 
 def home(request):
-    """Renders the home page."""
+    """Renders the home page.
+	@param request: Takes in a request for the home page
+	@returns home page
+	"""
     query_results = SpoilageReport.objects.all(),
     assert isinstance(request, HttpRequest)
     return render(
@@ -28,7 +31,10 @@ def home(request):
     )
 
 def contact(request):
-    """Renders the contact page."""
+    """Renders the contact page.
+	@param request: Takes in request for the contact page
+	@returns contact page
+	"""
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -42,7 +48,10 @@ def contact(request):
     )
 
 def about(request):
-    """Renders the about page."""
+    """Renders the about page.
+	@param request: Takes in request for the about page
+	@returns about page
+	"""
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -58,6 +67,8 @@ def about(request):
 def services(request):
     """Shows the services and their associated merchant IDs
     Can be used to refresh the merchant IDs
+	@param request: Takes in request for the services page
+	@returns services page. Can refresh merchant IDs
     """
     assert isinstance(request, HttpRequest)
     if request.POST.get('regenerate', False):
