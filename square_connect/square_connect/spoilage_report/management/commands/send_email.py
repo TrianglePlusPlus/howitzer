@@ -1,13 +1,14 @@
-""" Gets the most recent transactions from the 6 primary storefronts
-and adds any spoiled items to the spoilage databse """
+""" Sends emails with generated spoilage reports to the UM of each service """
 
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.sites.models import Site
 from app.models import Service
+from datetime import date
+from django.core.mail import send_mail
 from spoilage_report.models import SpoilageReport, SpoilageItem
-from data.transaction import PaymentRequest
 
 class Command(BaseCommand):
-    help = "Gets the last 200 transactions at each service and finds spoiled items"
+    help = "Sends emails with generated spoilage reports to the UM of each service"
 
     def handle(self, *args, **options):
         # Refresh the Services if necessary
@@ -32,8 +33,9 @@ class Command(BaseCommand):
         services = Service.objects.exclude(name__in=excludes)
 
         for service in services:
-            # Get the recent transactions for that service
-            sales_json = PaymentRequest(merchant_id=service.merchant_id).auto()
+            # Get the spoilage report for the past day
+            # report_url = Site.objects.get_current().domain + "/spoilage_report/" + service.name + "/" + date.today().strftime('%Y/%m/%d') + '/'
+            report_url = "http://localhost:8111/spoilage_report/" + service.name + "/" + date.today().strftime('%Y/%m/%d') + '/' + date.today().strftime('%Y/%m/%d') + '/'
 
-            # Pass the sales to the spoilage report model so it can do its magic
-            SpoilageReport.add_items_from_json_data(sales_json, service)
+            # Send a link to that report in an email
+            send_mail("hello ( ͡° ͜ʖ ͡°)", "go to this url!:\n" + report_url, "bodonicreativedesign@gmail.com", ["peter@thecorp.org"], fail_silently=False)
