@@ -21,9 +21,13 @@ urlpatterns = [
     url(r'^contact$', app_views.contact, name='contact'),
     url(r'^about', app_views.about, name='about'),
     url(r'^services', app_views.services, name='services'),
-    url(r'^spoilage_report/$', spoilage_report_views.spoilage_report, name='spoilage_report'),
+	url(r'^spoilage_report/$', spoilage_report_views.spoilage_report, name='spoilage_report'),
+	
+	# Handles direct url access to spoilage
 	url(r'^spoilage_report/([a-zA-Z]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})', spoilage_report_views.spoilage_date, name='spoilage_date'),
-    url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
+    
+	# Handles AJAX in-page requesting of spoilage report
+	url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
 	url(r'^login/$',
         django.contrib.auth.views.login,
         {
