@@ -3,7 +3,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 from app.models import Service
-from datetime import date
+from datetime import date, timedelta
 from django.core.mail import send_mail
 from spoilage_report.models import SpoilageReport, SpoilageItem
 
@@ -34,8 +34,17 @@ class Command(BaseCommand):
 
         for service in services:
             # Get the spoilage report for the past day
-            # report_url = Site.objects.get_current().domain + "/spoilage_report/" + service.name + "/" + date.today().strftime('%Y/%m/%d') + '/'
-            report_url = "http://localhost:8111/spoilage_report/" + service.name + "/" + date.today().strftime('%Y/%m/%d') + '/' + date.today().strftime('%Y/%m/%d') + '/'
+            yesterday = date.today() - timedelta(days=1)
+            report_url = "http://localhost:8111/spoilage_report/" + service.name + "/" + yesterday.strftime('%Y/%m/%d') + '/' + yesterday.strftime('%Y/%m/%d') + '/'
+
+            service_names = {
+                "mug": "MUG",
+                "vittles": "Vital Vittles",
+                "snaxa": "Hoya Snaxa",
+                "ug": "Uncommon Grounds",
+                "midnight": "Midnight Mug",
+                "hilltoss": "Hilltoss",
+            }
 
             # Send a link to that report in an email
-            send_mail("hello ( ͡° ͜ʖ ͡°)", "go to this url!:\n" + report_url, "bodonicreativedesign@gmail.com", ["peter@thecorp.org"], fail_silently=False)
+            send_mail("Spoilage Report", "Hello! Here is the spoilage report for " + service_names[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url, "reports@thecorp.org", ["peter@thecorp.org"], fail_silently=False)
