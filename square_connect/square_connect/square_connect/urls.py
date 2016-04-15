@@ -14,6 +14,7 @@ from django.conf.urls import include
 from django.contrib import admin
 import app.views as app_views
 import spoilage_report.views as spoilage_report_views
+import mailer.views as mailer_views
 admin.autodiscover()
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
     url(r'^spoilage_report/$', spoilage_report_views.spoilage_report, name='spoilage_report'),
 	url(r'^spoilage_report/([a-zA-Z]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})/([0-9]{4})/([0-9]{2})/([0-9]{2})', spoilage_report_views.spoilage_report_date, name='spoilage_report_date'),
     url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
+    url(r'^mailer', mailer_views.mailer, name='mailer'),
 	url(r'^login/$',
         django.contrib.auth.views.login,
         {
