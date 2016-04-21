@@ -12,18 +12,25 @@ class Report(models.Model):
     service = models.ForeignKey("app.Service")
 
     @staticmethod
-    def add_items_from_json_data(json_data, service):
+    def add_items_from_json_data(json_data, service, discount='Spoil'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
         @param service: A service object correspondinng to the sales data
+		@param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
+		
+		
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
-                    spoiled = False
-                    for discount in item['discounts']:
-                        if discount['name'] == 'Spoil': spoiled = True
-                    if spoiled:
+                    found = False
+                    for entry in item['discounts']:
+                        if entry['name'] == discount: found = True
+						# This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
+						elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting'
+						                    or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM':
+							found = True
+                    if found:
                         # Check to see if that item is already in the database
                         if Item.objects.filter(transaction_id=transaction["id"],
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
@@ -148,5 +155,5 @@ class Item(models.Model):
     quantity = models.IntegerField(default=1)
     transaction_id = models.CharField(max_length=30, default='')
     transaction_time = models.DateTimeField(default=DjangoCurrentTime)
-    # The report is the SpoilageReport which the item belongs to
-    report = models.ForeignKey('SpoilageReport')
+    # The report is the Report which the item belongs to
+    report = models.ForeignKey('Report')
