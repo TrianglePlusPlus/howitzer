@@ -9,6 +9,7 @@ from app.forms import BootstrapAuthenticationForm
 import django.contrib.auth.views
 from django.views.generic.base import RedirectView # For the favicon
 from django.contrib import admin
+from django.utils import timezone
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
 from django.contrib import admin
@@ -34,7 +35,7 @@ urlpatterns = [
             'extra_context':
             {
                 'title':'Log in',
-                'year':datetime.now().year,
+                'year':timezone.now().year,
             }
         },
         name='login'),
