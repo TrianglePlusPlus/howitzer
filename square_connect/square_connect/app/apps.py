@@ -5,8 +5,8 @@ class MainAppConfig(AppConfig):
     verbose_name = "Square Connect Main App"
 
     def ready(self):
-		"""Starts everything by populating database with services and merchant ID's
-		"""
+        """Starts everything by populating database with services and merchant ID's
+        """
         from app.models import Service
         try:
             if Service.objects.count() == 0:
