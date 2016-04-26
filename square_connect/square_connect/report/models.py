@@ -26,10 +26,9 @@ class Report(models.Model):
                     found = False
                     for entry in item['discounts']:
                         if entry['name'] == discount: found = True
-						# This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
-						elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting'
-						                    or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM':
-							found = True
+                        # This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
+                        elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting' or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM'):
+                            found = True
                     if found:
                         # Check to see if that item is already in the database
                         if Item.objects.filter(transaction_id=transaction["id"],

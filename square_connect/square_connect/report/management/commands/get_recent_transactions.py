@@ -8,11 +8,11 @@ from data.transaction import PaymentRequest
 
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds ___-marked items"
-	
-	# Allows input of report types to take in. Ex. spoilage and shift drinks. 
-	def add_arguments(self, parser):
-	    parser.add_argument('report_type', nargs='+')
-	
+
+    # Allows input of report types to take in. Ex. spoilage and shift drinks. 
+    def add_arguments(self, parser):
+        parser.add_argument('report_type', nargs='+')
+
     def handle(self, *args, **options):
         # Refresh the Services if necessary
         if Service.objects.count() == 0:
@@ -40,4 +40,4 @@ class Command(BaseCommand):
 
             # Pass the sales to the report model so it can do its magic
             for report_type in options['report_type']:
-			    Report.add_items_from_json_data(sales_json, service)
+                Report.add_items_from_json_data(sales_json, service)
