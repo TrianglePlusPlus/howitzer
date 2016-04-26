@@ -12,29 +12,52 @@ class Report(models.Model):
     service = models.ForeignKey("app.Service")
 
     @staticmethod
-    def add_items_from_json_data(json_data, service, discount='Spoil'):
+    def add_items_from_json_data(json_data, service, discount='All'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
         @param service: A service object correspondinng to the sales data
 		@param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
+        
+        """
+        List of discounts:
+        TODO: Check to see if there are more discounts
 		
+		'Employee Discount - Coffee'
+		'Spoil'
+		'Cup Reuse'
+		'Dollar FIDDY Off Dat Sambo'
+		'Shift Drink - UG'
+		'Shift Drink - Vital Vittles'
+		'Shift Drink - Accounting'
+		'Shift Drink - Accounting'
+		'Shift Drink - MUG'
+		'Shift Drink - Hoya Snaxa'
+		'Shift Drink - ITM'
 		
+        """
+
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
                     found = False
-                    for entry in item['discounts']:
-                        if entry['name'] == discount: found = True
-                        # This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
-                        elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting' or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM'):
+                    if discount == 'All':
+                        if len(item['discounts']) != 0:
                             found = True
+                    else:
+                        for entry in item['discounts']:
+                            if entry['name'] == discount: found = True
+                            # This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
+                            elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting' or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM'):
+                                found = True
                     if found:
                         # Check to see if that item is already in the database
-                        if Item.objects.filter(transaction_id=transaction["id"],
+                        """
+						if Item.objects.filter(transaction_id=transaction["id"],
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
                             # The item already exists, don't save a new one
                             continue
+					    """
                         # Get the report that the item should go on
                         transaction_date = Report.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
@@ -54,10 +77,12 @@ class Report(models.Model):
                         report_item.name = item['name']
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
-                        if len(item['item_variation_name']) > 1:
+                        """
+						if len(item['item_variation_name']) > 1:
                             report_item.variant = item['item_variation_name']
                         else:
                             report_item.variant = ''
+						"""
                         # 2 is an arbitrary cut off, normal SKUs should be 12
                         if len(item['item_detail']['sku']) > 2:
                             report_item.sku = item['item_detail']['sku']
