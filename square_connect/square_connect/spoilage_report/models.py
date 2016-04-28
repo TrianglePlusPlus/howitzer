@@ -10,7 +10,7 @@ class SpoilageReport(models.Model):
     # TODO
     date = models.DateField()
     service = models.ForeignKey("app.Service")
-    
+
     @staticmethod
     def add_items_from_json_data(json_data, service):
         """ Extracts spoilage items from sales json and saves to a report
@@ -87,14 +87,21 @@ class SpoilageReport(models.Model):
         @returns The report with the specified id
         """
         return SpoilageReport.objects.get(id=report_id)
-        
+
     @property
     def get_associated_items(self):
         """ Finds the SpoilageItems associated with this report
         @returns The QuerySet containing all of the items associated with this report
         """
-        # TODO: Test this 
-        return SpoilageItem.objects.filter(report=self)
+        # TODO: Test this
+        return SpoilageItem.objects.filter(report=self).order_by('transaction_time')
+
+    @property
+    def get_size(self):
+        """ Finds the size of the report in # of items
+        @returns The size of the report
+        """
+        return self.get_associated_items.count()
 
     @property
     def get_total(self):
@@ -112,16 +119,16 @@ class SpoilageReport(models.Model):
         @param start_date: A datetime.date corresponding to the start date
         @param end_date: A datetime.date corresponding to the end date
         @param service: (Optional) The service to pull reports for
-        @rerturns A QuerySet containing all of the reports from the date range (for a specified service)
+        @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if service is not None:
-            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service=service)
+            return SpoilageReport.objects.filter(date__range=(start_date, end_date), service__name=service)
         else:
             return SpoilageReport.objects.filter(date__range=(start_date, end_date))
 
     @staticmethod
     def get_associated_date(date_string):
-        """ Gets the sales date for the input date string 
+        """ Gets the sales date for the input date string
         Sales before 4/5 am EST belong to the previous day
         @param dt: The date string in question, FORMATTED IN ZULU TIME (UTC)
         @returns The 'sales' date that a date string belongs to
@@ -137,12 +144,22 @@ class SpoilageReport(models.Model):
             # They are associated with the stated day
             return dt.date()
 
+    def dictionary_form(self):
+        """ Turns a report into a json-friendly dictionary that includes date, service, id, size, total, and a list of all items
+        @returns a dictionary
+        """
+        return {
+            "size": self.get_size,
+            "total": self.get_total,
+            "items": list(self.get_associated_items.values()),
+        }
+
 class SpoilageItem(models.Model):
     """ A single spoiled item
     Part of a spoilage report """
-    name = models.CharField(max_length=50, default='') 
+    name = models.CharField(max_length=50, default='')
     variant = models.CharField(max_length=100, default='')
-    sku = models.CharField(max_length=12, default='') 
+    sku = models.CharField(max_length=12, default='')
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     quantity = models.IntegerField(default=1)
     transaction_id = models.CharField(max_length=30, default='')

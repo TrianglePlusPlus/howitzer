@@ -1,5 +1,6 @@
 ﻿"""
 Django settings for square_connect project.
+Refer to https://docs.djangoproject.com/en/1.9/ref/settings/ for 1.9 documentation
 """
 
 from os import path
@@ -30,7 +31,8 @@ DATABASES = {
     }
 }
 
-LOGIN_URL = '/login'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
