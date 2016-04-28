@@ -10,6 +10,7 @@ class Report(models.Model):
     # TODO
     date = models.DateField()
     service = models.ForeignKey("app.Service")
+    discount_label = models.CharField(max_length=50, default='')
 
     @staticmethod
     def add_items_from_json_data(json_data, service, discount='All'):
@@ -44,6 +45,7 @@ class Report(models.Model):
                     if discount == 'All':
                         if len(item['discounts']) != 0:
                             found = True
+                            label = item['discounts'][0]['name']
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
@@ -61,10 +63,10 @@ class Report(models.Model):
                         # Get the report that the item should go on
                         transaction_date = Report.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
-                        if Report.objects.filter(date=transaction_date, service=service).count() > 0:
-                            report = Report.objects.get(service=service, date=transaction_date)
+                        if Report.objects.filter(date=transaction_date, service=service, discount_label=label).count() > 0:
+                            report = Report.objects.get(service=service, date=transaction_date, discount_label=label)
                         else:
-                            report = Report.objects.create(service=service, date=transaction_date)
+                            report = Report.objects.create(service=service, date=transaction_date, discount_label=label)
                         report_item = Item()
                         report_item.report_id = report.id
                         report_item.transaction_id = transaction['id']
@@ -75,6 +77,7 @@ class Report(models.Model):
                         transaction_time = transaction_time.replace(tzinfo=utc_tz)
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
+                        report_item.label = label
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         """
@@ -129,17 +132,24 @@ class Report(models.Model):
         return total
 
     @staticmethod
-    def search_reports(start_date, end_date, service=None):
-        """ Searches for reports in a given timeframe, service optional
+    def search_reports(start_date, end_date, service=None, discount=None):
+        """ Searches for reports in a given timeframe, service optional. Discount optional
         @param start_date: A datetime.date corresponding to the start date
         @param end_date: A datetime.date corresponding to the end date
         @param service: (Optional) The service to pull reports for
+        @param discount: (Optional) The discount to pull reports for
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
-        if service is not None:
-            return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
+        if discount is not None:
+            if service is not None:
+                return Report.objects.filter(date__range=(start_date, end_date), service__name=service, discount_label__name=discount)
+            else:
+                return Report.objects.filter(date__range=(start_date, end_date))
         else:
-            return Report.objects.filter(date__range=(start_date, end_date))
+            if service is not None:
+                return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
+            else:
+                return Report.objects.filter(date__range=(start_date, end_date))
 
     @staticmethod
     def get_associated_date(date_string):
@@ -181,3 +191,4 @@ class Item(models.Model):
     transaction_time = models.DateTimeField(default=DjangoCurrentTime)
     # The report is the Report which the item belongs to
     report = models.ForeignKey('Report')
+    label = models.CharField(max_length=50, default='')
