@@ -39,10 +39,10 @@ class SpoilageReport(models.Model):
                     features = pending_items[item][0]
                     item_total = 0
                     for elem in pending_items[item]:
-                        item_total += int(float(item['quantity']))
+                        item_total += int(float(elem['quantity']))
                     # Check to see if that item is already in the database
                     if SpoilageItem.objects.filter(transaction_id=transaction["id"],  
-                            name=item['name'], variant=item['item_variation_name'], quantity=item_total).count() > 0:
+                            name=features['name'], variant=features['item_variation_name'], quantity=item_total).count() > 0:
                         # The item already exists, don't save a new one
                         continue
                     # Get the report that the item should go on
