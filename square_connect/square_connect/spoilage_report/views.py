@@ -6,9 +6,11 @@ from spoilage_report.models import SpoilageReport, SpoilageItem
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 
 import json
 
+@login_required
 def spoilage_report(request):
     """Renders the reports page.
 	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date

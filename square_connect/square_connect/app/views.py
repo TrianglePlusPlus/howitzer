@@ -5,6 +5,8 @@ Definition of views.
 from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from datetime import datetime
 # For security
 from django.template.context_processors import csrf
@@ -30,6 +32,7 @@ def home(request):
         })
     )
 
+@login_required
 def contact(request):
     """Renders the contact page.
 	@param request: Takes in request for the contact page
@@ -42,11 +45,11 @@ def contact(request):
         context_instance = RequestContext(request,
         {
             'title':'Contact',
-            'message':'Your contact page.',
             'year':'Remember never give up.',
         })
     )
 
+@login_required
 def about(request):
     """Renders the about page.
 	@param request: Takes in request for the about page
@@ -59,11 +62,11 @@ def about(request):
         context_instance = RequestContext(request,
         {
             'title':'About',
-            'message':'Your application description page.',
             'year':'Remember never give up.',
         })
     )
 
+@staff_member_required
 def services(request):
     """Shows the services and their associated merchant IDs
     Can be used to refresh the merchant IDs

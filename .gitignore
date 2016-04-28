@@ -3,6 +3,7 @@
 ptvs_virtualenv_proxy.py
 virt_env/
 .bundle/
+nohup.out
 
 #################################
 #		Visual Studio			#

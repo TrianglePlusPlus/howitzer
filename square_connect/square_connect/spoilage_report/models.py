@@ -26,7 +26,8 @@ class SpoilageReport(models.Model):
                     if spoiled:
                         # Check to see if that item is already in the database
                         if SpoilageItem.objects.filter(transaction_id=transaction["id"],
-                                name=item['name'], variant=item['item_variation_name']).count() > 0:
+                                name=item['name'], variant=item['item_variation_name'], 
+                                quantity=int(float(item['quantity']))).count() > 0:
                             # The item already exists, don't save a new one
                             continue
                         # Get the report that the item should go on

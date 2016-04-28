@@ -8,6 +8,7 @@
         <section id="loginForm">
             <form action="." method="post" class="form-horizontal">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}" />
                 <h4>Use a local account to log in.</h4>
                 <hr />
                 <div class="form-group">
@@ -24,7 +25,6 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="hidden" name="next" value="/" />
                         <input type="submit" value="Log in" class="btn btn-default" />
                     </div>
                 </div>
