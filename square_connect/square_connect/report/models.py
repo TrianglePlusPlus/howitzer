@@ -53,7 +53,7 @@ class Report(models.Model):
                     if found:
                         # Check to see if that item is already in the database
                         """
-						if Item.objects.filter(transaction_id=transaction["id"],
+                        if Item.objects.filter(transaction_id=transaction["id"],
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
                             # The item already exists, don't save a new one
                             continue
@@ -78,7 +78,7 @@ class Report(models.Model):
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         """
-						if len(item['item_variation_name']) > 1:
+                        if len(item['item_variation_name']) > 1:
                             report_item.variant = item['item_variation_name']
                         else:
                             report_item.variant = ''
