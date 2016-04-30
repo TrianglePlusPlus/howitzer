@@ -25,6 +25,10 @@ class SpoilageReport(models.Model):
                     spoiled = False
                     for discount in item['discounts']:
                         if discount['name'] == 'Spoil': spoiled = True
+                        # Vittles uses the discount "Expired" for spoilage
+                        if discount['name'] == 'Expired': spoiled = True
+                        # Vittles also uses "CREDITED Spoilage"
+                        if discount['name'] == 'CREDITED Spoilage': spoiled = True
                     if spoiled:
                         hash_string = item['name']+item['item_variation_name']
                         if hash_string not in pending_items:
