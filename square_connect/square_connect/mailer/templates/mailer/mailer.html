@@ -9,24 +9,16 @@
         <table class="table">
             <tr>
                 <th>
-                    <select id="mailinglist_select" name="mailing_list">
-                        <option selected="selected">-- Select Mailing List --</option>
-                        <option value="mug">MUG</option>
-                        <option value="vittles">Vital Vittles</option>
-                        <option value="snaxa">Hoya Snaxa</option>
-                        <option value="ug">Uncommon Grounds</option>
-                        <option value="midnight">Midnight Mug</option>
-                        <option value="hilltoss">Hilltoss</option>
-                    </select>
+                    <p>Mailing List: {{ form.mailing_list }}</p>
                 </th>
                 <th>
-                    <p>First Name: <input name="first_name" type="text" id="first_namepicker"></p>
+                    <p>First Name: {{ form.first_name }}</p>
                 </th>
                 <th>
-                    <p>Last Name: <input name="last_name" type="text" id="last_namepicker"></p>
+                    <p>Last Name: {{ form.last_name }}</p>
                 </th>
                 <th>
-                    <p>Email: <input name="email" type="text" id="email_picker"></p>
+                    <p>Email: {{ form.email }}</p>
                 </th>
                 <th>
                     <button id="person-form-button" type="submit" class="btn btn-default">Add person</button>
@@ -39,7 +31,7 @@
     {% for mailing_list in mailing_lists %}
         <h3>{{ mailing_list.service }}</h3>
         <ul>
-        {% for person in people %} <!--should be "for person in Person.get_all_by_service("mug")", etc.-->
+        {% for person in mailing_list.members %}
             <li>{{ person.first_name }} {{ person.last_name }}: {{ person.email }}</li>
         {% endfor %}
         </ul>
