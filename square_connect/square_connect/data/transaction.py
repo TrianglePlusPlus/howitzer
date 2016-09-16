@@ -8,6 +8,9 @@ import locale
 # For pretty printing!
 import pprint
 
+# TODO: convert to Square API v2
+# comment to test pushing to remote branch
+
 # Convert cent-based transactions to dollars and cents
 def format_money(cents):
     """ Formats money into actual dollars and cents instead of just cents
@@ -89,11 +92,11 @@ class LocationsRequest(SquareRequest):
     def __init__(self, *args, **kwargs):
         """ Constructor, takes no parameters """
         super().__init__(args, kwargs)
-        
+
         self.request_path = "/v1/me/locations"
 
     def get_merchant_ids(self):
-        """ Processes the square response data and returns the merchant IDs 
+        """ Processes the square response data and returns the merchant IDs
         @returns A dictionary of the store merchant IDs with the store names as the keys
         """
         if self.response_json is None:
@@ -108,8 +111,8 @@ class LocationsRequest(SquareRequest):
 
     @staticmethod
     def auto():
-        """ Builds a request, sends the request, and returns the merchant IDs 
-        
+        """ Builds a request, sends the request, and returns the merchant IDs
+
         Takes care of almost everything for you
         @returns A dictionary of the store merchant IDs with the store names as the keys
         """
@@ -120,9 +123,9 @@ class LocationsRequest(SquareRequest):
 
 class PaymentRequest(SquareRequest):
     """ Gets sales information from Square
-   
+
    Can retrieve up to 200 records at a time, the limit is imposed by square
-   When used automatically it will the 200 most recent sales from a store in thelast hour 
+   When used automatically it will the 200 most recent sales from a store in thelast hour
    """
     def __init__(self, *args, **kwargs):
         """ Constructor for the request
@@ -192,7 +195,7 @@ class PaymentRequest(SquareRequest):
         self.add_parameter("order", "DESC", True)
 
     def auto(self):
-        """ Builds a request, sends the request, and returns the sales information 
+        """ Builds a request, sends the request, and returns the sales information
         Gets information from the last 200 sales from the last 24 hours
         @returns The json sales data
         """
