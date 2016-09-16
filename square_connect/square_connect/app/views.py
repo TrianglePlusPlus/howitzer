@@ -11,7 +11,7 @@ from datetime import datetime
 # For security
 from django.template.context_processors import csrf
 # Our imports
-from data.transaction import PaymentRequest, LocationsRequest
+from data.connect import PaymentRequest, LocationsRequest
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from app.models import Service
 

@@ -4,7 +4,7 @@ and adds any spoiled items to the spoilage databse """
 from django.core.management.base import BaseCommand, CommandError
 from app.models import Service
 from spoilage_report.models import SpoilageReport, SpoilageItem
-from data.transaction import PaymentRequest
+from data.connect import PaymentRequest
 
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds spoiled items"

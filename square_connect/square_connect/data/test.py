@@ -1,4 +1,4 @@
-﻿from transaction import LocationsRequest, PaymentRequest
+﻿from connect import LocationsRequest, PaymentRequest
 import pprint
 
 loc = LocationsRequest().auto()

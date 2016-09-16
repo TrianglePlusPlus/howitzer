@@ -3,7 +3,7 @@ from django.utils.timezone import now as DjangoCurrentTime
 import datetime
 # Importing models from other apps
 from app.models import Service
-from data.transaction import LocationsRequest, PaymentRequest, format_money
+from data.connect import LocationsRequest, PaymentRequest, format_money
 
 
 class SpoilageReport(models.Model):
@@ -45,7 +45,7 @@ class SpoilageReport(models.Model):
                     for elem in pending_items[item]:
                         item_total += int(float(elem['quantity']))
                     # Check to see if that item is already in the database
-                    if SpoilageItem.objects.filter(transaction_id=transaction["id"],  
+                    if SpoilageItem.objects.filter(transaction_id=transaction["id"],
                             name=features['name'], variant=features['item_variation_name'], quantity=item_total).count() > 0:
                         # The item already exists, don't save a new one
                         continue

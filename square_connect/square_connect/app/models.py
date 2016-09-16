@@ -1,5 +1,5 @@
 ﻿from django.db import models
-from data.transaction import LocationsRequest
+from data.connect import LocationsRequest
 
 class Service(models.Model):
     name = models.CharField(max_length=40)
