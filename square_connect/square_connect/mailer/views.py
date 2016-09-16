@@ -15,16 +15,14 @@ def mailer(request):
         email"""
     assert isinstance(request, HttpRequest)
 
-    # Check if they are adding a Person
-    if request.POST.get('first_name', False):
-        # They are adding a Person
+    if request.method == 'POST':
         form = PersonForm(request.POST)
         if form.is_valid():
-            person = form.save()
+            form.save()
+            form = PersonForm()
     else:
         form = PersonForm()
 
-    people = Person.objects.all()
     mailing_lists = MailingList.objects.all()
 
     return render(
@@ -33,7 +31,6 @@ def mailer(request):
         context_instance = RequestContext(request,
         {
             'mailing_lists': mailing_lists,
-            'people': people,
             'title':'Report Viewer',
             'year':'Remember never give up.',
             'form': form,
