@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from mailer.models import MailingList, Person
 from mailer.forms import PersonForm
+from django.contrib.admin.views.decorators import staff_member_required
 
 @login_required
 def mailer(request):
@@ -35,4 +36,21 @@ def mailer(request):
             'year':'Remember never give up.',
             'form': form,
         })
+    )
+
+@staff_member_required
+def mailer_admin(request, retcode=None):
+    # if retcode:
+    #     return render(
+    #         request,
+    #         'common/rt_update.html',
+    #         context = RequestContext(request,
+    #         {
+    #             'retcode':retcode,
+    #         })
+    #     )
+    # else:
+    return render(
+        request,
+        'mailer/mailer_admin.html'
     )

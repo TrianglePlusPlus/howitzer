@@ -3,6 +3,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 from app.models import Service
+from mailer.models import MailingList, Person
 from datetime import date, timedelta
 from django.core.mail import send_mail
 from spoilage_report.models import SpoilageReport, SpoilageItem
@@ -33,18 +34,26 @@ class Command(BaseCommand):
         services = Service.objects.exclude(name__in=excludes)
 
         for service in services:
-            # Get the spoilage report for the past day
-            yesterday = date.today() - timedelta(days=1)
-            report_url = "http://localhost:8111/spoilage_report/" + service.name + "/" + yesterday.strftime('%Y/%m/%d') + '/' + yesterday.strftime('%Y/%m/%d') + '/'
+            mailing_list = MailingList.objects.get(service=service)
+            for person in mailing_list.members:
+                # Get the spoilage report for the past day
+                yesterday = date.today() - timedelta(days=1)
+                report_url = "http://reports.thecorp.org/spoilage_report/" + service.name + "/" + yesterday.strftime('%Y/%m/%d') + '/' + yesterday.strftime('%Y/%m/%d') + '/'
 
-            service_names = {
-                "mug": "MUG",
-                "vittles": "Vital Vittles",
-                "snaxa": "Hoya Snaxa",
-                "ug": "Uncommon Grounds",
-                "midnight": "Midnight Mug",
-                "hilltoss": "Hilltoss",
-            }
+                service_names = {
+                    "mug": "MUG",
+                    "vittles": "Vital Vittles",
+                    "snaxa": "Hoya Snaxa",
+                    "ug": "Uncommon Grounds",
+                    "midnight": "Midnight Mug",
+                    "hilltoss": "Hilltoss",
+                }
 
-            # Send a link to that report in an email
-            send_mail("Spoilage Report", "Hello! Here is the spoilage report for " + service_names[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url, "reports@thecorp.org", ["peter@thecorp.org"], fail_silently=False)
+                # Send a link to that report in an email
+                send_mail(
+                    "Spoilage Report",
+                    "Hello " + person.first_name + " " + person.last_name + "! Here is the spoilage report for " + service_names[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url,
+                    "reports@thecorp.org",
+                    [person.email],
+                    fail_silently=False
+                )
