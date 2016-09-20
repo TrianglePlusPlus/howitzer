@@ -54,12 +54,12 @@ class Report(models.Model):
                                 found = True
                     if found:
                         # Check to see if that item is already in the database
-                        """
+                        
                         if Item.objects.filter(transaction_id=transaction["id"],
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
                             # The item already exists, don't save a new one
                             continue
-					    """
+					    
                         # Get the report that the item should go on
                         transaction_date = Report.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
