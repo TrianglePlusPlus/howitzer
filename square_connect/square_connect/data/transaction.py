@@ -13,7 +13,7 @@ from django.utils import timezone
 # Convert cent-based transactions to dollars and cents
 def format_money(cents):
     """ Formats money into actual dollars and cents instead of just cents
-    @param cents The number of cents to convert
+    @param cents: The number of cents to convert
     """
     #locale.setlocale(locale.LC_ALL, 'en_US.utf8')
     #return locale.currency(cents / 100.0)
@@ -43,9 +43,9 @@ class SquareRequest:
 
     def add_parameter(self, key, value, force=False):
         """ Adds a parameter, value pair to the request
-        @param key The parameter name
-        @param value The value for the specified parameter
-        @param force If the paramter is set you can change it using the force flag
+        @param key: The parameter name
+        @param value: The value for the specified parameter
+        @param force: If the paramter is set you can change it using the force flag. Defaults to False
         @throw KeyError Thrown when someone tries to set an already set parameter without forcing
         """
         if key in self.parameters and not force:
@@ -55,9 +55,9 @@ class SquareRequest:
 
     def add_header(self, key, value, force=False):
         """ Adds a header, value pair to the request
-        @param key The header name
-        @param value The value for the specified header
-        @param force If the header is set you can change it using the force flag
+        @param key: The header name
+        @param value: The value for the specified header
+        @param force: If the header is set you can change it using the force flag. Defaults to False
         @throw KeyError Thrown when someone tries to set an already set header without forcing
         """
         if key in self.headers and not force:
@@ -128,7 +128,7 @@ class PaymentRequest(SquareRequest):
    """
     def __init__(self, *args, **kwargs):
         """ Constructor for the request
-        @param merchant_id The location ID for the store you want information about, KWARG
+        @param merchant_id: The location ID for the store you want information about, KWARG
         """
         super().__init__(args, kwargs)
 
@@ -141,14 +141,14 @@ class PaymentRequest(SquareRequest):
 
     def set_merchant_id(self, merchant_id):
         """ Set or change the merchant ID
-        @param merchant_id The location ID for the store you want information about
+        @param merchant_id: The location ID for the store you want information about
         """
         self.merchant_id = merchant_id
         self.request_path = "/v1/" + self.merchant_id + "/payments"
 
     def set_response_limit(self, limit=200):
         """ Sets the number of responses that square will return, max 200
-        @param limit The number of responses you want from Square, max 200
+        @param limit: The number of responses you want from Square, max 200
         @exception OverflowError Raised when the limit entered is not between 1 and 200 inclusive
         """
         if limit <= 0 or limit > 200:
@@ -159,7 +159,7 @@ class PaymentRequest(SquareRequest):
     def set_begin_time(self, time=None):
         """Sets the begin time to 24 hours ago
         Do not attempt to enter your own time unless you know what you're doing
-        @param time Formatted time string
+        @param time: Formatted time string
         """
         if time is None:
             time = timezone.now()
@@ -173,7 +173,7 @@ class PaymentRequest(SquareRequest):
     def set_end_time(self, time=None):
         """Sets the end time to now
         Do not attempt to enter your own time unless you know what you're doing
-        @param time Formatted time string
+        @param time: Formatted time string
         """
         if time is None:
             current_time = timezone.now().strftime("%Y-%m-%dT%H:%M:%SZ")

@@ -6,11 +6,16 @@ from spoilage_report.models import SpoilageReport, SpoilageItem
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 
 import json
 
+@login_required
 def spoilage_report(request):
-    """Renders the reports page."""
+    """Renders the reports page.
+	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date
+	@returns filtered spoilage data for today
+	"""
     assert isinstance(request, HttpRequest)
     today = datetime.today().strftime("%m/%d/%Y")
 
@@ -25,9 +30,18 @@ def spoilage_report(request):
         })
     )
 
-
 def spoilage_report_date(request, service_location, start_year, start_month, start_day, end_year, end_month, end_day):
-    """Renders the reports for a given date range and service, embedded in the url."""
+	"""Renders the reports for a given date. Takes in URL regex as parameters. This should only be called from urls.py
+	@param request: Takes a request for spoilage
+	@param service_location: Takes in Corp Service E.X. "mug"
+	@param start_year: Takes in the start year of the spoilage
+	@param start_month: Takes in the start month of the spoilage
+	@param start_day: Takes in the start day of the spoilage
+	@param end_year: Takes in the end year of the spoilage
+	@param end_month: Takes in the end month of the spoilage
+	@param end_day: Takes in the end day of the spoilage
+	@returns filtered spoilage data based on date and service
+	"""
     assert isinstance(request, HttpRequest)
 
     start_date = start_month + '/' + start_day + '/' + start_year
@@ -54,7 +68,10 @@ def request_report(request):
     request.POST dictionary keys:
         start_date
         end_date
-        service"""
+        service
+	@param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
+	@returns filtered spoilage data based on a date
+	"""
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
