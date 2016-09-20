@@ -34,6 +34,12 @@ DATABASES = {
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'reports@thecorp.org'
+EMAIL_HOST_PASSWORD = 'S90YhXKQfjBymCbbHmgz'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -147,6 +153,7 @@ INSTALLED_APPS = [
     'app.apps.MainAppConfig',
     'data',
     'spoilage_report',
+    'mailer',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

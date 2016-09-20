@@ -15,7 +15,7 @@ class SpoilageReport(models.Model):
     def add_items_from_json_data(json_data, service):
         """ Extracts spoilage items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
-        @param service: A service object correspondinng to the sales data
+        @param service: A service object corresponding to the sales data
         """
         for transaction in json_data:
             pending_items = {}

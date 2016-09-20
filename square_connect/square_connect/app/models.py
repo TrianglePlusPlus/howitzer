@@ -2,6 +2,9 @@
 from data.transaction import LocationsRequest
 
 class Service(models.Model):
+    def __str__(self):
+        return self.name
+
     name = models.CharField(max_length=40)
     merchant_id = models.CharField(max_length=13)
 
