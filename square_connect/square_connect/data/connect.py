@@ -204,6 +204,9 @@ class ChargeRequest(ConnectRequest):
         self.create_request(self.data.get_json_form())
         self.send_request()
 
+# TODO: v2 uses pagination now
+# TODO: find discounts in data
+
 class PaymentRequest(ConnectRequest):
     """ Gets sales information from Square
 

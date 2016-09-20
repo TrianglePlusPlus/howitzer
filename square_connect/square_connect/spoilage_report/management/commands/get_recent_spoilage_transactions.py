@@ -5,6 +5,8 @@ from django.core.management.base import BaseCommand, CommandError
 from app.models import Service
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from data.connect import PaymentRequest
+# For pretty printing!
+import pprint
 
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds spoiled items"
@@ -15,17 +17,17 @@ class Command(BaseCommand):
                 Service.regenerate_services()
 
         # Run for each service with spoilage
-        """ Service names in backend, exclude the * ones from the services list: 
-                midnight                            
-                snaxa                               
-                vittles                             
-                ug                                  
-                mug                                 
+        """ Service names in backend, exclude the * ones from the services list:
+                midnight
+                snaxa
+                vittles
+                ug
+                mug
                 hilltoss
                 *the corp
-                *storage                             
-                *catering                            
-                *students of georgetown incorporated 
+                *storage
+                *catering
+                *students of georgetown incorporated
 		@returns spoilage from the last 200 transactions from each service
         """
         excludes = ["the corp", "storage", "catering", "students of georgetown incorporated"]
@@ -34,6 +36,7 @@ class Command(BaseCommand):
         for service in services:
             # Get the recent transactions for that service
             sales_json = PaymentRequest(merchant_id=service.merchant_id).auto()
+            pprint.pprint(sales_json)
 
             # Pass the sales to the spoilage report model so it can do its magic
             SpoilageReport.add_items_from_json_data(sales_json, service)

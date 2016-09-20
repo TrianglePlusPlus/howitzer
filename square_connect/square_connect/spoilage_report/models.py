@@ -17,7 +17,7 @@ class SpoilageReport(models.Model):
         @param json_data: The JSON object containing all of the transaction data
         @param service: A service object correspondinng to the sales data
         """
-        for transaction in json_data:
+        for transaction in json_data['transactions']:
             pending_items = {}
             # We first extract the spoilage transactions from the data set
             for item in transaction['itemizations']:
