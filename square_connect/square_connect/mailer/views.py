@@ -29,13 +29,12 @@ def mailer(request):
     return render(
         request,
         'mailer/mailer.html',
-        context_instance = RequestContext(request,
         {
             'mailing_lists': mailing_lists,
             'title':'Report Viewer',
             'year':'Remember never give up.',
             'form': form,
-        })
+        }
     )
 
 @staff_member_required

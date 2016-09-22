@@ -3,7 +3,7 @@ Definition of urls for square_connect.
 """
 
 from datetime import datetime
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from app.forms import BootstrapAuthenticationForm
 # My imports
 import django.contrib.auth.views
