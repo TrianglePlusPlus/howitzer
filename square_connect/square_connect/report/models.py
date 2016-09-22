@@ -46,7 +46,7 @@ class Report(models.Model):
                         if len(item['discounts']) != 0:
                             found = True
                             label = item['discounts'][0]['name']
-                            label_cost = item['discounts'][0]['applied_money']['amount']
+                            label_cost = format_money(abs(item['discount_money']['amount']))
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
@@ -79,6 +79,7 @@ class Report(models.Model):
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
                         report_item.label = label
+                        report_item.label_cost = label_cost
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         
@@ -180,6 +181,11 @@ class Report(models.Model):
             "items": list(self.get_associated_items.values()),
         }
 
+class Discounts(models.Model):
+    """ Handles individual discounts"""
+    name = models.CharField(max_length=50, default='')
+    amount = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+        
 class Item(models.Model):
     """ A single item
     Part of a report """
@@ -193,4 +199,7 @@ class Item(models.Model):
     # The report is the Report which the item belongs to
     report = models.ForeignKey('Report')
     label = models.CharField(max_length=50, default='')
-    label_cost = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+    label_cost = models.DecimalField(max_digits=6, decimal_places=2, default=4.00)
+    # Discounts have a many to many relationship with the discounts model. This is to ensure that multiple discounts can be caught (1 item 2 discounts applied)
+    discounts = models.ManyToManyField(Discounts)
+    
