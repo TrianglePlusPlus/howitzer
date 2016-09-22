@@ -46,6 +46,7 @@ class Report(models.Model):
                         if len(item['discounts']) != 0:
                             found = True
                             label = item['discounts'][0]['name']
+                            label_cost = item['discounts'][0]['applied_money']['amount']
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
@@ -80,12 +81,12 @@ class Report(models.Model):
                         report_item.label = label
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
-                        """
+                        
                         if len(item['item_variation_name']) > 1:
                             report_item.variant = item['item_variation_name']
                         else:
                             report_item.variant = ''
-						"""
+						
                         # 2 is an arbitrary cut off, normal SKUs should be 12
                         if len(item['item_detail']['sku']) > 2:
                             report_item.sku = item['item_detail']['sku']
@@ -192,3 +193,4 @@ class Item(models.Model):
     # The report is the Report which the item belongs to
     report = models.ForeignKey('Report')
     label = models.CharField(max_length=50, default='')
+    label_cost = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
