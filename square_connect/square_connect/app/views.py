@@ -25,11 +25,10 @@ def home(request):
     return render(
         request,
         'app/index.html',
-        context_instance = RequestContext(request,
         {
             'title':'Home Page',
             'year':'Remember never give up.',
-        })
+        }
     )
 
 @login_required
@@ -42,11 +41,10 @@ def contact(request):
     return render(
         request,
         'app/contact.html',
-        context_instance = RequestContext(request,
         {
             'title':'Contact',
             'year':'Remember never give up.',
-        })
+        }
     )
 
 @login_required
@@ -59,11 +57,10 @@ def about(request):
     return render(
         request,
         'app/about.html',
-        context_instance = RequestContext(request,
         {
             'title':'About',
             'year':'Remember never give up.',
-        })
+        }
     )
 
 @staff_member_required
@@ -79,10 +76,9 @@ def services(request):
     return render(
         request,
         'app/services.html',
-        context_instance = RequestContext(request,
         {
             'title':'Services',
             'services':Service.objects.all(),
-        })
+        }
 
     )

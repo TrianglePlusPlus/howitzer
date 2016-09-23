@@ -22,12 +22,11 @@ def spoilage_report(request):
     return render(
         request,
         'spoilage_report/spoilage_report.html',
-        context_instance = RequestContext(request,
         {
             'today':today,
             'title':'Report Viewer',
             'year':'Remember never give up.',
-        })
+        }
     )
 
 def spoilage_report_date(request, service_location, start_year, start_month, start_day, end_year, end_month, end_day):
@@ -51,14 +50,13 @@ def spoilage_report_date(request, service_location, start_year, start_month, sta
     return render(
         request,
         'spoilage_report/spoilage_report.html',
-        context_instance = RequestContext(request,
         {
             'start_date': start_date,
             'end_date': end_date,
             'service': service,
             'title':'Report Viewer',
             'year':'Remember never give up.',
-        })
+        }
     )
 
 @csrf_exempt
