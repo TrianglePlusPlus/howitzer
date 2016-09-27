@@ -38,6 +38,7 @@ def request_custom_report(request):
 
         return_data = {}
         sum_total = 0
+        discount_sum_total = 0
 
         # Check if they are searching for a report
         if request.POST.get('start_date', False) and request.POST.get('end_date', False):
@@ -52,10 +53,12 @@ def request_custom_report(request):
             if reports.count() > 0:
                 for report in reports:
                     sum_total += report.get_total
+                    discount_sum_total += report.get_discount_total
                     reports_list.append(report.dictionary_form())
                 return_data = {
                     "reports": reports_list,
-                    "sum_total": sum_total
+                    "sum_total": sum_total,
+                    "discount_sum_total": discount_sum_total
                 }
         else:
             reports = None # is this really necessary?

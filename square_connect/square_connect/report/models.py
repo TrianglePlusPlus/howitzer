@@ -46,7 +46,6 @@ class Report(models.Model):
                         if len(item['discounts']) != 0:
                             found = True
                             label = item['discounts'][0]['name']
-                            label_cost = format_money(abs(item['discount_money']['amount']))
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
@@ -78,8 +77,8 @@ class Report(models.Model):
                         transaction_time = transaction_time.replace(tzinfo=utc_tz)
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
-                        report_item.label = label
-                        report_item.label_cost = label_cost
+                        report_item.discount = label
+                        report_item.service = str(service).title()
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         
@@ -95,6 +94,7 @@ class Report(models.Model):
                             report_item.sku = ''
                         report_item.price = format_money(item['single_quantity_money']['amount'])
                         report_item.quantity = int(float(item['quantity']))
+                        report_item.discountcost = format_money(abs(item['discount_money']['amount']))
                         report_item.save()
                 except IndexError:
                     # There's nothing to do
@@ -125,12 +125,23 @@ class Report(models.Model):
 
     @property
     def get_total(self):
-        """ Finds the total cost of all the itmes in this report
+        """ Finds the total cost of all the items in this report
         @returns The total cost of all the items in the report (price * quantity)
         """
         total = 0
         for item in Item.objects.filter(report=self):
             total += item.price * item.quantity
+        return total
+        
+    @property
+    def get_discount_total(self):
+        """ Finds the total discounts across a report
+        @returns The total discounts (cost * quantity)        
+        """
+        
+        total = 0
+        for item in Item.objects.filter(report=self):
+            total += item.discountcost * item.quantity
         return total
 
     @staticmethod
@@ -178,6 +189,7 @@ class Report(models.Model):
         return {
             "size": self.get_size,
             "total": self.get_total,
+            "discount_total": self.get_discount_total,
             "items": list(self.get_associated_items.values()),
         }
 
@@ -198,8 +210,9 @@ class Item(models.Model):
     transaction_time = models.DateTimeField(default=DjangoCurrentTime)
     # The report is the Report which the item belongs to
     report = models.ForeignKey('Report')
-    label = models.CharField(max_length=50, default='')
-    label_cost = models.DecimalField(max_digits=6, decimal_places=2, default=4.00)
+    discount = models.CharField(max_length=50, default='')
+    discountcost = models.DecimalField(max_digits=6, decimal_places=2, default=4.00)
+    service = models.CharField(max_length=50, default='')
     # Discounts have a many to many relationship with the discounts model. This is to ensure that multiple discounts can be caught (1 item 2 discounts applied)
     discounts = models.ManyToManyField(Discounts)
     

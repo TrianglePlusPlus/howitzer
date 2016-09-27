@@ -94,7 +94,7 @@ class SpoilageReport(models.Model):
         """
         total = 0
         for item in SpoilageItem.objects.filter(report=self):
-            total += item.price * item.quantity
+            total += item.price
         return total
 
     @staticmethod
