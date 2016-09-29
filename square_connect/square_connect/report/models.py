@@ -37,6 +37,8 @@ class Report(models.Model):
 		'Shift Drink - ITM'
 		
         """
+        
+        service_name = service
 
         for transaction in json_data:
             for item in transaction['itemizations']:
@@ -78,7 +80,7 @@ class Report(models.Model):
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
                         report_item.discount = label
-                        report_item.service = str(service).title()
+                        report_item.service = str(service_name).title()
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         
@@ -94,7 +96,7 @@ class Report(models.Model):
                             report_item.sku = ''
                         report_item.price = format_money(item['single_quantity_money']['amount'])
                         report_item.quantity = int(float(item['quantity']))
-                        report_item.discountcost = format_money(abs(item['discount_money']['amount']))
+                        report_item.discountcost = format_money(abs(item['discount_money']['amount'])/report_item.quantity)
                         report_item.save()
                 except IndexError:
                     # There's nothing to do
@@ -154,12 +156,12 @@ class Report(models.Model):
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if discount is not None:
-            if service is not None:
+            if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service, discount_label__name=discount)
             else:
                 return Report.objects.filter(date__range=(start_date, end_date))
         else:
-            if service is not None:
+            if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
             else:
                 return Report.objects.filter(date__range=(start_date, end_date))
