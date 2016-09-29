@@ -8,6 +8,8 @@
 
         $( "#start_datepicker" ).datepicker().val("{{ today }}");
         $( "#end_datepicker" ).datepicker().val("{{ today }}");
+        
+        var menu_populated = false;
 
         // AJAX for requesting report
         function submit_form() {
@@ -45,16 +47,22 @@
                         var discount_options = [];
                         var select = document.getElementById("discount_select");
                         // Resets discount options so that they don't add up every time someone fetches a report
-                        select.options.length = 1;
+                        if (menu_populated == false){
+                            select.options.length = 1;
+                        }
+                        
 
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
                                 // Keeps track of discounts in this particular report
                                 var discount = parsed_data.reports[i]['items'][j]['discount']
-                                if (discount_options.indexOf(discount) == -1) {
-                                    discount_options.push(discount);
-                                    select.options[select.options.length] = new Option(discount, discount);
+                                if (menu_populated == false) {
+                                    if (discount_options.indexOf(discount) == -1) {
+                                        discount_options.push(discount);
+                                        select.options[select.options.length] = new Option(discount, discount);
+                                    }
                                 }
+
                                 
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
                                 $("#reports-table tbody").append("\
@@ -86,7 +94,8 @@
                             ");
                         }
                         
-                        
+                        // Finalizes the list of discount options
+                        menu_populated = true;
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
