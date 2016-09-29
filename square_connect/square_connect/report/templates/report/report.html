@@ -40,9 +40,22 @@
                                 <th>Time</th>\
                             </tr>\
                         ");
+                        
+                        // Dynamically populates discount drop down
+                        var discount_options = [];
+                        var select = document.getElementById("discount_select");
+                        // Resets discount options so that they don't add up every time someone fetches a report
+                        select.options.length = 1;
 
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
+                                // Keeps track of discounts in this particular report
+                                var discount = parsed_data.reports[i]['items'][j]['discount']
+                                if (discount_options.indexOf(discount) == -1) {
+                                    discount_options.push(discount);
+                                    select.options[select.options.length] = new Option(discount, discount);
+                                }
+                                
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
                                 $("#reports-table tbody").append("\
                                     <tr>\
@@ -72,6 +85,8 @@
                                 </tr>\
                             ");
                         }
+                        
+                        
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
@@ -114,8 +129,10 @@
         $('#report-form-button').click(function() {
             submit_form();
         });
+        window.onload = submit_form();
     });
 </script>
+
 
 <div class="jumbotron">
     <h1>Reports</h1>
@@ -124,14 +141,13 @@
             <th>
                 <p>Discount:
                 <select id="discount_select" name="discount">
-                    <option selected="selected">-- Select Discount --</option>
+                    <option selected="selected" value="all">All Discounts</option>
                 </select> </p>
             </th>
             <th>
                 <p>Service:
                 <select id="service_select" name="service">
-                    <option selected="selected">-- Select Service --</option>
-                    <option value="all">All Services</option>
+                    <option selected="selected" value="all">All Services</option>
                     <option value="mug">MUG</option>
                     <option value="vittles">Vital Vittles</option>
                     <option value="snaxa">Hoya Snaxa</option>
