@@ -155,11 +155,11 @@ class Report(models.Model):
         @param discount: (Optional) The discount to pull reports for
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
-        if discount is not None:
+        if (discount is not None) and (discount != 'all'):
             if (service is not None) and (service != 'all'):
-                return Report.objects.filter(date__range=(start_date, end_date), service__name=service, discount_label__name=discount)
+                return Report.objects.filter(date__range=(start_date, end_date), service__name=service, discount_label=discount)
             else:
-                return Report.objects.filter(date__range=(start_date, end_date))
+                return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
         else:
             if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)

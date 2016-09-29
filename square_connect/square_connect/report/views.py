@@ -32,7 +32,8 @@ def request_custom_report(request):
     request.POST dictionary keys:
         start_date
         end_date
-        service"""
+        service
+        discount"""
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
@@ -48,7 +49,8 @@ def request_custom_report(request):
             start_date = datetime.strptime(start_date, "%m/%d/%Y").date()
             end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
             service = request.POST.get('service', None)
-            reports = Report.search_reports(start_date, end_date, service)
+            discount = request.POST.get('discount', None)
+            reports = Report.search_reports(start_date, end_date, service, discount)
             reports_list = []
             if reports.count() > 0:
                 for report in reports:

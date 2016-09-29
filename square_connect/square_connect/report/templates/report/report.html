@@ -14,7 +14,7 @@
             $.ajax({
                 url : "{% url 'request_custom_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
 
                 // handle a successful response
                 success : function(json) {
@@ -139,12 +139,6 @@
     <table class="table">
         <tr>
             <th>
-                <p>Discount:
-                <select id="discount_select" name="discount">
-                    <option selected="selected" value="all">All Discounts</option>
-                </select> </p>
-            </th>
-            <th>
                 <p>Service:
                 <select id="service_select" name="service">
                     <option selected="selected" value="all">All Services</option>
@@ -154,6 +148,12 @@
                     <option value="ug">Uncommon Grounds</option>
                     <option value="midnight">Midnight Mug</option>
                     <option value="hilltoss">Hilltoss</option>
+                </select> </p>
+            </th>
+            <th>
+                <p>Discount:
+                <select id="discount_select" name="discount">
+                    <option selected="selected" value="all">All Discounts</option>
                 </select> </p>
             </th>
             <th>
