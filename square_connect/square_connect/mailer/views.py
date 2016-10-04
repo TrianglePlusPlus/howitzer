@@ -17,9 +17,13 @@ def mailer(request):
     assert isinstance(request, HttpRequest)
 
     if request.method == 'POST':
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            form.save()
+        if request.POST.get('person') == None:
+            form = PersonForm(request.POST)
+            if form.is_valid():
+                form.save()
+                form = PersonForm()
+        else:
+            Person.objects.get(pk=request.POST.get('person')).delete()
             form = PersonForm()
     else:
         form = PersonForm()
