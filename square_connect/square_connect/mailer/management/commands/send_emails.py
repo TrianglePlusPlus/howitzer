@@ -33,7 +33,7 @@ class Command(BaseCommand):
         """
         if datetime.datetime.weekday():
 	    excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
-	else:
+        else:
 	    excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard", "mug", "hilltoss"]
         services = Service.objects.exclude(name__in=excludes)
 
