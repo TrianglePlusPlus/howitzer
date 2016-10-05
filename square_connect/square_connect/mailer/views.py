@@ -4,7 +4,9 @@ from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from mailer.models import MailingList, Person
 from mailer.forms import PersonForm
+from app.models import Service
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.mail import send_mail
 
 @login_required
 def mailer(request):
@@ -21,6 +23,21 @@ def mailer(request):
             form = PersonForm(request.POST)
             if form.is_valid():
                 form.save()
+                mailing_list = form.cleaned_data['mailing_list']
+                service = mailing_list.service
+                service_name = service.name
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                email = form.cleaned_data['email']
+                print(email)
+                send_mail(
+                    "Mailing List Notification",
+                    "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + ".",
+                    "reports@thecorp.org",
+                    [email],
+                    fail_silently=False
+                )
+
                 form = PersonForm()
         else:
             Person.objects.get(pk=request.POST.get('person')).delete()
