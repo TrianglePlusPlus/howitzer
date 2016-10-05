@@ -7,6 +7,7 @@ from mailer.models import MailingList, Person
 from datetime import date, timedelta
 from django.core.mail import send_mail
 from spoilage_report.models import SpoilageReport, SpoilageItem
+import datetime
 
 class Command(BaseCommand):
     help = "Sends emails with generated spoilage reports to the UM of each service"
@@ -30,7 +31,10 @@ class Command(BaseCommand):
                 *students of georgetown incorporated
                 *project whiteboard
         """
-        excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
+        if datetime.datetime.weekday():
+	    excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
+	else:
+	     excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard", "mug", "hilltoss"]
         services = Service.objects.exclude(name__in=excludes)
 
         for service in services:
