@@ -30,7 +30,6 @@ def mailer(request):
                 first_name = form.cleaned_data['first_name']
                 last_name = form.cleaned_data['last_name']
                 email = form.cleaned_data['email']
-                print(email)
                 send_mail(
                     "Mailing List Notification",
                     "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + ".",
