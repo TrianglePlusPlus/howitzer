@@ -22,6 +22,7 @@ def mailer(request):
         if request.POST.get('person') == None:
             form = PersonForm(request.POST)
             if form.is_valid():
+                # add to mailing list
                 form.save()
                 mailing_list = form.cleaned_data['mailing_list']
                 service = mailing_list.service
@@ -40,6 +41,7 @@ def mailer(request):
 
                 form = PersonForm()
         else:
+            # remove from mailing list
             Person.objects.get(pk=request.POST.get('person')).delete()
             form = PersonForm()
     else:
