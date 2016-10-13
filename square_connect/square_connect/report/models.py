@@ -13,33 +13,13 @@ class Report(models.Model):
     discount_label = models.CharField(max_length=50, default='')
 
     @staticmethod
-    def add_items_from_json_data(json_data, service, discount='All'):
+    def add_items_from_json_data(json_data, service_name, discount='All'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
         @param service: A service object correspondinng to the sales data
 		@param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
         
-        """
-        List of discounts:
-        TODO: Check to see if there are more discounts
-		
-		'Employee Discount - Coffee'
-		'Spoil'
-		'Cup Reuse'
-		'Dollar FIDDY Off Dat Sambo'
-		'Shift Drink - UG'
-		'Shift Drink - Vital Vittles'
-		'Shift Drink - Accounting'
-		'Shift Drink - Accounting'
-		'Shift Drink - MUG'
-		'Shift Drink - Hoya Snaxa'
-		'Shift Drink - ITM'
-		
-        """
-        
-        service_name = service
-
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
@@ -57,18 +37,21 @@ class Report(models.Model):
                     if found:
                         # Check to see if that item is already in the database
                         
-                        if Item.objects.filter(transaction_id=transaction["id"],
+                        try:
+                            if Item.objects.filter(transaction_id=transaction["id"],
                                 name=item['name'], variant=item['item_variation_name']).count() > 0:
                             # The item already exists, don't save a new one
-                            continue
+                                continue
+                        except KeyError as e:
+                            print("KeyError found: " + str(e))
 					    
                         # Get the report that the item should go on
                         transaction_date = Report.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
-                        if Report.objects.filter(date=transaction_date, service=service, discount_label=label).count() > 0:
-                            report = Report.objects.get(service=service, date=transaction_date, discount_label=label)
+                        if Report.objects.filter(date=transaction_date, service=service_name, discount_label=label).count() > 0:
+                            report = Report.objects.get(service=service_name, date=transaction_date, discount_label=label)
                         else:
-                            report = Report.objects.create(service=service, date=transaction_date, discount_label=label)
+                            report = Report.objects.create(service=service_name, date=transaction_date, discount_label=label)
                         report_item = Item()
                         report_item.report_id = report.id
                         report_item.transaction_id = transaction['id']
@@ -80,15 +63,19 @@ class Report(models.Model):
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
                         report_item.discount = label
-                        report_item.service = str(service_name).title()
+                        #report_item.service = str(service_name).title()
+                        report_item.service = 'Testing'
+                        
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
                         
-                        if len(item['item_variation_name']) > 1:
-                            report_item.variant = item['item_variation_name']
-                        else:
-                            report_item.variant = ''
-						
+                        try:
+                            if len(item['item_variation_name']) > 1:
+                                report_item.variant = item['item_variation_name']
+                            else:
+                                report_item.variant = ''
+                        except KeyError as e:
+                            print("KeyError found: " + str(e))
                         # 2 is an arbitrary cut off, normal SKUs should be 12
                         if len(item['item_detail']['sku']) > 2:
                             report_item.sku = item['item_detail']['sku']

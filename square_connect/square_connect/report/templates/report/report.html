@@ -9,7 +9,9 @@
         $( "#start_datepicker" ).datepicker().val("{{ today }}");
         $( "#end_datepicker" ).datepicker().val("{{ today }}");
         
-        var menu_populated = false;
+        var populate = true;
+        var current_service = $('#service_select').val();
+        var seen_service = false;
 
         // AJAX for requesting report
         function submit_form() {
@@ -44,10 +46,32 @@
                         ");
                         
                         // Dynamically populates discount drop down
+                        
                         var discount_options = [];
                         var select = document.getElementById("discount_select");
-                        // Resets discount options so that they don't add up every time someone fetches a report
-                        if (menu_populated == false){
+                        
+                        // Logic handling drop down population while maintaining an individual service's discounts
+                        // I.E. Don't repopulate if we're narrowing down discounts. Only repopulate if the service changes
+                        if (current_service == 'all'){
+                            current_service = $('#service_select').val();
+                            populate = true;
+                            seen_service = false;
+                        }
+                        if (current_service != 'all'){
+                            populate = true;
+                            if (current_service == $('#service_select').val()){
+                                // Don't repopulate if we're still looking at the same service
+                                if (seen_service == true){
+                                    populate = false;
+                                }
+                                seen_service = true;
+                            }
+                            else {
+                                current_service = $('#service_select').val();
+                                seen_service = true;
+                            }
+                        }
+                        if (populate == true){
                             select.options.length = 1;
                         }
                         
@@ -56,14 +80,13 @@
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
                                 // Keeps track of discounts in this particular report
                                 var discount = parsed_data.reports[i]['items'][j]['discount']
-                                if (menu_populated == false) {
+                                if (populate == true) {
                                     if (discount_options.indexOf(discount) == -1) {
                                         discount_options.push(discount);
                                         select.options[select.options.length] = new Option(discount, discount);
                                     }
                                 }
 
-                                
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
                                 $("#reports-table tbody").append("\
                                     <tr>\
@@ -95,7 +118,7 @@
                         }
                         
                         // Finalizes the list of discount options
-                        menu_populated = true;
+                        populate = false;
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
