@@ -6,12 +6,24 @@
     $( document ).ready(function() {
         $.noConflict();
 
-        $( "#start_datepicker" ).datepicker().val("{{ today }}");
-        $( "#end_datepicker" ).datepicker().val("{{ today }}");
-        
         var populate = true;
         var current_service = $('#service_select').val();
+        var current_discount = $('#discount_select').val();
         var seen_service = false;
+        
+        if ("{{ today }}" == ""){
+            $("#start_datepicker").datepicker().val("{{ start_date }}");
+            $("#end_datepicker").datepicker().val("{{ end_date }}");
+            $("#service_select").val("{{ service }}");
+            current_service = $("#service_select").val("{{ service }}");
+            $("#discount_select").val("{{ discount }}");
+            current_discount = $("#discount_select").val("{{ discount }}");
+            submit_form()
+        }
+        else {
+            $( "#start_datepicker" ).datepicker().val("{{ today }}");
+            $( "#end_datepicker" ).datepicker().val("{{ today }}");
+        }
 
         // AJAX for requesting report
         function submit_form() {
@@ -23,6 +35,14 @@
                 // handle a successful response
                 success : function(json) {
                     var parsed_data = json;
+                    var start_date_input = $('#start_datepicker').val().split('/');
+                    var end_date_input = $('#end_datepicker').val().split('/');
+                    var start_date = new Date(start_date_input[2], start_date_input[0] - 1, start_date_input[1]); // -1 necessary as js months are 0-based
+                    var end_date = new Date(end_date_input[2], end_date_input[0] - 1, end_date_input[1]); // see above comment
+                    var start_date_str = start_date.getFullYear() + '/' + (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_date_str = end_date.getFullYear() + '/' + (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+
+                    history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + $('#discount_select').val() + '/' + start_date_str + '/' + end_date_str);
                     console.log(json);
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -46,6 +66,7 @@
                         ");
                         
                         // Dynamically populates discount drop down
+                        // Currently does not handle edge case of User selects a specific discount looking at all services. Then narrows down by service. The discount drop-down has no knowledge of the narrowed down service's list of discounts. Not sure how to get around that
                         
                         var discount_options = [];
                         var select = document.getElementById("discount_select");
@@ -54,8 +75,12 @@
                         // I.E. Don't repopulate if we're narrowing down discounts. Only repopulate if the service changes
                         if (current_service == 'all'){
                             current_service = $('#service_select').val();
-                            populate = true;
-                            seen_service = false;
+                            current_discount = $('#discount_select').val();
+                            // Don't repopulate if we're narrowing down within all services
+                            if (current_discount == 'all'){
+                                populate = true;
+                                seen_service = false;
+                            }
                         }
                         if (current_service != 'all'){
                             populate = true;

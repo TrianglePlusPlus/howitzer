@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
 
 import json
+from urllib.parse import unquote
 
 def report(request):
     """Renders the reports page."""
@@ -75,24 +76,37 @@ def request_custom_report(request):
             content_type="application/json"
         )
 
-def report_date(request, service_location, year, month, day):
-	"""Renders the reports for a given date"""
+def report_date(request, service_location, discount_label, start_year, start_month, start_day, end_year, end_month, end_day):
+    """Renders the reports for a given date
+    @param request: Takes a request for spoilage
+    @param service_location: Takes in Corp Service E.X. "mug"
+    @param discount_label: Takes in a discount to search for E.X. "spoil"
+    @param start_year: Takes in the start year of the spoilage
+    @param start_month: Takes in the start month of the spoilage
+    @param start_day: Takes in the start day of the spoilage
+    @param end_year: Takes in the end year of the spoilage
+    @param end_month: Takes in the end month of the spoilage
+    @param end_day: Takes in the end day of the spoilage
+    @returns filtered spoilage data based on date and service
+    """
 
-	assert isinstance(request, HttpRequest)
+    assert isinstance(request, HttpRequest)
 
-	date = year + '-' + month + '-' + day
-	service = service_location
+    start_date = start_month + '/' + start_day + '/' + start_year
+    end_date = end_month + '/' + end_day + '/' + end_year
+    discount = unquote(discount_label)
+    service = service_location
 
-	report = Report.objects.filter(date=date, service__name=service)
-	if report.count() > 0:
-            report = Report.objects.get(date=date, service__name=service)
-	return render(
+    return render(
         request,
         'report/report.html',
         context_instance = RequestContext(request,
         {
-            'report':report,
-            'title':service + ' Report Viewer',
+            'start_date': start_date,
+            'end_date': end_date,
+            'service': service,
+            'discount': discount,
+            'title': service + ' Report Viewer',
             'year':'Remember never give up.',
         })
     )
