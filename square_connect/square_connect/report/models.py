@@ -63,8 +63,12 @@ class Report(models.Model):
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
                         report_item.discount = label
-                        #report_item.service = str(service_name).title()
-                        report_item.service = 'Testing'
+                        
+                        # Formats the service names correctly from all lower case to either all upper case (for MUG and UG) or Title Case
+                        if len(str(service_name.name)) > 3:
+                            report_item.service = str(service_name.name).title()
+                        else:
+                            report_item.service = str(service_name.name).upper()
                         
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
