@@ -54,5 +54,7 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
     url(r'^mailinglists/$', mailer_views.mailer_admin, name='mailer_admin'),
+    url(r'^add_emp', mailer_views.add_emp, name='add_emp'),
+    url(r'^delete_emp', mailer_views.delete_emp, name='delete_emp'),
     url(r'^favicon\.ico$', RedirectView.as_view(url='static/favicon.ico')),
 ]

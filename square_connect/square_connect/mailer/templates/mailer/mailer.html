@@ -2,11 +2,94 @@
 
 {% block content %}
 
+<script>
+$( document ).ready
+(
+    function() 
+    {
+        $.noConflict();
+        
+	function submit_form() 
+        {
+            $.ajax
+            ({
+                url : "{% url 'add_emp' %}",
+                
+		type : "POST", // http method
+                
+		data : 
+                { 
+                    mailing_list : $('#mailing_list').val(), 
+                    first_name : $('#first_name').val(), 
+                    last_name : $('#last_name').val(), 
+                    email : $('#email').val() 
+                }, // data sent with the post request
+	        
+		success : function(json) 
+                {    
+                    $("#div").html
+                    (
+                        "<h3>" + json.result + "</h3>"
+                    );
+
+                    $("#"+json.person_service).html
+                    (
+                        "<p>" + json.person_first_name + " " + json.person_last_name + ": " + json.person_email + "</p>"
+                    )                 
+                }
+             });
+        };
+
+       	function delete_emp() 
+        {
+            console.log($("#delete-person-input").val(event.target.dataset.person));
+            $.ajax
+            ({
+                url : "{% url 'delete_emp' %}",
+                
+		type : "POST", // http method
+                
+		data : 
+                { 
+                    person : $("#delete-person-input").val(event.target.dataset.person),
+                }, // data sent with the post request
+	        
+		success : function(json) 
+                {   
+                    $("#div").html
+                    (
+                        "<h3>" + json.result + "</h3>"
+                    ); 
+                }
+             });
+        };
+
+        
+        $('.delete-form-button').click
+        (
+            function() 
+            {
+                delete_emp();
+            }
+        );
+
+
+        $('.submit-form-button').click
+        (
+            function() 
+            {
+                submit_form();
+            }
+        );
+    }
+);  
+</script>
+
 <div class="jumbotron">
+    <div id="div">
+    </div>
     <h1>Mailer</h1>
-    <h2>Add New Employee</h2>
-    <form method="post">
-        {% csrf_token %}	    
+    <h2>Add New Employee</h2> 
 	<div class="form-group">
 		<label for="mailing_list">Mailing List</label>
 		<select id="mailing_list" name="mailing_list" class="form-control">
@@ -28,8 +111,7 @@
 		<label for="email">Email</label>
                 <input id="email" name="email" class="form-control" value="{{ email }}"></input>
         </div>
-       <button type="submit" class="btn btn-default">Add person</button>
-    </form>
+       <button type="submit" id = "report-form-button" class="btn btn-default submit-form-button">Add person</button>
     <h2>Current Mailing Lists</h2>
     {% for list in mailing_lists %}
 	<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#{{ list.id }}" aria-expanded="false" aria-controls="collapseExample">
@@ -40,28 +122,19 @@
         		{% for person in list.members %}
             			<p>
 					{{ person.first_name }} {{ person.last_name }}: {{ person.email }}
-					<button type="button" class="btn btn-default delete-person-submit" data-person="{{ person.id }}">Delete</button> 
+					<button type='submit' class='btn btn-default delete-form-button' data-person='{{ person.id }}'>Delete</button> 
 	   			</p>
         		{% endfor %}
+                        <p id="{{ list.service.name }}">
+                        </p> 
 		</div>
 	</div>
 	<br>
     {% endfor %}
-</p>
-</div>
+
     <form id="delete-person-form" method="post">
         {% csrf_token %}
         <input type="hidden" id="delete-person-input" name="person">
     </form>
-</div>
-
-<script>
-$(document).ready(function() {
-    $(".delete-person-submit").click(function() {
-        $("#delete-person-input").val(event.target.dataset.person);
-        $("#delete-person-form").submit();
-    });
-});
-</script>
 
 {% endblock %}

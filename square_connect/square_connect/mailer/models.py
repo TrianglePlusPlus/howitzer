@@ -12,6 +12,11 @@ class MailingList(models.Model):
     def members(self):
         return Person.objects.filter(mailing_list=self)
 
+class PersonManager(models.Manager):
+    def create_person(self, mailing_list, first_name, last_name, email):
+        person = self.create(mailing_list=mailing_list, first_name=first_name, last_name=last_name, email=email)
+        return person
+
 class Person(models.Model):
     """ A single user
     Part of a mailing list """
@@ -22,3 +27,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField()
+
+    objects = PersonManager()
+
+
