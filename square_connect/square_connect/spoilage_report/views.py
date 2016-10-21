@@ -113,13 +113,14 @@ def export_csv(request):
         end_date
         service
 	@param request: Takes in a request query to return a CSV file of filtered spoilage data. Queries must have a date range as well as service
-	@returns filtered spoilage data based on a date in .CSV format
+	@returns filtered spoilage data based on a date range in .CSV format
 	"""
     if request.method == "POST":
         return_data = {}
         sum_total = 0
 
         # Check if they are searching for a report
+        reports = []
         if request.POST.get('start_date', False) and request.POST.get('end_date', False):
             # They are searching for a report
             start_date = request.POST.get('start_date', None)
@@ -128,29 +129,18 @@ def export_csv(request):
             end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
             service = request.POST.get('service', None)
             reports = SpoilageReport.search_reports(start_date, end_date, service)
-            reports_list = []
-            if reports.count() > 0:
-                for report in reports:
-                    sum_total += report.get_total
-                    reports_list.append(report.dictionary_form())
-                return_data = {
-                    "reports": reports_list,
-                    "sum_total": sum_total
-                }
-        else:
-            reports = None # is this really necessary?
 
+        # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="export.csv"'
-
         writer = csv.writer(response)
-        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
-        for report in reports:
-            # iterate over reports
-            writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-            writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+        writer.writerow(['Item', 'Variant', 'Price', 'Quantity', 'Transaction ID', 'Time'])
+        if reports.count() > 0:
+            for report in reports:
+                for item in report.get_associated_items:
+                    writer.writerow([item.name, item.variant, item.price, item.quantity, item.transaction_id, item.transaction_time])
+                writer.writerow([])
 
         return response
 
