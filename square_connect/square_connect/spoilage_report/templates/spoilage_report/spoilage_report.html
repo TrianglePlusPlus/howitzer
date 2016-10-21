@@ -1,10 +1,25 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+{% load staticfiles%}
+<script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
 
 <script>
     $( document ).ready(function() {
         $.noConflict();
+
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
 
         if ("{{ today }}" == "") {
             $("#start_datepicker").datepicker().val("{{ start_date }}");
@@ -116,6 +131,30 @@
         $('#report-form-button').click(function() {
             submit_form();
         });
+
+        $('#export-csv-button').click(function() {
+            var form = $('<form/>', {
+                action: "{% url 'export_csv' %}",
+                method: "post"
+            });
+            form.append("{% csrf_token %}");
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'service',
+                    value: $('#service_select').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'start_date',
+                    value: $('#start_datepicker').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'end_date',
+                    value: $('#end_datepicker').val()
+            }));
+            form.submit();
+        });
     });
 </script>
 
@@ -143,6 +182,9 @@
             <th>
                 <button id="report-form-button" type="submit" class="btn btn-default">Retrieve report</button>
             </th>
+            <th>
+                <button id="export-csv-button" class="btn btn-default">Export CSV</button>
+            </th>
         </tr>
     </table>
     <h3>Search Results:</h3>
@@ -161,6 +203,12 @@
         </div>
         <input type="hidden" name="send" value="yes" />
     </form-->
+
+    <form action="" method="post">
+        <input type="hidden" name="service" value="">
+        <input type="hidden" name="start_date" value="">
+        <input type="hidden" name="end_date" value="">
+    </form>
 </div>
 
 {% endblock %}
