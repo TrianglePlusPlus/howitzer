@@ -42,7 +42,7 @@ class Command(BaseCommand):
             for person in mailing_list.members:
                 # Get the spoilage report for the past day
                 yesterday = date.today() - timedelta(days=1)
-                report_url = "http://reports.thecorp.org/spoilage_report/" + service.name + "/" + yesterday.strftime('%Y/%m/%d') + '/' + yesterday.strftime('%Y/%m/%d') + '/'
+                report_url = "http://reports.thecorp.org/spoilage_report?service=" + service.name + "&start_date=" + yesterday.strftime('%m/%d/%Y') + '&end_date=' + yesterday.strftime('%m/%d/%Y')
 
                 # Send a link to that report in an email
                 send_mail(
