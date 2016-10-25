@@ -5,7 +5,6 @@ from django.db import models
 from app.models import service_names
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from datetime import datetime
-from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 
