@@ -140,7 +140,7 @@ def export_csv(request):
         if reports.count() > 0:
             for report in reports:
                 for item in report.get_associated_items:
-                    writer.writerow([item.name, item.variant, item.price, item.quantity, item.transaction_id, item.transaction_time])
+                    writer.writerow([item.name, item.variant, item.price, item.quantity, '=HYPERLINK("https://squareup.com/receipt/preview/' + item.transaction_id + '", "View Transaction")', item.transaction_time])
                 writer.writerow([])
 
         return response
