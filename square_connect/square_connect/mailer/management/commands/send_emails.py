@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 *students of georgetown incorporated
                 *project whiteboard
         """
-        if datetime.datetime.weekday():
+        if datetime.datetime.today().weekday() not in [5, 6]:
             excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
         else:
             excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard", "mug", "hilltoss"]
