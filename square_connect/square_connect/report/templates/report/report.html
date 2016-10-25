@@ -10,14 +10,24 @@
         var current_service = $('#service_select').val();
         var current_discount = $('#discount_select').val();
         var seen_service = false;
+        var url_accessed = false;
+        
+        // Dynamically populates discount drop down
+        // Currently does not handle edge case of User selects a specific discount looking at all services. Then narrows down by service. The discount drop-down has no knowledge of the narrowed down service's list of discounts. Not sure how to get around that
+        
+        var discount_options = [];
+        var select = document.getElementById("discount_select");
         
         if ("{{ today }}" == ""){
             $("#start_datepicker").datepicker().val("{{ start_date }}");
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
             current_service = $("#service_select").val("{{ service }}");
+            current_discount = "{{ discount }}";
+            discount_options.push(current_discount);
+            select.options[select.options.length] = new Option(current_discount, current_discount);
             $("#discount_select").val("{{ discount }}");
-            current_discount = $("#discount_select").val("{{ discount }}");
+            url_accessed = true;
             submit_form()
         }
         else {
@@ -30,7 +40,7 @@
             $.ajax({
                 url : "{% url 'request_custom_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request               
 
                 // handle a successful response
                 success : function(json) {
@@ -42,7 +52,13 @@
                     var start_date_str = start_date.getFullYear() + '/' + (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
                     var end_date_str = end_date.getFullYear() + '/' + (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
 
-                    history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + $('#discount_select').val() + '/' + start_date_str + '/' + end_date_str);
+                    if (url_accessed == true) {
+                        history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + current_discount + '/' + start_date_str + '/' + end_date_str);
+                        url_accessed = false;
+                    }
+                    else {
+                        history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + $('#discount_select').val() + '/' + start_date_str + '/' + end_date_str);
+                    }
                     console.log(json);
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -65,11 +81,7 @@
                             </tr>\
                         ");
                         
-                        // Dynamically populates discount drop down
-                        // Currently does not handle edge case of User selects a specific discount looking at all services. Then narrows down by service. The discount drop-down has no knowledge of the narrowed down service's list of discounts. Not sure how to get around that
                         
-                        var discount_options = [];
-                        var select = document.getElementById("discount_select");
                         
                         // Logic handling drop down population while maintaining an individual service's discounts
                         // I.E. Don't repopulate if we're narrowing down discounts. Only repopulate if the service changes
@@ -97,9 +109,13 @@
                             }
                         }
                         if (populate == true){
-                            select.options.length = 1;
+                            if (url_accessed == false){
+                                select.options.length = 1;
+                            }
+                            else{
+                                select.options.length = 2;
+                            }
                         }
-                        
 
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
