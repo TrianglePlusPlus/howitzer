@@ -1,6 +1,15 @@
 ﻿from django.db import models
 from data.transaction import LocationsRequest
 
+service_names = {
+    "mug": "MUG",
+    "vittles": "Vital Vittles",
+    "snaxa": "Hoya Snaxa",
+    "ug": "Uncommon Grounds",
+    "midnight": "Midnight Mug",
+    "hilltoss": "Hilltoss",
+}
+
 class Service(models.Model):
     def __str__(self):
         return self.name
