@@ -2,7 +2,7 @@
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
-from app.models import Service
+from app.models import Service, service_names
 from mailer.models import MailingList, Person
 from datetime import date, timedelta
 from django.core.mail import send_mail
@@ -43,15 +43,6 @@ class Command(BaseCommand):
                 # Get the spoilage report for the past day
                 yesterday = date.today() - timedelta(days=1)
                 report_url = "http://reports.thecorp.org/spoilage_report/" + service.name + "/" + yesterday.strftime('%Y/%m/%d') + '/' + yesterday.strftime('%Y/%m/%d') + '/'
-
-                service_names = {
-                    "mug": "MUG",
-                    "vittles": "Vital Vittles",
-                    "snaxa": "Hoya Snaxa",
-                    "ug": "Uncommon Grounds",
-                    "midnight": "Midnight Mug",
-                    "hilltoss": "Hilltoss",
-                }
 
                 # Send a link to that report in an email
                 send_mail(
