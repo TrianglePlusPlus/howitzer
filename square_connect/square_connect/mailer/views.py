@@ -73,10 +73,12 @@ def add_emp(request):
 
         response_data = {}
         response_data['result'] = 'Successful Submit!'
+        response_data['person_id'] = person.id
         response_data['person_first_name'] = person.first_name
         response_data['person_last_name'] = person.last_name
         response_data['person_email'] = person.email
         response_data['person_service'] = service.name
+        response_data['person_service_id'] = service.merchant_id
 
         send_mail(
             "Mailing List Notification",
@@ -99,10 +101,23 @@ def add_emp(request):
 
 @csrf_exempt
 def delete_emp(request):
-    if request.method == "POST":
-
+    
+    if request.method == "POST":  
+        
         person_id = request.POST.get('person', None)
+        print(person_id)
         person = Person.objects.get(id=person_id)
+        
+        response_data = {}
+        response_data['result'] = 'Successful Delete!'
+        response_data['person_id'] = person.id
+        response_data['person_first_name'] = person.first_name
+        response_data['person_last_name'] = person.last_name
+        response_data['person_email'] = person.email
+        response_data['person_service'] = person.mailing_list.service.name
+        response_data['person_service_id'] = person.mailing_list.service.merchant_id
+
+
         person.delete()
 
         return HttpResponse(

@@ -26,50 +26,62 @@ $( document ).ready
                 }, // data sent with the post request
 	        
 		success : function(json) 
-                {    
-                    $("#div").html
+                {              
+                    $('#div').html
                     (
-                        "<h3>" + json.result + "</h3>"
+                        "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "</h1><h3 style='text-align:center'>Added " + json.person_first_name + " " + json.person_last_name + " to the " + json.person_service + " mailing list.</h3></div>"
                     );
-
-                    $("#"+json.person_service).html
-                    (
-                        "<p>" + json.person_first_name + " " + json.person_last_name + ": " + json.person_email + "</p>"
-                    )                 
+                    $('#mailing_list').val('');
+                    $('#first_name').val('');
+                    $('#last_name').val('');
+                    $('#email').val('')
+                    $('#' + json.person_service_id).html
+                    (                 
+                        "<p id='" + json.person_first_name + json.person_last_name + "'>" + json.person_first_name + " " + json.person_last_name + ": " + json.person_email + " <button type='submit' id = '" + json.person_id + "' value = '" + json.person_id + "' class='btn btn-default delete-emp-button'>Delete</button></p>"		
+                    );
+                    $('html, body').animate({ scrollTop: 0 }, 0); 
                 }
              });
         };
 
-       	function delete_emp() 
+       	function delete_emp(buttonpressed) 
         {
-            console.log($("#delete-person-input").val(event.target.dataset.person));
+            console.log(buttonpressed);
             $.ajax
             ({
                 url : "{% url 'delete_emp' %}",
                 
-		type : "POST", // http method
+	        type : "POST", // http method
                 
-		data : 
+	        data : 
                 { 
-                    person : $("#delete-person-input").val(event.target.dataset.person),
+                    person : buttonpressed,
                 }, // data sent with the post request
 	        
-		success : function(json) 
+	        success : function(json) 
                 {   
                     $("#div").html
                     (
-                        "<h3>" + json.result + "</h3>"
-                    ); 
-                }
-             });
+                        "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "!</h1><h3 style='text-align:center'>Removed " + json.person_first_name + " " + json.person_last_name + " from the " + json.person_service + " mailing list.</h3></div>"
+                    );
+                    $('.mailing_list').addClass('collapsed');
+                    console.log(json.person_first_name + json.person_last_name);
+                    $('#' + json.person_first_name + json.person_last_name).remove();
+                    $('.mailing_list_2').removeClass('in');
+                    $('.mailing_list_2').addClass('collapse');
+                    $('html, body').animate({ scrollTop: 0 }, 0); 
+                },
+            });
         };
 
         
-        $('.delete-form-button').click
+        $('.delete-emp-button').click
         (
             function() 
             {
-                delete_emp();
+                var buttonpressed = $(this).attr('value');      
+                console.log(buttonpressed); 
+                delete_emp(buttonpressed);
             }
         );
 
@@ -114,27 +126,21 @@ $( document ).ready
        <button type="submit" id = "report-form-button" class="btn btn-default submit-form-button">Add person</button>
     <h2>Current Mailing Lists</h2>
     {% for list in mailing_lists %}
-	<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#{{ list.id }}" aria-expanded="false" aria-controls="collapseExample">
+	<button class="mailing_list btn btn-default" type="button" data-toggle="collapse" data-target="#{{ list.id }}" aria-expanded="false" aria-controls="collapseExample">
     		{{ list.service }}
     	</button>
-	<div class="collapse" id="{{ list.id }}">
+	<div class="mailing_list_2 collapse" id="{{ list.id }}">
   		<div class="card card-block">
         		{% for person in list.members %}
-            			<p>
+            			<p id='{{ person.first_name }}{{ person.last_name }}'>
 					{{ person.first_name }} {{ person.last_name }}: {{ person.email }}
-					<button type='submit' class='btn btn-default delete-form-button' data-person='{{ person.id }}'>Delete</button> 
+					<button type='submit' id = '{{ person.id }}' value = '{{ person.id }}' class='btn btn-default delete-emp-button'>Delete</button> 
 	   			</p>
         		{% endfor %}
-                        <p id="{{ list.service.name }}">
+                        <p id="{{ list.service.merchant_id }}">
                         </p> 
 		</div>
 	</div>
 	<br>
     {% endfor %}
-
-    <form id="delete-person-form" method="post">
-        {% csrf_token %}
-        <input type="hidden" id="delete-person-input" name="person">
-    </form>
-
 {% endblock %}
