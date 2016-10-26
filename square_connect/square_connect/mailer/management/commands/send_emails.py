@@ -39,11 +39,12 @@ class Command(BaseCommand):
 
         for service in services:
             mailing_list = MailingList.objects.get(service=service)
-            for person in mailing_list.members:
-                # Get the spoilage report for the past day
-                yesterday = date.today() - timedelta(days=1)
-                report_url = "http://reports.thecorp.org/spoilage_report?service=" + service.name + "&start_date=" + yesterday.strftime('%m/%d/%Y') + '&end_date=' + yesterday.strftime('%m/%d/%Y')
 
+            # Get the spoilage report for the past day
+            yesterday = date.today() - timedelta(days=1)
+            report_url = "http://reports.thecorp.org/spoilage_report?service=" + service.name + "&start_date=" + yesterday.strftime('%m/%d/%Y') + '&end_date=' + yesterday.strftime('%m/%d/%Y')
+
+            for person in mailing_list.members:
                 # Send a link to that report in an email
                 send_mail(
                     "Spoilage Report",
