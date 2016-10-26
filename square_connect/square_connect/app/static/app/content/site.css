@@ -40,3 +40,42 @@ input[type="checkbox"].input-validation-error {
 .validation-summary-valid {
     display: none;
 }
+
+.jumbotron {
+    background-color: white;
+}
+
+div.navbar.navbar-inverse.navbar-fixed-top {
+    background-color: #0E2B7B;
+}
+
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus, .navbar-inverse .navbar-brand:hover {
+    color: white;
+    border-bottom: 1.5px solid white;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a {
+    color: white;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+}
+
+#logo {
+    height: 60px;
+    width: 60px;
+    border: white;
+}
+
+.navbar-inverse {
+    border: white;
+}
+
+.navbar-nav>li>a, .navbar-brand {
+    padding-top: 20px;
+}
+
+.container {
+    padding-left: 1px;
+}
