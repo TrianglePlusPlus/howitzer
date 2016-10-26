@@ -14,51 +14,45 @@ import json, csv
 def spoilage_report(request):
     """Renders the reports page.
 	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date
-	@returns filtered spoilage data for today
+    @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
+    @param start_year: (GET parameter) Takes in the start year of the spoilage
+    @param start_month: (GET parameter) Takes in the start month of the spoilage
+    @param start_day: (GET parameter) Takes in the start day of the spoilage
+    @param end_year: (GET parameter) Takes in the end year of the spoilage
+    @param end_month: (GET parameter) Takes in the end month of the spoilage
+    @param end_day: (GET parameter) Takes in the end day of the spoilage
+    @returns filtered spoilage data for today if no GET parameters, or based on date and service
 	"""
     assert isinstance(request, HttpRequest)
-    today = datetime.today().strftime("%m/%d/%Y")
 
-    return render(
-        request,
-        'spoilage_report/spoilage_report.html',
-        {
-            'today':today,
-            'title':'Report Viewer',
-            'year':'Remember never give up.',
-        }
-    )
+    if request.GET.get('service', None):
+        service = request.GET.get('service', None)
+        # TODO: discount = request.GET.get('discount', None)
+        start_date = request.GET.get('start_date', None)
+        end_date = request.GET.get('end_date', None)
 
-@login_required
-def spoilage_report_date(request, service_location, start_year, start_month, start_day, end_year, end_month, end_day):
-    """Renders the reports for a given date. Takes in URL regex as parameters. This should only be called from urls.py
-    @param request: Takes a request for spoilage
-    @param service_location: Takes in Corp Service E.X. "mug"
-    @param start_year: Takes in the start year of the spoilage
-    @param start_month: Takes in the start month of the spoilage
-    @param start_day: Takes in the start day of the spoilage
-    @param end_year: Takes in the end year of the spoilage
-    @param end_month: Takes in the end month of the spoilage
-    @param end_day: Takes in the end day of the spoilage
-    @returns filtered spoilage data based on date and service
-    """
-    assert isinstance(request, HttpRequest)
-
-    start_date = start_month + '/' + start_day + '/' + start_year
-    end_date = end_month + '/' + end_day + '/' + end_year
-    service = service_location
-
-    return render(
-        request,
-        'spoilage_report/spoilage_report.html',
-        {
-            'start_date': start_date,
-            'end_date': end_date,
-            'service': service,
-            'title':'Report Viewer',
-            'year':'Remember never give up.',
-        }
-    )
+        return render(
+            request,
+            'spoilage_report/spoilage_report.html',
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'service': service,
+                'title':'Report Viewer',
+                'year':'Remember never give up.',
+            }
+        )
+    else:
+        today = datetime.today().strftime("%m/%d/%Y")
+        return render(
+            request,
+            'spoilage_report/spoilage_report.html',
+            {
+                'today':today,
+                'title':'Report Viewer',
+                'year':'Remember never give up.',
+            }
+        )
 
 def request_report(request):
     """Requests the spoilage data.
