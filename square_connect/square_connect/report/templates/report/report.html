@@ -7,10 +7,10 @@
         $.noConflict();
 
         var populate = true;
-        var current_service = $('#service_select').val();
+        var current_service = "initial page load";
         var current_discount = $('#discount_select').val();
-        var seen_service = false;
         var url_accessed = false;
+        var second_loop = false; // The page technically loads twice so this will keep track of that
         
         // Dynamically populates discount drop down
         // Currently does not handle edge case of User selects a specific discount looking at all services. Then narrows down by service. The discount drop-down has no knowledge of the narrowed down service's list of discounts. Not sure how to get around that
@@ -22,11 +22,10 @@
             $("#start_datepicker").datepicker().val("{{ start_date }}");
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
-            current_service = $("#service_select").val("{{ service }}");
             current_discount = "{{ discount }}";
             discount_options.push(current_discount);
             select.options[select.options.length] = new Option(current_discount, current_discount);
-            $("#discount_select").val("{{ discount }}");
+            $("#discount_select").val(current_discount);
             url_accessed = true;
             submit_form()
         }
@@ -54,7 +53,12 @@
 
                     if (url_accessed == true) {
                         history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + current_discount + '/' + start_date_str + '/' + end_date_str);
-                        url_accessed = false;
+                        if (second_loop == true){
+                            url_accessed = false;
+                        }
+                        else {
+                            second_loop = true;
+                        }
                     }
                     else {
                         history.replaceState(null, null, '/report/' + $('#service_select').val() + '/' + $('#discount_select').val() + '/' + start_date_str + '/' + end_date_str);
@@ -82,38 +86,42 @@
                         ");
                         
                         
-                        
                         // Logic handling drop down population while maintaining an individual service's discounts
                         // I.E. Don't repopulate if we're narrowing down discounts. Only repopulate if the service changes
-                        if (current_service == 'all'){
-                            current_service = $('#service_select').val();
-                            current_discount = $('#discount_select').val();
-                            // Don't repopulate if we're narrowing down within all services
-                            if (current_discount == 'all'){
-                                populate = true;
-                                seen_service = false;
-                            }
-                        }
-                        if (current_service != 'all'){
+                        
+                        // Populate the first time
+                        if (current_service == "initial page load"){
                             populate = true;
-                            if (current_service == $('#service_select').val()){
-                                // Don't repopulate if we're still looking at the same service
-                                if (seen_service == true){
-                                    populate = false;
-                                }
-                                seen_service = true;
+                            current_service = $('#service_select').val();
+                        }
+                        // If we haven't switched services don't repopulate, unless we're looking at all discounts (This is so they can be repopulated if they get narrowed down due to direct URL accessing)
+                        else if (current_service == $('#service_select').val()){
+                            if ($('#discount_select').val() == 'all'){
+                                populate = true;
                             }
-                            else {
-                                current_service = $('#service_select').val();
-                                seen_service = true;
+                            else{
+                                populate = false;
                             }
                         }
+                        // If the current service is different from the last service repopulate
+                        else{
+                            populate = true;
+                            current_service = $('#service_select').val();
+                        }
+                        
+                        // Don't populating is redundant if url accessed
+                        if (second_loop == true){
+                            populate = false;
+                        }
+                        
                         if (populate == true){
                             if (url_accessed == false){
                                 select.options.length = 1;
+                                discount_options = [];
                             }
                             else{
                                 select.options.length = 2;
+                                discount_options = [];
                             }
                         }
 
@@ -122,6 +130,7 @@
                                 // Keeps track of discounts in this particular report
                                 var discount = parsed_data.reports[i]['items'][j]['discount']
                                 if (populate == true) {
+                                    // If discount is not in discount options, add it 
                                     if (discount_options.indexOf(discount) == -1) {
                                         discount_options.push(discount);
                                         select.options[select.options.length] = new Option(discount, discount);
