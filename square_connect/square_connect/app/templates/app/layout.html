@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - Howitzer</title>
+    <title>{{ title }} - Corp Spoilage</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -29,11 +29,11 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{% url 'home' %}">HOME</a></li>
+                    <li><a id="homeButton" href="{% url 'home' %}">HOME</a></li>
                     <li><a href="{% url 'about' %}">ABOUT</a></li>
                     <li><a href="{% url 'contact' %}">CONTACT</a></li>
                     <li><a href="{% url 'mailer' %}">MAILER</a></li>
-                    <li><a href="{% url 'spoilage_report' %}">SPOILAGE REPORT</a></li>
+                    <li><a href="{% url 'spoilage_report' %}">REPORTS</a></li>
                 </ul>
                 {% include 'app/loginpartial.html' %}
             </div>
