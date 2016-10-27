@@ -3,98 +3,163 @@
 {% block content %}
 
 <script>
-$( document ).ready
-(
-    function() 
-    {
-        $.noConflict();
-        
-	function submit_form() 
-        {
-            $.ajax
-            ({
-                url : "{% url 'add_emp' %}",
-                
-		type : "POST", // http method
-                
-		data : 
-                { 
-                    mailing_list : $('#mailing_list').val(), 
-                    first_name : $('#first_name').val(), 
-                    last_name : $('#last_name').val(), 
-                    email : $('#email').val() 
-                }, // data sent with the post request
-	        
-		success : function(json) 
-                {              
-                    $('#div').html
-                    (
-                        "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "</h1><h3 style='text-align:center'>Added " + json.person_first_name + " " + json.person_last_name + " to the " + json.person_service + " mailing list.</h3></div>"
-                    );
-                    $('#mailing_list').val('');
-                    $('#first_name').val('');
-                    $('#last_name').val('');
-                    $('#email').val('')
-                    $('#' + json.person_service_id).html
-                    (                 
-                        "<p id='" + json.person_first_name + json.person_last_name + "'>" + json.person_first_name + " " + json.person_last_name + ": " + json.person_email + " <button type='submit' id = '" + json.person_id + "' value = '" + json.person_id + "' class='btn btn-default delete-emp-button'>Delete</button></p>"		
-                    );
-                    $('html, body').animate({ scrollTop: 0 }, 0); 
-                }
-             });
-        };
+        // when the page loads
+	$( document ).ready
+	(
+	    function() 
+	    {
+                // you know, I still am not entirely sure what this function does
+                // but it tends to magically fix any and all problems I have with JavaScript/jQuery
+                // so I recomment using it
+		$.noConflict();
 
-       	function delete_emp(buttonpressed) 
-        {
-            console.log(buttonpressed);
-            $.ajax
-            ({
-                url : "{% url 'delete_emp' %}",
-                
-	        type : "POST", // http method
-                
-	        data : 
-                { 
-                    person : buttonpressed,
-                }, // data sent with the post request
-	        
-	        success : function(json) 
-                {   
-                    $("#div").html
-                    (
-                        "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "!</h1><h3 style='text-align:center'>Removed " + json.person_first_name + " " + json.person_last_name + " from the " + json.person_service + " mailing list.</h3></div>"
-                    );
-                    $('.mailing_list').addClass('collapsed');
-                    console.log(json.person_first_name + json.person_last_name);
-                    $('#' + json.person_first_name + json.person_last_name).remove();
-                    $('.mailing_list_2').removeClass('in');
-                    $('.mailing_list_2').addClass('collapse');
-                    $('html, body').animate({ scrollTop: 0 }, 0); 
-                },
-            });
-        };
+                // if a button of class "submit-form-button" is clicked, run the "submit_form" function
+		$('.submit-form-button').click
+		(
+		    function() 
+		    {
+			submit_form();
+		    }
+		);
 
-        
-        $('.delete-emp-button').click
-        (
-            function() 
-            {
-                var buttonpressed = $(this).attr('value');      
-                console.log(buttonpressed); 
-                delete_emp(buttonpressed);
-            }
-        );
+                // if a button of class "delete-emp-button" is clicked, run the "delete_form function" 
+                // pass the button's value as a parameter 	
+       		$('.delete-emp-button').click
+		(
+		    function() 
+		    {
+			var buttonpressed = $(this).attr('value');      
+			console.log(buttonpressed); 
+			delete_emp(buttonpressed);
+		    }
+		);
 
 
-        $('.submit-form-button').click
-        (
-            function() 
-            {
-                submit_form();
-            }
-        );
-    }
-);  
+		// jQuery won't let you click on dynamically created buttons the 'normal' way
+                // this function allows a user to click on a dynamically created button "delete-emp-button"
+                // they will get the same results as if they clicked on a pre-loaded button 
+	        $('#div2').on('click', '.delete-emp-button-tmp', function()
+		{
+		    var buttonpressed = $(this).attr('value');      
+		    console.log(buttonpressed); 
+		    delete_emp(buttonpressed);
+		});
+       
+                // submit_form function
+		function submit_form() 
+		{
+                    // creates an ajax POST request to pass form data to the add_emp function in mailer/views.py
+		    $.ajax
+		    ({
+			url : "{% url 'add_emp' %}",
+			
+			type : "POST", // http method
+			
+			data : 
+			{ 
+			    mailing_list : $('#mailing_list').val(), 
+			    first_name : $('#first_name').val(), 
+			    last_name : $('#last_name').val(), 
+			    email : $('#email').val() 
+			},
+			
+                        // if the pass is successful
+			success : function(json) 
+			{   
+                            if (json.result == 'fail')
+                            {
+                                $('#div').html
+        		        (
+                                    "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submission Failed!</h1><h3 style='text-align:center'>Invalid Email Address.</h3><div>"
+			        );
+                            } 
+                            else
+                            {
+                                // dynamically add a success message to the top of the page	       
+			        $('#div').html
+        		        (
+                                    "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "</h1><h3 style='text-align:center'>Added " + json.person_first_name + " " + json.person_last_name + " to the " + json.person_service + " mailing list.</h3></div>"
+			        );
+                             
+                                // clear the input values   
+		       	        $('#mailing_list').val('');
+			        $('#first_name').val('');
+			        $('#last_name').val('');
+			        $('#email').val('')
+
+                                // dynamically append the newly created database entry to the list of entries
+			        $('#div2').append
+			        (                 
+				    "<p id='" + json.person_id + json.person_first_name + json.person_last_name + "'>" + json.person_first_name + " " + json.person_last_name + ": " + json.person_email + " <button type='submit' id = '" + json.person_id + "' value = '" + json.person_id + "' class='btn btn-default delete-emp-button-tmp'>Delete</button></p>"		
+			        );
+                            }
+
+                            // scroll to the top of the page
+			    $('html, body').animate({ scrollTop: 0 }, 0); 
+			},
+
+                        // if the pass is not successful
+                        error : function()
+                        {
+                            // dynamically add a failure message to the top of the page
+                            $('#div').html
+			    (
+                                "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submit Failed.</h1>"
+			    );
+                            
+                        }
+		     });
+		};
+
+                // delete_emp function
+		function delete_emp(buttonpressed) 
+		{
+		    // create an ajax POST request to pass the employee id to the delete_emp function in mailer/views.py
+		    $.ajax
+		    ({
+			url : "{% url 'delete_emp' %}",
+			
+			type : "POST", // http method
+			
+			data : 
+			{ 
+			    person : buttonpressed,
+			}, // data sent with the post request
+			
+                        // if the pass is successful
+			success : function(json) 
+			{   
+                            // dynamically add a success message to the top of the page
+			    $("#div").html
+			    (
+				"<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>" + json.result + "</h1><h3 style='text-align:center'>Removed " + json.person_first_name + " " + json.person_last_name + " from the " + json.person_service + " mailing list.</h3></div>"
+			    );
+
+                            // dynamically remove the employee from the list of entries
+                            $('#' + json.person_id + json.person_first_name + json.person_last_name).remove();
+			   
+                            // collapse all mailing lists
+			    $('.mailing_list').addClass('collapsed');
+			    $('.mailing_list_2').removeClass('in');
+			    $('.mailing_list_2').addClass('collapse');
+
+                            // scroll to the top of the page
+			    $('html, body').animate({ scrollTop: 0 }, 0); 
+			},
+ 
+                        // if the pass is not successful
+                        error : function()
+                        {
+                            // dynamically add a failure message to the top of the page
+                            $('#div').html
+			    (
+                                "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submit Failed.</h1>"
+			    );
+                        }
+		    });
+		};
+	    }
+        );    
 </script>
 
 <div class="jumbotron">
@@ -130,15 +195,13 @@ $( document ).ready
     		{{ list.service }}
     	</button>
 	<div class="mailing_list_2 collapse" id="{{ list.id }}">
-  		<div class="card card-block">
+  		<div class="card card-block" id="div2">
         		{% for person in list.members %}
-            			<p id='{{ person.first_name }}{{ person.last_name }}'>
+            			<p id='{{ person.id }}{{ person.first_name }}{{ person.last_name }}'>
 					{{ person.first_name }} {{ person.last_name }}: {{ person.email }}
 					<button type='submit' id = '{{ person.id }}' value = '{{ person.id }}' class='btn btn-default delete-emp-button'>Delete</button> 
 	   			</p>
         		{% endfor %}
-                        <p id="{{ list.service.merchant_id }}">
-                        </p> 
 		</div>
 	</div>
 	<br>
