@@ -32,7 +32,7 @@ urlpatterns = [
 	
     # Handles AJAX in-page requesting of spoilage report
     url(r'^report/$', report_views.report, name='report'),
-	url(r'^report/([a-zA-Z]+)/([a-zA-Z0-9.% \\&-]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})/([0-9]{4})/([0-9]{2})/([0-9]{2})', report_views.report_date, name='report_date'),
+	url(r'^report/([a-zA-Z]+)/([a-zA-Z0-9$.% \\&-]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})/([0-9]{4})/([0-9]{2})/([0-9]{2})', report_views.report_date, name='report_date'),
     url(r'^request_custom_report', report_views.request_custom_report, name='request_custom_report'),
     url(r'^login/$',
         django.contrib.auth.views.login,

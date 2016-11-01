@@ -109,11 +109,6 @@
                             current_service = $('#service_select').val();
                         }
                         
-                        // Don't populating is redundant if url accessed
-                        if (second_loop == true){
-                            populate = false;
-                        }
-                        
                         if (populate == true){
                             if (url_accessed == false){
                                 select.options.length = 1;
