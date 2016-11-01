@@ -18,50 +18,70 @@ class SpoilageReport(models.Model):
         @param service: A service object correspondinng to the sales data
         """
         for transaction in json_data:
+            pending_items = {}
+            # We first extract the spoilage transactions from the data set
             for item in transaction['itemizations']:
                 try:
                     spoiled = False
                     for discount in item['discounts']:
                         if discount['name'] == 'Spoil': spoiled = True
+                        # Vittles uses the discount "Expired" for spoilage
+                        if discount['name'] == 'Expired': spoiled = True
+                        # Vittles also uses "CREDITED Spoilage"
+                        if discount['name'] == 'CREDITED Spoilage': spoiled = True
                     if spoiled:
-                        # Check to see if that item is already in the database
-                        if SpoilageItem.objects.filter(transaction_id=transaction["id"],
-                                name=item['name'], variant=item['item_variation_name']).count() > 0:
-                            # The item already exists, don't save a new one
-                            continue
-                        # Get the report that the item should go on
-                        transaction_date = SpoilageReport.get_associated_date(transaction["created_at"])
-                        # Get or make the corresponding report
-                        if SpoilageReport.objects.filter(date=transaction_date, service=service).count() > 0:
-                            report = SpoilageReport.objects.get(service=service, date=transaction_date)
+                        hash_string = item['name']+item['item_variation_name']
+                        if hash_string not in pending_items:
+                            pending_items[hash_string] = [item]
                         else:
-                            report = SpoilageReport.objects.create(service=service, date=transaction_date)
-                        spoiled_item = SpoilageItem()
-                        spoiled_item.report_id = report.id
-                        spoiled_item.transaction_id = transaction['id']
-                        # This next bit with the timezones is to that the database doesn't
-                        # raise errors about naive datetimes. We set the timezone to UTC
-                        utc_tz = datetime.timezone(datetime.timedelta(hours=0))
-                        transaction_time = datetime.datetime.strptime(transaction['created_at'], "%Y-%m-%dT%H:%M:%SZ")
-                        transaction_time = transaction_time.replace(tzinfo=utc_tz)
-                        spoiled_item.transaction_time = transaction_time
-                        spoiled_item.name = item['name']
-                        # 1 is an arbitrary cut off, typical variants are "Pumpkin"
-                        # for a muffin for example
-                        if len(item['item_variation_name']) > 1:
-                            spoiled_item.variant = item['item_variation_name']
-                        else:
-                            spoiled_item.variant = ''
-                        # 2 is an arbitrary cut off, normal SKUs should be 12
-                        if len(item['item_detail']['sku']) > 2:
-                            spoiled_item.sku = item['item_detail']['sku']
-                        else:
-                            spoiled_item.sku = ''
-                        spoiled_item.price = format_money(item['single_quantity_money']['amount'])
-                        spoiled_item.quantity = int(float(item['quantity']))
-                        spoiled_item.save()
+                            pending_items[hash_string].append(item)
                 except IndexError:
                     # There's nothing to do
+                    pass
+            for item in pending_items:
+                try:
+                    features = pending_items[item][0]
+                    item_total = 0
+                    for elem in pending_items[item]:
+                        item_total += int(float(elem['quantity']))
+                    # Check to see if that item is already in the database
+                    if SpoilageItem.objects.filter(transaction_id=transaction["id"],  
+                            name=features['name'], variant=features['item_variation_name'], quantity=item_total).count() > 0:
+                        # The item already exists, don't save a new one
+                        continue
+                    # Get the report that the item should go on
+                    transaction_date = SpoilageReport.get_associated_date(transaction["created_at"])
+                    # Get or make the corresponding report
+                    if SpoilageReport.objects.filter(date=transaction_date, service=service).count() > 0:
+                        report = SpoilageReport.objects.get(service=service, date=transaction_date)
+                    else:
+                        report = SpoilageReport.objects.create(service=service, date=transaction_date)
+                    spoiled_item = SpoilageItem()
+                    spoiled_item.report_id = report.id
+                    spoiled_item.transaction_id = transaction['id']
+                    # This next bit with the timezones is to that the database doesn't
+                    # raise errors about naive datetimes. We set the timezone to UTC
+                    utc_tz = datetime.timezone(datetime.timedelta(hours=0))
+                    transaction_time = datetime.datetime.strptime(transaction['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                    transaction_time = transaction_time.replace(tzinfo=utc_tz)
+                    spoiled_item.transaction_time = transaction_time
+                    spoiled_item.name = features['name']
+                    # 1 is an arbitrary cut off, typical variants are "Pumpkin"
+                    # for a muffin for example
+                    if len(features['item_variation_name']) > 1:
+                        spoiled_item.variant = features['item_variation_name']
+                    else:
+                        spoiled_item.variant = ''
+                    # 2 is an arbitrary cut off, normal SKUs should be 12
+                    if len(features['item_detail']['sku']) > 2:
+                        spoiled_item.sku = features['item_detail']['sku']
+                    else:
+                        spoiled_item.sku = ''
+                    spoiled_item.price = format_money(features['single_quantity_money']['amount'])
+                    spoiled_item.quantity = item_total
+                    spoiled_item.save()
+                except IndexError:
+                    # Nothing to do
                     pass
 
     @staticmethod
