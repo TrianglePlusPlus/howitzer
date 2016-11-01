@@ -17,7 +17,7 @@ class Report(models.Model):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
         @param service: A service object correspondinng to the sales data
-		@param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
+        @param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
         
         for transaction in json_data:
@@ -31,27 +31,32 @@ class Report(models.Model):
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
-                            # This is to catch all shift drinks (unless we only want shift drinks per service?). I'm probably missing some
-                            elif (entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or 'Shift Drink - Accounting' or 'Shift Drink - MUG' or 'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM'):
+                            # This is to catch all shift drinks (unless we only want shift drinks per service?)
+                            elif entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or \
+                                    'Shift Drink - Accounting' or 'Shift Drink - MUG' or \
+                                    'Shift Drink - Hoya Snaxa' or 'Shift Drink - ITM':
                                 found = True
                     if found:
                         # Check to see if that item is already in the database
                         
                         try:
                             if Item.objects.filter(transaction_id=transaction["id"],
-                                name=item['name'], variant=item['item_variation_name']).count() > 0:
-                            # The item already exists, don't save a new one
+                                                   name=item['name'], variant=item['item_variation_name']).count() > 0:
+                                # The item already exists, don't save a new one
                                 continue
                         except KeyError as e:
                             print("KeyError found: " + str(e))
-					    
+
                         # Get the report that the item should go on
                         transaction_date = Report.get_associated_date(transaction["created_at"])
                         # Get or make the corresponding report
-                        if Report.objects.filter(date=transaction_date, service=service_name, discount_label=label).count() > 0:
-                            report = Report.objects.get(service=service_name, date=transaction_date, discount_label=label)
+                        if Report.objects.filter(date=transaction_date, service=service_name,
+                                                 discount_label=label).count() > 0:
+                            report = Report.objects.get(service=service_name, date=transaction_date,
+                                                        discount_label=label)
                         else:
-                            report = Report.objects.create(service=service_name, date=transaction_date, discount_label=label)
+                            report = Report.objects.create(service=service_name, date=transaction_date,
+                                                           discount_label=label)
                         report_item = Item()
                         report_item.report_id = report.id
                         report_item.transaction_id = transaction['id']
@@ -64,7 +69,8 @@ class Report(models.Model):
                         report_item.name = item['name']
                         report_item.discount = label
                         
-                        # Formats the service names correctly from all lower case to either all upper case (for MUG and UG) or Title Case
+                        # Formats the service names correctly from all lower case to either all upper
+                        # case (for MUG and UG) or Title Case
                         if len(str(service_name.name)) > 3:
                             report_item.service = str(service_name.name).title()
                         else:
@@ -148,7 +154,8 @@ class Report(models.Model):
         """
         if (discount is not None) and (discount != 'all'):
             if (service is not None) and (service != 'all'):
-                return Report.objects.filter(date__range=(start_date, end_date), service__name=service, discount_label=discount)
+                return Report.objects.filter(date__range=(start_date, end_date),
+                                             service__name=service, discount_label=discount)
             else:
                 return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
         else:
@@ -176,7 +183,8 @@ class Report(models.Model):
             return dt.date()
 
     def dictionary_form(self):
-        """ Turns a report into a json-friendly dictionary that includes date, service, id, size, total, and a list of all items
+        """ Turns a report into a json-friendly dictionary that includes date, service, id, size, total,
+        and a list of all items
         @returns a dictionary
         """
         return {
@@ -186,11 +194,13 @@ class Report(models.Model):
             "items": list(self.get_associated_items.values()),
         }
 
+
 class Discounts(models.Model):
     """ Handles individual discounts"""
     name = models.CharField(max_length=50, default='')
     amount = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
-        
+
+
 class Item(models.Model):
     """ A single item
     Part of a report """
@@ -206,6 +216,6 @@ class Item(models.Model):
     discount = models.CharField(max_length=50, default='')
     discountcost = models.DecimalField(max_digits=6, decimal_places=2, default=4.00)
     service = models.CharField(max_length=50, default='')
-    # Discounts have a many to many relationship with the discounts model. This is to ensure that multiple discounts can be caught (1 item 2 discounts applied)
+    # Discounts have a many to many relationship with the discounts model.
+    # This is to ensure that multiple discounts can be caught (1 item 2 discounts applied)
     discounts = models.ManyToManyField(Discounts)
-    

@@ -10,6 +10,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 from urllib.parse import unquote
 
+
 def report(request):
     """Renders the reports page."""
     assert isinstance(request, HttpRequest)
@@ -20,11 +21,12 @@ def report(request):
         'report/report.html',
         context_instance = RequestContext(request,
         {
-            'today':today,
-            'title':'Report Viewer',
-            'year':'Remember never give up.',
+            'today': today,
+            'title': 'Report Viewer',
+            'year': 'Remember never give up.',
         })
     )
+
 
 @csrf_exempt
 # @require_POST ?
@@ -36,7 +38,7 @@ def request_custom_report(request):
         service
         discount"""
     if request.method == "POST":
-        #assert isinstance(request, HttpRequest)
+        # assert isinstance(request, HttpRequest)
 
         return_data = {}
         sum_total = 0
@@ -64,7 +66,7 @@ def request_custom_report(request):
                     "discount_sum_total": discount_sum_total
                 }
         else:
-            reports = None # is this really necessary?
+            reports = None  # is this really necessary?
 
         return HttpResponse(
             json.dumps(return_data, cls=DjangoJSONEncoder),
@@ -75,6 +77,7 @@ def request_custom_report(request):
             json.dumps({"nothing to see": "this isn't happening"}),
             content_type="application/json"
         )
+
 
 def report_date(request, service_location, discount_label, start_year, start_month, start_day, end_year, end_month, end_day):
     """Renders the reports for a given date
