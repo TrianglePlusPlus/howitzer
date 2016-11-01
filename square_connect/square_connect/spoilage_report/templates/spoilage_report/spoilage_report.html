@@ -1,13 +1,36 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+{% load staticfiles%}
+<script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
 
 <script>
     $( document ).ready(function() {
         $.noConflict();
 
-        $( "#start_datepicker" ).datepicker().val("{{ today }}");
-        $( "#end_datepicker" ).datepicker().val("{{ today }}");
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        if ("{{ today }}" == "") {
+            $("#start_datepicker").datepicker().val("{{ start_date }}");
+            $("#end_datepicker").datepicker().val("{{ end_date }}");
+            $("#service_select").val("{{ service }}");
+            submit_form();
+        }
+        else {
+            $("#start_datepicker").datepicker().val("{{ today }}");
+            $("#end_datepicker").datepicker().val("{{ today }}");
+        }
 
         // AJAX for requesting report
         function submit_form() {
@@ -19,7 +42,16 @@
                 // handle a successful response
                 success : function(json) {
                     var parsed_data = json;
-                    console.log(json);
+
+                    var start_date_input = $('#start_datepicker').val().split('/');
+                    var end_date_input = $('#end_datepicker').val().split('/');
+                    var start_date = new Date(start_date_input[2], start_date_input[0] - 1, start_date_input[1]); // -1 necessary as js months are 0-based
+                    var end_date = new Date(end_date_input[2], end_date_input[0] - 1, end_date_input[1]); // see above comment
+                    var start_date_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getFullYear();
+                    var end_date_str =  (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getFullYear();
+
+                    history.replaceState(null, null, '/spoilage_report?service=' + $('#service_select').val() + '&start_date=' + start_date_str + '&end_date=' + end_date_str);
+
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
                         return;
@@ -99,6 +131,30 @@
         $('#report-form-button').click(function() {
             submit_form();
         });
+
+        $('#export-csv-button').click(function() {
+            var form = $('<form/>', {
+                action: "{% url 'export_csv' %}",
+                method: "post"
+            });
+            form.append("{% csrf_token %}");
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'service',
+                    value: $('#service_select').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'start_date',
+                    value: $('#start_datepicker').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'end_date',
+                    value: $('#end_datepicker').val()
+            }));
+            form.submit();
+        });
     });
 </script>
 
@@ -126,6 +182,9 @@
             <th>
                 <button id="report-form-button" type="submit" class="btn btn-default">Retrieve report</button>
             </th>
+            <th>
+                <button id="export-csv-button" class="btn btn-default">Export CSV</button>
+            </th>
         </tr>
     </table>
     <h3>Search Results:</h3>
@@ -144,6 +203,12 @@
         </div>
         <input type="hidden" name="send" value="yes" />
     </form-->
+
+    <form action="" method="post">
+        <input type="hidden" name="service" value="">
+        <input type="hidden" name="start_date" value="">
+        <input type="hidden" name="end_date" value="">
+    </form>
 </div>
 
 {% endblock %}

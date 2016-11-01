@@ -14,7 +14,7 @@ apt-get install -y nginx
 echo -e "************* UPDATING PHP REPOSITORY *************"
 apt-get install -y python-software-properties build-essential
 add-apt-repository -y ppa:ondrej/php5 # This is more up to date than the ubuntu one
-apt-get update	
+apt-get update
 
 # Installing PHP for phpmyadmin
 echo -e "************* INSTALLING PHP *************"
@@ -76,7 +76,7 @@ if ! type mysql >/dev/null 2>&1; then
 	echo "INSTALLING MYSQL..."
 	apt-get install -y mysql-server
 
-	
+
 	# Installing mysqlclient
 	echo -e "************* INSTALLING MYSQLCLIENT HEADERS *************"
 	apt-get install -y libmysqlclient-dev
@@ -93,9 +93,9 @@ fi
 # Virtualenv based installed finished, deactive
 deactivate
 
-# Enable apache_configure.sh to run 
+# Enable apache_configure.sh to run
 chmod +x /vagrant/vagrant_bootstrap/apache_configure.sh
-	
+
 # Configure apache
 echo -e "************* CONFIGURING APACHE *************"
 /vagrant/vagrant_bootstrap/apache_configure.sh
@@ -110,9 +110,11 @@ chmod +x /vagrant/vagrant_bootstrap/make_migrations.sh
 
 # Make the half hourly cron tasks script runable
 chmod +x /vagrant/square_connect/square_connect/half_hour_cron.sh
+chmod +x /vagrant/square_connect/square_connect/daily_cron.sh
 
 # Set the crontab for tasks that run every 30 minutes
 (crontab -l 2>/dev/null; echo "*/30 * * * * /vagrant/square_connect/square_connect/half_hour_cron.sh") | crontab -
+(crontab -l 2>/dev/null; echo "* 4 * * * /vagrant/square_connect/square_connect/daily_cron.sh") | crontab -
 
 echo -e "THE SETUP PROCESS HAS COMPLETED.\nMAKE SURE TO ADDRESS ANY ERROR MESSAGES."
 echo -e "\a\a\a\a"

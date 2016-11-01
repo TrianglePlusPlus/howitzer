@@ -15,20 +15,24 @@ class Command(BaseCommand):
                 Service.regenerate_services()
 
         # Run for each service with spoilage
-        """ Service names in backend, exclude the * ones from the services list: 
-                midnight                            
-                snaxa                               
-                vittles                             
-                ug                                  
-                mug                                 
+        """ Service names in backend, exclude the * ones from the services list:
+                midnight
+                snaxa
+                vittles
+                ug
+                mug
                 hilltoss
                 *the corp
-                *storage                             
-                *catering                            
-                *students of georgetown incorporated 
+                *storage
+                *catering
+                *students of georgetown incorporated
+                *storage
+                *catering
+                *students of georgetown incorporated
+                *project whiteboard
 		@returns spoilage from the last 200 transactions from each service
         """
-        excludes = ["the corp", "storage", "catering", "students of georgetown incorporated"]
+        excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
         services = Service.objects.exclude(name__in=excludes)
 
         for service in services:
