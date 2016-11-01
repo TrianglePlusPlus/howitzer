@@ -57,11 +57,7 @@ def mailer_admin(request, retcode=None):
         'mailer/mailer_admin.html'
     )
 
-# add_emp function
-@csrf_exempt
 def add_emp(request):
-    
-    # if the request is a POST request
     if request.method == "POST":
 
         # get data from the POST request
@@ -73,7 +69,7 @@ def add_emp(request):
         # get additional information from the request data
         mailing_list = MailingList.objects.get(id=mailing_list_num)
         service = mailing_list.service
-        
+
         try:
             # send an email to the added individual
             send_mail(
@@ -107,26 +103,20 @@ def add_emp(request):
             json.dumps(response_data),
             content_type = "application/json"
         )
-        
+
     else:
         return HttpResponse(
             json.dumps({"POST method failed": "we have no data for you"}),
             content_type = "application/json"
         )
 
-# delete_emp function
-@csrf_exempt
 def delete_emp(request):
-    
-    # if the request is a POST request
-    if request.method == "POST":  
-        
-        # get data from the POST request
+    if request.method == "POST":
         person_id = request.POST.get('person', None)
-         
+
         # get additional information from the request data
         person = Person.objects.get(id=person_id)
-        
+
         # assemble a dictionary of information with thich to respond to the POST request
         response_data = {}
         response_data['result'] = 'Successful Delete!'
@@ -151,4 +141,3 @@ def delete_emp(request):
             json.dumps({"POST method failed": "we have no data for you"}),
             content_type="application/json"
         )
-

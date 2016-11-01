@@ -1,18 +1,30 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+{% load staticfiles %}
+<script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
 
 <script>
 	$( document ).ready(function() {
 		$.noConflict();
 
-        // if a button of class "submit-form-button" is clicked, run the "submit_form" function
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
 		$('.submit-form-button').click(function() {
-				submit_form();
+			submit_form();
 	    });
 
-        // if a button of class "delete-emp-button" is clicked, run the "delete_form function"
-        // pass the button's value as a parameter
        	$('.delete-emp-button').click(function() {
 			var buttonpressed = $(this).attr('value');
 			console.log(buttonpressed);
@@ -38,8 +50,7 @@
 				    last_name : $('#last_name').val(),
 				    email : $('#email').val()
 				},
-				success : function(json)
-				{
+				success : function(json) {
 	                if (json.result == 'fail') {
 	                    $('#div').html(
 							"<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submission Failed!</h1><h3 style='text-align:center'>Invalid Email Address.</h3><div>"
@@ -66,8 +77,7 @@
                     // scroll to the top of the page
 				    $('html, body').animate({ scrollTop: 0 }, 0);
 				},
-	            error : function()
-		        {
+	            error : function() {
 	                // dynamically add a failure message to the top of the page
 	                $('#div').html(
 						"<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submit Failed.</h1>"
@@ -76,9 +86,7 @@
 			});
 		};
 
-		function delete_emp(buttonpressed)
-		{
-		    // create an ajax POST request to pass the employee id to the delete_emp function in mailer/views.py
+		function delete_emp(buttonpressed) {
 		    $.ajax({
 				url : "{% url 'delete_emp' %}",
 				type : "POST", // http method
@@ -104,8 +112,7 @@
 	                // scroll to the top of the page
 				    $('html, body').animate({ scrollTop: 0 }, 0);
 				},
-	            error : function()
-	            {
+	            error : function() {
 	                // dynamically add a failure message to the top of the page
 	                $('#div').html(
 	                    "<div style='border:3px;border-style:solid;border-color:black;'><h1 style='text-align:center'>Submit Failed.</h1>"
