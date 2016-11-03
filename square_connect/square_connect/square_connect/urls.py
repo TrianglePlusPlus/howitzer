@@ -38,8 +38,8 @@ urlpatterns = [
             'authentication_form': BootstrapAuthenticationForm,
             'extra_context':
             {
-                'title':'Log in',
-                'year':timezone.now().year,
+                'title': 'Log in',
+                'year': timezone.now().year,
             }
         },
         name='login'),

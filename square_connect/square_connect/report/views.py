@@ -64,7 +64,7 @@ def request_report(request):
     @returns filtered transaction data based on a date
     """
     if request.method == "POST":
-        #assert isinstance(request, HttpRequest)
+        # assert isinstance(request, HttpRequest)
 
         return_data = {}
         sum_total = 0
@@ -92,7 +92,7 @@ def request_report(request):
                     "discount_sum_total": discount_sum_total
                 }
         else:
-            reports = None # is this really necessary?
+            reports = None  # is this really necessary?
 
         return HttpResponse(
             json.dumps(return_data, cls=DjangoJSONEncoder),
