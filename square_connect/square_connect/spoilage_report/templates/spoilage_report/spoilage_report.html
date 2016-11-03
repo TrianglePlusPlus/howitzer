@@ -155,6 +155,30 @@
             }));
             form.submit();
         });
+
+        $('#generate-graph-button').click(function() {
+            var form = $('<form/>', {
+                action: "{% url 'generate-graph' %}",
+                method: "post"
+            });
+            form.append("{% csrf_token %}");
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'service',
+                    value: $('#service_select').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'start_date',
+                    value: $('#start_datepicker').val()
+            }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'end_date',
+                    value: $('#end_datepicker').val()
+            }));
+            form.submit();
+        });        
     });
 </script>
 
@@ -184,6 +208,9 @@
             </th>
             <th>
                 <button id="export-csv-button" class="btn btn-default">Export CSV</button>
+            </th>
+            <th>
+                <button id="generate-graph-button" class="btn btn-default">Generate Graph</button>
             </th>
         </tr>
     </table>

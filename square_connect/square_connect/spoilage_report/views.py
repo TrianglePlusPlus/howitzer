@@ -143,3 +143,17 @@ def export_csv(request):
             json.dumps({"POST method failed": "we have no data for you"}),
             content_type="application/json"
         )
+
+def generate_graph(request):
+    if request.method == "POST":
+        json = request_report(request)
+        return render(
+            request,
+            'spoilage_report/generate_graph.html',
+            {
+                'report_data':json,
+                'title':'Report Viewer',
+                'year':'Remember never give up.',
+            }
+        )
+

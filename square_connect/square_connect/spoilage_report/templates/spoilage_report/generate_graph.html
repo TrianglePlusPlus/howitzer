@@ -1,0 +1,15 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+{% load staticfiles%}
+<script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
+
+<script>
+// generate and show graph based on {{ report_data }}
+$(document).ready(function() {
+    var report_data = "{{ report_data }}";
+    console.log(report_data);
+});
+</script>
+
+{% endblock %}
