@@ -146,7 +146,35 @@ def export_csv(request):
 
 def generate_graph(request):
     if request.method == "POST":
-        json = request_report(request)
+
+        return_data = {}
+        sum_total = 0
+        
+        if request.POST.get('start_date', False) and request.POST.get('end_date', False):
+            # They are searching for a report
+            start_date = request.POST.get('start_date', None)
+            end_date = request.POST.get('end_date', None)
+            start_date = datetime.strptime(start_date, "%m/%d/%Y").date()
+            end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
+            service = request.POST.get('service', None)
+            reports = SpoilageReport.search_reports(start_date, end_date, service)
+            reports_list = []
+            if reports.count() > 0:
+                for report in reports:
+                    sum_total += report.get_total
+                    reports_list.append(report.dictionary_form())
+                return_data = {
+                    "reports": reports_list,
+                    "sum_total": sum_total
+                }
+        else:
+            reports = None # is this really necessary?
+
+        return HttpResponse(
+            json.dumps(return_data, cls=DjangoJSONEncoder),
+            content_type="application/json"
+        )
+        return request_report(request)
         return render(
             request,
             'spoilage_report/generate_graph.html',

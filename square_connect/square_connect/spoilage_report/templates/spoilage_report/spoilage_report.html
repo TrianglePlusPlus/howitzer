@@ -32,6 +32,36 @@
             $("#end_datepicker").datepicker().val("{{ today }}");
         }
 
+        function generate_graph() {
+            $.ajax({
+                url : "{% url 'request_report' %}",
+                type : "POST", // http method
+                data : { service : $('#service_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+
+                // handle a successful response
+                success : function(json) {
+                    var parsed_data = json;
+                    var data = [];
+                    var dates = [];
+                    var thing = 0;
+                    console.log(json);
+                    for (i = 0; i < parsed_data.reports.length; i++) { //each report (day)
+                        data[i] = 0;
+                        for (j = 0; j < parsed_data.reports[i]['size']; j++) { //each item
+                            dates[i] = parsed_data.reports[i]['items'][j]['transaction_time'].substr(0, 10);
+                            data[i] += parsed_data.reports[i]['items'][j]['price'] * parsed_data.reports[i]['items'][j]['quantity'];
+                            console.log(data[i] + " , " + dates[i]);
+                        }
+                    }
+                },
+
+                // handle an unsuccessful response
+                error : function(xhr, errmsg, err) {
+                    console.log("Something got fucked up.");
+                }
+            });
+        }
+
         // AJAX for requesting report
         function submit_form() {
             $.ajax({
@@ -157,27 +187,7 @@
         });
 
         $('#generate-graph-button').click(function() {
-            var form = $('<form/>', {
-                action: "{% url 'generate-graph' %}",
-                method: "post"
-            });
-            form.append("{% csrf_token %}");
-            form.append($('<input/>', {
-                    type: 'hidden',
-                    name: 'service',
-                    value: $('#service_select').val()
-            }));
-            form.append($('<input/>', {
-                    type: 'hidden',
-                    name: 'start_date',
-                    value: $('#start_datepicker').val()
-            }));
-            form.append($('<input/>', {
-                    type: 'hidden',
-                    name: 'end_date',
-                    value: $('#end_datepicker').val()
-            }));
-            form.submit();
+            generate_graph();
         });        
     });
 </script>
