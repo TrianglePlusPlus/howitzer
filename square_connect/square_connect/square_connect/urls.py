@@ -24,16 +24,13 @@ urlpatterns = [
     url(r'^contact$', app_views.contact, name='contact'),
     url(r'^about', app_views.about, name='about'),
     url(r'^services', app_views.services, name='services'),
-    url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
     url(r'^mailer', mailer_views.mailer, name='mailer'),
-    # Handles AJAX in-page requesting of spoilage report
-    url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
-    url(r'^export_csv', spoilage_report_views.export_csv, name='export_csv'),
-	
-    # Handles AJAX in-page requesting of spoilage report
+
+    # url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
     url(r'^report/$', report_views.report, name='report'),
-	url(r'^report/([a-zA-Z]+)/([a-zA-Z0-9$.% \\&-]+)/([0-9]{4})/([0-9]{2})/([0-9]{2})/([0-9]{4})/([0-9]{2})/([0-9]{2})', report_views.report_date, name='report_date'),
-    url(r'^request_custom_report', report_views.request_custom_report, name='request_custom_report'),
+    url(r'^request_report', report_views.request_report, name='request_report'),
+    url(r'^export_csv', report_views.export_csv, name='export_csv'),
+
     url(r'^login/$',
         django.contrib.auth.views.login,
         {

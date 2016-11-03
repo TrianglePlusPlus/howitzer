@@ -2,39 +2,67 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
+from app.models import service_names
 from report.models import Report, Item
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 
-import json
-from urllib.parse import unquote
+import json, csv
 
+@login_required
 def report(request):
-    """Renders the reports page."""
+    """Renders the reports page.
+    @param request: Takes in a request query to filter through the transaction data. Queries must have a date
+    @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
+    @param start_date: (GET parameter) Takes in the start date of the transactions
+    @param end_date: (GET parameter) Takes in the end date of the transactions
+    @returns filtered transaction data for today if no GET parameters, or based on date and service
+    """
     assert isinstance(request, HttpRequest)
+
     today = datetime.today().strftime("%m/%d/%Y")
 
-    return render(
-        request,
-        'report/report.html',
-        context_instance = RequestContext(request,
-        {
-            'today':today,
-            'title':'Report Viewer',
-            'year':'Remember never give up.',
-        })
-    )
+    if request.GET.get('service', None):
+        service = request.GET.get('service', None) # TODO: we need a better default
+        discount = request.GET.get('discount', 'all')
+        start_date = request.GET.get('start_date', today)
+        end_date = request.GET.get('end_date', today)
 
-@csrf_exempt
-# @require_POST ?
-def request_custom_report(request):
+        return render(
+            request,
+            'report/report.html',
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'service': service,
+                'discount': discount,
+                'title': 'Report Viewer',
+                'year': 'Remember never give up.',
+            }
+        )
+    else:
+        return render(
+            request,
+            'report/report.html',
+            {
+                'today': today,
+                'title': 'Report Viewer',
+                'year': 'Remember never give up.',
+            }
+        )
+
+def request_report(request):
     """Requests the report data.
     request.POST dictionary keys:
         start_date
         end_date
         service
-        discount"""
+        discount
+    @param request: Takes in a request query to return a JSON dump of filtered transaction data. Queries must have a date range as well as service
+    @returns filtered transaction data based on a date
+    """
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
@@ -76,38 +104,48 @@ def request_custom_report(request):
             content_type="application/json"
         )
 
-def report_date(request, service_location, discount_label, start_year, start_month, start_day, end_year, end_month, end_day):
-    """Renders the reports for a given date
-    @param request: Takes a request for spoilage
-    @param service_location: Takes in Corp Service E.X. "mug"
-    @param discount_label: Takes in a discount to search for E.X. "spoil"
-    @param start_year: Takes in the start year of the spoilage
-    @param start_month: Takes in the start month of the spoilage
-    @param start_day: Takes in the start day of the spoilage
-    @param end_year: Takes in the end year of the spoilage
-    @param end_month: Takes in the end month of the spoilage
-    @param end_day: Takes in the end day of the spoilage
-    @returns filtered spoilage data based on date and service
+# TODO: specialize for discounts
+def export_csv(request):
+    """Exports the report as a .CSV.
+    request.POST dictionary keys:
+        start_date
+        end_date
+        service
+    @param request: Takes in a request query to return a CSV file of filtered transaction data. Queries must have a date range as well as service
+    @returns filtered transaction data based on a date range in .CSV format
     """
+    if request.method == "POST":
+        return_data = {}
+        sum_total = 0
 
-    assert isinstance(request, HttpRequest)
+        # Check if they are searching for a report
+        reports = []
+        if request.POST.get('start_date', False) and request.POST.get('end_date', False):
+            # They are searching for a report
+            start_date = request.POST.get('start_date', None)
+            end_date = request.POST.get('end_date', None)
+            start_date = datetime.strptime(start_date, "%m/%d/%Y").date()
+            end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
+            service = request.POST.get('service', None)
+            discount = request.POST.get('discount', None)
+            reports = Report.search_reports(start_date, end_date, service, discount)
 
-    start_date = start_month + '/' + start_day + '/' + start_year
-    end_date = end_month + '/' + end_day + '/' + end_year
-    discount = unquote(discount_label)
-    service = service_location
+        # TODO: use dictionary_form and csv.DictWriter?
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Report for ' + service_names[service] + ' from ' + request.POST.get('start_date', None) + ' to ' + request.POST.get('end_date', None) + '.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Item', 'Variant', 'Price', 'Quantity', 'Transaction ID', 'Time'])
+        if reports.count() > 0:
+            for report in reports:
+                for item in report.get_associated_items:
+                    writer.writerow([item.name, item.variant, item.price, item.quantity, '=HYPERLINK("https://squareup.com/receipt/preview/' + item.transaction_id + '", "View Transaction")', item.transaction_time])
+                writer.writerow([])
 
-    return render(
-        request,
-        'report/report.html',
-        context_instance = RequestContext(request,
-        {
-            'start_date': start_date,
-            'end_date': end_date,
-            'service': service,
-            'discount': discount,
-            'title': service + ' Report Viewer',
-            'year':'Remember never give up.',
-        })
-    )
+        return response
 
+    else:
+        return HttpResponse(
+            json.dumps({"POST method failed": "we have no data for you"}),
+            content_type="application/json"
+        )
