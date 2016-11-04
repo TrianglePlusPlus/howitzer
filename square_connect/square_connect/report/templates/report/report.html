@@ -21,10 +21,21 @@
             }
         });
 
+        var changed_nondiscount_val = true;
+        var discount_select = $("#discount_select");
+        var discount_options = [];
+        function discount_select_init() {
+            discount_select.prepend($("<option></option>")
+                .attr("value","all")
+                .text("All Discounts"));
+        }
+
         if ("{{ today }}" == "") {
             $("#start_datepicker").datepicker().val("{{ start_date }}");
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
+            $('#discount_select').val("{{ discount }}");
+
             submit_form();
         }
         else {
@@ -32,12 +43,22 @@
             $("#end_datepicker").datepicker().val("{{ today }}");
         }
 
+        $("#service_select").change(function() {
+            changed_nondiscount_val = true;
+        });
+        $("#start_datepicker").change(function() {
+            changed_nondiscount_val = true;
+        });
+        $("#end_datepicker").change(function() {
+            changed_nondiscount_val = true;
+        });
+
         // AJAX for requesting report
         function submit_form() {
             $.ajax({
                 url : "{% url 'request_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
 
                 // handle a successful response
                 success : function(json) {
@@ -50,7 +71,7 @@
                     var start_date_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getFullYear();
                     var end_date_str =  (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getFullYear();
 
-                    history.replaceState(null, null, '/spoilage_report?service=' + $('#service_select').val() + '&start_date=' + start_date_str + '&end_date=' + end_date_str);
+                    history.replaceState(null, null, '/report?service=' + $('#service_select').val() + '&discount=' + $('#discount_select').val() + '&start_date=' + start_date_str + '&end_date=' + end_date_str);
 
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -61,24 +82,44 @@
                         // Title row
                         $("#reports-table tbody").html("\
                             <tr>\
+                                <th>Service</th>\
                                 <th>Item</th>\
                                 <th>Variant</th>\
-                                <th>Price</th>\
+                                <th>Discount Type</th>\
+                                <th>Discount</th>\
                                 <th>Quantity</th>\
+                                <th>Price</th>\
                                 <th>Transaction ID</th>\
                                 <th>Time</th>\
                             </tr>\
                         ");
 
+                        if (changed_nondiscount_val) {
+                            discount_select.empty();
+                            discount_options = [];
+                            discount_select_init();
+                        }
+
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
+                                if (changed_nondiscount_val) {
+                                    // accumulate a list of discounts in this particular report
+                                    var discount = parsed_data.reports[i]['items'][j]['discount'];
+                                    if ($.inArray(discount, discount_options) == -1) {
+                                        discount_options.push(discount);
+                                    }
+                                }
+
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
                                 $("#reports-table tbody").append("\
                                     <tr>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['service'] + "</td>\
                                         <td>" + parsed_data.reports[i]['items'][j]['name'] + "</td>\
                                         <td>" + parsed_data.reports[i]['items'][j]['variant'] + "</td>\
-                                        <td>" + parsed_data.reports[i]['items'][j]['price'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['discount'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['discountcost'] + "</td>\
                                         <td>" + parsed_data.reports[i]['items'][j]['quantity'] + "</td>\
+                                        <td>" + parsed_data.reports[i]['items'][j]['price'] + "</td>\
                                         <td><a href=\"https://squareup.com/receipt/preview/" + parsed_data.reports[i]['items'][j]['transaction_id'] + "\" target=\"_blank\">View receipt</a></td>\
                                         <td>" + datetime.toLocaleString() + "</td>\
                                     </tr>\
@@ -87,14 +128,29 @@
                             $("#reports-table tbody").append("\
                                 <tr>\
                                     <td/>\
+                                    <td/>\
+                                    <td/>\
+                                    <td align='right'><b>Total:</b></right></td>\
+                                    <td>" + parsed_data.reports[i]['discount_total'] + "</td>\
                                     <td align='right'><b>Total:</b></right></td>\
                                     <td>" + parsed_data.reports[i]['total'] + "</td>\
-                                    <td/>\
                                     <td/>\
                                     <td/>\
                                 </tr>\
                             ");
                         }
+
+
+                        if (changed_nondiscount_val) {
+                            // fill out discounts option list
+                            $.each(discount_options, function(key, value) {
+                                 discount_select.append($("<option></option>")
+                                    .attr("value", value)
+                                    .text(value));
+                            });
+                        }
+
+                        changed_nondiscount_val = false;
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
@@ -105,12 +161,18 @@
                                 <td/>\
                                 <td/>\
                                 <td/>\
+                                <td/>\
+                                <td/>\
+                                <td/>\
                             </tr>\
                             <tr>\
                                 <td/>\
-                                <td align='right'><b>Sum Total:</b></td>\
-                                <td>" + parsed_data.sum_total + "</td>\
                                 <td/>\
+                                <td/>\
+                                <td align='right'><b>Discount Sum Total:</b></td>\
+                                <td>" + parsed_data.discount_sum_total + "</td>\
+                                <td align='right'><b>Price Sum Total:</b></td>\
+                                <td>" + parsed_data.sum_total + "</td>\
                                 <td/>\
                                 <td/>\
                             </tr>\
@@ -121,8 +183,8 @@
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
                     /*$('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console*/
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom*/
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
                     console.log("Something got fucked up.");
                 }
             });
@@ -158,20 +220,28 @@
     });
 </script>
 
+
 <div class="jumbotron">
-    <h1>Spoilage Reports</h1>
+    <h1>Reports</h1>
     <table class="table">
         <tr>
             <th>
+                <p>Service:
                 <select id="service_select" name="service">
-                    <option selected="selected">-- Select Service --</option>
+                    <option selected="selected" value="all">All Services</option>
                     <option value="mug">MUG</option>
                     <option value="vittles">Vital Vittles</option>
                     <option value="snaxa">Hoya Snaxa</option>
                     <option value="ug">Uncommon Grounds</option>
                     <option value="midnight">Midnight Mug</option>
                     <option value="hilltoss">Hilltoss</option>
-                </select>
+                </select> </p>
+            </th>
+            <th>
+                <p>Discount:
+                <select id="discount_select" name="discount">
+                    <option selected="selected" value="all">All Discounts</option>
+                </select> </p>
             </th>
             <th>
                 <p>Start Date: <input name="start_date" type="text" id="start_datepicker"></p>
@@ -181,8 +251,7 @@
             </th>
             <th>
                 <button id="report-form-button" type="submit" class="btn btn-default">Retrieve report</button>
-            </th>
-            <th>
+                <br>
                 <button id="export-csv-button" class="btn btn-default">Export CSV</button>
             </th>
         </tr>

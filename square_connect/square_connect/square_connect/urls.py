@@ -16,6 +16,7 @@ from django.contrib import admin
 import app.views as app_views
 import spoilage_report.views as spoilage_report_views
 import mailer.views as mailer_views
+import report.views as report_views
 admin.autodiscover()
 
 urlpatterns = [
@@ -23,11 +24,12 @@ urlpatterns = [
     url(r'^contact$', app_views.contact, name='contact'),
     url(r'^about', app_views.about, name='about'),
     url(r'^services', app_views.services, name='services'),
-    url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
     url(r'^mailer', mailer_views.mailer, name='mailer'),
-    # Handles AJAX in-page requesting of spoilage report
-    url(r'^request_report', spoilage_report_views.request_report, name='request_report'),
-    url(r'^export_csv', spoilage_report_views.export_csv, name='export_csv'),
+
+    url(r'^report/$', report_views.report, name='report'),
+    url(r'^request_report', report_views.request_report, name='request_report'),
+    url(r'^export_csv', report_views.export_csv, name='export_csv'),
+
     url(r'^login/$',
         django.contrib.auth.views.login,
         {
@@ -35,8 +37,8 @@ urlpatterns = [
             'authentication_form': BootstrapAuthenticationForm,
             'extra_context':
             {
-                'title':'Log in',
-                'year':timezone.now().year,
+                'title': 'Log in',
+                'year': timezone.now().year,
             }
         },
         name='login'),
