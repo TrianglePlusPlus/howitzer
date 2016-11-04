@@ -26,11 +26,8 @@ class Command(BaseCommand):
                 *storage
                 *catering
                 *students of georgetown incorporated
-                *storage
-                *catering
-                *students of georgetown incorporated
                 *project whiteboard
-		@returns spoilage from the last 200 transactions from each service
+        @returns spoilage from the last 200 transactions from each service
         """
         excludes = ["the corp", "storage", "catering", "students of georgetown incorporated", "project whiteboard"]
         services = Service.objects.exclude(name__in=excludes)

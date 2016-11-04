@@ -26,7 +26,6 @@ urlpatterns = [
     url(r'^services', app_views.services, name='services'),
     url(r'^mailer', mailer_views.mailer, name='mailer'),
 
-    # url(r'^spoilage_report', spoilage_report_views.spoilage_report, name='spoilage_report'),
     url(r'^report/$', report_views.report, name='report'),
     url(r'^request_report', report_views.request_report, name='request_report'),
     url(r'^export_csv', report_views.export_csv, name='export_csv'),

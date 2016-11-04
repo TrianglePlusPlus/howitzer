@@ -21,9 +21,14 @@
             }
         });
 
+        var changed_nondiscount_val = true;
+        var discount_select = $("#discount_select");
         var discount_options = [];
-        var select = $("#discount_select");
-        console.log("select options: " + select);
+        function discount_select_init() {
+            discount_select.prepend($("<option></option>")
+                .attr("value","all")
+                .text("All Discounts"));
+        }
 
         if ("{{ today }}" == "") {
             $("#start_datepicker").datepicker().val("{{ start_date }}");
@@ -31,18 +36,22 @@
             $("#service_select").val("{{ service }}");
             $('#discount_select').val("{{ discount }}");
 
-            if ("{{ discount }}" != "all") {
-                discount_options.push("{{ discount }}");
-                select.options[select.options.length] = new Option(current_discount, current_discount);
-                select.val("{{ discount }}");
-            }
-
             submit_form();
         }
         else {
-            $( "#start_datepicker" ).datepicker().val("{{ today }}");
-            $( "#end_datepicker" ).datepicker().val("{{ today }}");
+            $("#start_datepicker").datepicker().val("{{ today }}");
+            $("#end_datepicker").datepicker().val("{{ today }}");
         }
+
+        $("#service_select").change(function() {
+            changed_nondiscount_val = true;
+        });
+        $("#start_datepicker").change(function() {
+            changed_nondiscount_val = true;
+        });
+        $("#end_datepicker").change(function() {
+            changed_nondiscount_val = true;
+        });
 
         // AJAX for requesting report
         function submit_form() {
@@ -85,14 +94,20 @@
                             </tr>\
                         ");
 
+                        if (changed_nondiscount_val) {
+                            discount_select.empty();
+                            discount_options = [];
+                            discount_select_init();
+                        }
+
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
-                                // Keeps track of discounts in this particular report
-                                var discount = parsed_data.reports[i]['items'][j]['discount']
-                                // If discount is not in discount options, add it
-                                if (discount_options.indexOf(discount) == -1) {
-                                    discount_options.push(discount);
-                                    select.options[select.options.length] = new Option(discount, discount);
+                                if (changed_nondiscount_val) {
+                                    // accumulate a list of discounts in this particular report
+                                    var discount = parsed_data.reports[i]['items'][j]['discount'];
+                                    if ($.inArray(discount, discount_options) == -1) {
+                                        discount_options.push(discount);
+                                    }
                                 }
 
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
@@ -124,6 +139,18 @@
                                 </tr>\
                             ");
                         }
+
+
+                        if (changed_nondiscount_val) {
+                            // fill out discounts option list
+                            $.each(discount_options, function(key, value) {
+                                 discount_select.append($("<option></option>")
+                                    .attr("value", value)
+                                    .text(value));
+                            });
+                        }
+
+                        changed_nondiscount_val = false;
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
@@ -166,9 +193,6 @@
         $('#report-form-button').click(function() {
             submit_form();
         });
-
-        // TODO: what the fuck?
-        // window.onload = submit_form();
 
         $('#export-csv-button').click(function() {
             var form = $('<form/>', {
