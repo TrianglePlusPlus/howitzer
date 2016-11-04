@@ -21,14 +21,16 @@
             }
         });
 
+        var discount_options = [];
+        var select = $("#discount_select");
+        console.log("select options: " + select);
+
         if ("{{ today }}" == "") {
             $("#start_datepicker").datepicker().val("{{ start_date }}");
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
             $('#discount_select').val("{{ discount }}");
 
-            var discount_options = [];
-            var select = $("#discount_select");
             if ("{{ discount }}" != "all") {
                 discount_options.push("{{ discount }}");
                 select.options[select.options.length] = new Option(current_discount, current_discount);
