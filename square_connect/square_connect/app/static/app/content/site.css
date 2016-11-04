@@ -40,3 +40,84 @@ input[type="checkbox"].input-validation-error {
 .validation-summary-valid {
     display: none;
 }
+
+.jumbotron {
+    background-color: white;
+}
+
+div.navbar.navbar-inverse.navbar-fixed-top {
+    background-color: #0E2B7B;
+}
+
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus {
+    color: white;
+    border-bottom: 1.5px solid white;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a {
+    color: white;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+}
+
+#logo {
+    height: 60px;
+    width: 60px;
+}
+
+.navbar-inverse {
+    border: white;
+}
+
+.navbar-nav>li>a, .navbar-brand {
+    padding-top: 20px;
+}
+
+.container {
+    padding-left: 1px;
+    padding-right: 10px;
+}
+
+.jumbotron h1 {
+    font-size: 50px;
+}
+
+.container>.navbar-header {
+    margin-left: 5px;
+}
+
+.navbar-brand {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.body-content {
+    padding-top: 20px;
+}
+
+.navbar-inverse .navbar-toggle{
+    border-color: white;
+}
+
+.navbar-inverse .navbar-toggle:hover .icon-bar, .navbar-inverse .navbar-toggle:focus .icon-bar{
+    background-color: #0E2B7B;
+}
+
+.navbar-inverse .navbar-toggle{
+    margin-top: 13px;
+}
+
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus{
+    background-color: white;
+}
+
+#homeButton {
+    margin-left: 30px;
+}
+
+.navbar-nav>li>a{
+    padding-bottom: 10px;
+}

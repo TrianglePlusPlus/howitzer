@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - Howitzer</title>
+    <title>{{ title }} - Corp Reports</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -11,6 +11,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <link rel="icon" href="{% static 'app/site.ico' %}">
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
+
 </head>
 
 <body>
@@ -22,15 +25,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="/" class="navbar-brand">Howitzer</a>
+                <img id="logo" src="{% static 'app/corp_logo_white.png' %}">
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
-                    <li><a href="{% url 'mailer' %}">Mailer</a></li>
-                    <li><a href="{% url 'report' %}">Reports</a></li>
+                    <li><a id="homeButton" href="{% url 'home' %}">HOME</a></li>
+                    <li><a href="{% url 'about' %}">ABOUT</a></li>
+                    <li><a href="{% url 'contact' %}">CONTACT</a></li>
+                    <li><a href="{% url 'mailer' %}">MAILER</a></li>
+                    <li><a href="{% url 'spoilage_report' %}">REPORTS</a></li>
                 </ul>
                 {% include 'app/loginpartial.html' %}
             </div>
