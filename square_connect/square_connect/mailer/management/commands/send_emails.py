@@ -8,6 +8,7 @@ from datetime import date, timedelta
 from django.core.mail import send_mail
 from spoilage_report.models import SpoilageReport, SpoilageItem
 import datetime
+from urllib.parse import quote
 
 class Command(BaseCommand):
     help = "Sends emails with generated spoilage reports to the UM of each service"
@@ -44,10 +45,11 @@ class Command(BaseCommand):
 
             # Get the spoilage report for the past day
             yesterday = date.today() - timedelta(days=1)
-            report_url = "http://reports.thecorp.org/spoilage_report?service=" + service.name + "&start_date=" + yesterday.strftime('%m/%d/%Y') + '&end_date=' + yesterday.strftime('%m/%d/%Y')
+            report_url = "http://reports.thecorp.org/report?service=" + service.name + "&discount={discount}" + "&start_date=" + yesterday.strftime('%m/%d/%Y') + '&end_date=' + yesterday.strftime('%m/%d/%Y')
 
             for person in mailing_list.members:
                 # Send a link to that report in an email
+                report_url = report_url.format(discount=quote(person.discount))
                 send_mail(
                     "Spoilage Report",
                     "Hello " + person.first_name + " " + person.last_name + "! Here is the spoilage report for " + service_names[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url,
