@@ -215,6 +215,11 @@
                     name: 'end_date',
                     value: $('#end_datepicker').val()
             }));
+            form.append($('<input/>', {
+                    type: 'hidden',
+                    name: 'discount',
+                    value: $('#discount_select').val()
+            }));
             form.submit();
         });
     });
