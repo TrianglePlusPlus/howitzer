@@ -21,6 +21,11 @@
             }
         });
 
+        var last_requested_service;
+        var last_requested_start;
+        var last_requested_end;
+        var last_requested_discount;
+
         var changed_nondiscount_val = true;
         var discount_select = $("#discount_select");
         var discount_options = [];
@@ -178,6 +183,11 @@
                             </tr>\
                         ");
                     }
+
+                    last_requested_service = $('#service_select').val();
+                    last_requested_start = $('#start_datepicker').val();
+                    last_requested_end = $('#end_datepicker').val();
+                    last_requested_discount = $('#discount_select').val();
                 },
 
                 // handle an unsuccessful response
@@ -203,22 +213,22 @@
             form.append($('<input/>', {
                     type: 'hidden',
                     name: 'service',
-                    value: $('#service_select').val()
+                    value: last_requested_service != null ? last_requested_service : $('#service_select').val()
             }));
             form.append($('<input/>', {
                     type: 'hidden',
                     name: 'start_date',
-                    value: $('#start_datepicker').val()
+                    value: last_requested_start != null ? last_requested_start : $('#start_datepicker').val()
             }));
             form.append($('<input/>', {
                     type: 'hidden',
                     name: 'end_date',
-                    value: $('#end_datepicker').val()
+                    value: last_requested_end != null ? last_requested_end : $('#end_datepicker').val()
             }));
             form.append($('<input/>', {
                     type: 'hidden',
                     name: 'discount',
-                    value: $('#discount_select').val()
+                    value: last_requested_discount != null ? last_requested_discount : $('#discount_select').val()
             }));
             form.submit();
         });
