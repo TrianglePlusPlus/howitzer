@@ -2,6 +2,10 @@
 
 {% block content %}
 
+<script>
+   
+</script>
+
 <style>
     .mailing 
     {
@@ -11,6 +15,16 @@
 </style>
 
 <div class="jumbotron">
+
+    {% if messages %}
+        <p class="messages">
+            {% for msg in messages %}       
+                    <div class="alert alert-{{msg.level_tag}}" role="alert">
+ 	                {{msg.message}}
+	            </div>
+            {% endfor %}
+       </p>
+{% endif %}
 
     <h1>Mailing Lists</h1>
 

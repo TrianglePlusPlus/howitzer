@@ -7,6 +7,7 @@ from mailer.forms import PersonForm
 from app.models import Service
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
+from django.contrib import messages
 
 @login_required
 def mailer(request):
@@ -23,26 +24,26 @@ def mailer(request):
             form = PersonForm(request.POST)
             if form.is_valid():
                 # add to mailing list
-                form.save()
                 mailing_list = form.cleaned_data['mailing_list']
-                service = mailing_list.service
-                service_name = service.name
                 first_name = form.cleaned_data['first_name']
                 last_name = form.cleaned_data['last_name']
                 email = form.cleaned_data['email']
                 send_mail(
                     "Mailing List Notification",
-                    "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + ".",
+                    "Hello " + first_name + " " + last_name + "! You were added to the " + mailing_list.service.name + " mailing list.",
                     "reports@thecorp.org",
                     [email],
-                    fail_silently=False
+                    fail_silently = False,
                 )
-
+                form.save()
+                messages.success(request, first_name + ' ' + last_name + ' was successfully added to the ' + mailing_list.service.name + ' mailing list.') 
                 form = PersonForm()
+
         else:
             # remove from mailing list
             Person.objects.get(pk=request.POST.get('person')).delete()
             form = PersonForm()
+            messages.success(request, 'Delete sucessful.')
     else:
         form = PersonForm()
 
