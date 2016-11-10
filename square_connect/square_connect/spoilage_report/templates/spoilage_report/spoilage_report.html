@@ -3,6 +3,8 @@
 {% block content %}
 {% load staticfiles%}
 <script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
+<script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 
 <script>
     $( document ).ready(function() {
@@ -40,20 +42,47 @@
 
                 // handle a successful response
                 success : function(json) {
+                    var startDate = $('#start_datepicker').val();
+                    var endDate = $('#end_datepicker').val();
                     var parsed_data = json;
-                    var data = [];
-                    var dates = [];
-                    var thing = 0;
-                    console.log(json);
+                    var data = []; //parallel array: data has total amount spoiled on that day
+                    var dates = []; //dates holds the day 
+                    //console.log(json);
                     for (i = 0; i < parsed_data.reports.length; i++) { //each report (day)
                         data[i] = 0;
                         for (j = 0; j < parsed_data.reports[i]['size']; j++) { //each item
-                            dates[i] = parsed_data.reports[i]['items'][j]['transaction_time'].substr(0, 10);
                             data[i] += parsed_data.reports[i]['items'][j]['price'] * parsed_data.reports[i]['items'][j]['quantity'];
-                            console.log(data[i] + " , " + dates[i]);
+                            dates[i] = parsed_data.reports[i]['items'][j]['transaction_time'].substr(0, 10);
                         }
                     }
-                },
+                   $("#reports-table tbody").html("\
+                        <h3>Spoilage from " + startDate + " to " + endDate +"</h3>\
+                        <canvas id='myCanvas' width='200' height='100' style='border:1px solid #000000;'>\
+                        </canvas>");
+                    var ctx = document.getElementById("myCanvas").getContext('2d');
+                    var myChart = new Chart(ctx, {
+                      type: 'bar',
+                      data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Amount Spoiled ($)',
+                            data: data,
+                                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                                hoverBackgroundColor: "rgba(255, 99, 132, 1)",
+                                borderColor: "rgba(255, 99, 132, 1)",
+                                borderWidth: "3",
+                        }]
+                      },
+                        options: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    fontColor: 'rgb(3, 3, 132)'
+                                    }
+                                }
+                        }
+                    });
+                }, //end of successful response
 
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
