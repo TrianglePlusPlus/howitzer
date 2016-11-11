@@ -1,7 +1,7 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
-{% load staticfiles%}
+{% load staticfiles %}
 <script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
 
 <script>
@@ -35,13 +35,26 @@
                 .text("All Discounts"));
         }
 
+        function select_specific_discount() {
+            // if we needed to narrow by discount, now handle that (once ajax fills out our options)
+            if (discount_options.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
+                discount_select.val("{{ discount }}");
+                submit_form();
+            }
+            // if we did need to narrow by discount, but that discount doesn't exist in this data
+            else if ("{{ discount }}" != "all") {
+                $("#errors").html("<p>There were no items with the {{ discount }} discount. Here is your request unfiltered by discount.</p><br/>");
+            }
+        }
+
+        // in other words, if there are GET values that the view is giving us
         if ("{{ today }}" == "") {
+            // request report with all parameters except specified discount
             $("#start_datepicker").datepicker().val("{{ start_date }}");
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
-            $('#discount_select').val("{{ discount }}");
-
-            submit_form();
+            discount_select.val("all");
+            submit_form(select_specific_discount);
         }
         else {
             $("#start_datepicker").datepicker().val("{{ today }}");
@@ -59,7 +72,7 @@
         });
 
         // AJAX for requesting report
-        function submit_form() {
+        function submit_form(success_function) {
             $.ajax({
                 url : "{% url 'request_report' %}",
                 type : "POST", // http method
@@ -188,13 +201,14 @@
                     last_requested_start = $('#start_datepicker').val();
                     last_requested_end = $('#end_datepicker').val();
                     last_requested_discount = $('#discount_select').val();
+
+                    if (success_function != null)
+                        success_function();
                 },
 
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
-                    /*$('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom*/
-                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                    console.log(xhr.status + ": " + xhr.responseText);
                     console.log("Something got fucked up.");
                 }
             });
@@ -272,6 +286,7 @@
         </tr>
     </table>
     <h3>Search Results:</h3>
+    <div id="errors"></div>
     <div class="table-responsive">
         <table id="reports-table" class="table">
             <tbody></tbody>

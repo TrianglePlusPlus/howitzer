@@ -121,3 +121,9 @@ body {
 .navbar-nav>li>a{
     padding-bottom: 10px;
 }
+
+#errors p {
+    text-align: center;
+    color: red;
+    font-size: 1em;
+}
