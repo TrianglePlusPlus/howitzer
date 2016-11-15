@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from mailer.models import MailingList, Person
-from mailer.forms import PersonForm
+from mailer.forms import MailerPersonForm
 from app.models import Service
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
@@ -20,7 +20,7 @@ def mailer(request):
 
     if request.method == 'POST':
         if request.POST.get('person') == None:
-            form = PersonForm(request.POST)
+            form = MailerPersonForm(request.POST)
             if form.is_valid():
                 # add to mailing list
                 form.save()
@@ -30,21 +30,25 @@ def mailer(request):
                 first_name = form.cleaned_data['first_name']
                 last_name = form.cleaned_data['last_name']
                 email = form.cleaned_data['email']
+                discount = form.cleaned_data['discount']
+                discount_str = ''
+                if discount != 'all':
+                    discount_str = ' Your results will be filtered for the ' + discount + ' discount.'
                 send_mail(
                     "Mailing List Notification",
-                    "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + ".",
+                    "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + "." + discount_str,
                     "reports@thecorp.org",
                     [email],
                     fail_silently=False
                 )
 
-                form = PersonForm()
+                form = MailerPersonForm()
         else:
             # remove from mailing list
             Person.objects.get(pk=request.POST.get('person')).delete()
-            form = PersonForm()
+            form = MailerPersonForm()
     else:
-        form = PersonForm()
+        form = MailerPersonForm()
 
     mailing_lists = MailingList.objects.all()
 

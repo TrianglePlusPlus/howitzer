@@ -12,6 +12,9 @@
                     <p>Mailing List: {{ form.mailing_list }}</p>
                 </th>
                 <th>
+                    <p>Discount Filter: {{ form.discount }}</p>
+                </th>
+                <th>
                     <p>First Name: {{ form.first_name }}</p>
                 </th>
                 <th>
@@ -32,7 +35,7 @@
         <h3>{{ mailing_list.service }}</h3>
         <ul>
         {% for person in mailing_list.members %}
-            <li><button type="button" class="btn btn-default delete-person-submit" data-person="{{ person.id }}">X</button> {{ person.first_name }} {{ person.last_name }}: {{ person.email }}</li>
+            <li><button type="button" class="btn btn-default delete-person-submit" data-person="{{ person.id }}">X</button> {{ person.first_name }} {{ person.last_name }}: {{ person.email }}{% if person.discount != 'all' %}, filtered for the {{ person.discount }} discount{% endif %}</li>
         {% endfor %}
         </ul>
     {% endfor %}

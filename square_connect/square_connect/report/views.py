@@ -8,6 +8,7 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
+# TODO: needed? from urllib.parse import unquote
 
 import json, csv
 
@@ -60,7 +61,8 @@ def request_report(request):
         end_date
         service
         discount
-    @param request: Takes in a request query to return a JSON dump of filtered transaction data. Queries must have a date range as well as service
+    @param request: Takes in a request query to return a JSON dump of filtered transaction data.
+    Queries must have a date range as well as service.
     @returns filtered transaction data based on a date
     """
     if request.method == "POST":
@@ -111,7 +113,8 @@ def export_csv(request):
         start_date
         end_date
         service
-    @param request: Takes in a request query to return a CSV file of filtered transaction data. Queries must have a date range as well as service
+    @param request: Takes in a request query to return a CSV file of filtered transaction data.
+    Queries must have a date range as well as service.
     @returns filtered transaction data based on a date range in .CSV format
     """
     if request.method == "POST":
@@ -133,13 +136,30 @@ def export_csv(request):
         # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="Report for ' + service_names[service] + ' from ' + request.POST.get('start_date', None) + ' to ' + request.POST.get('end_date', None) + '.csv"'
+        if request.POST.get('discount', '') == 'all' or request.POST.get('discount', '') == None:
+            discount_str = ''
+        else:
+            discount_str = ', filtered for the {discount} discount'.format(discount=request.POST.get('discount'))
+        response['Content-Disposition'] = ('attachment; filename="Report for {service} from {start_date} to {end_date}'
+            '{discount}.csv').format(
+                service=service_names[service],
+                start_date=request.POST.get('start_date', None),
+                end_date=request.POST.get('end_date', None),
+                discount=discount_str)
         writer = csv.writer(response)
-        writer.writerow(['Item', 'Variant', 'Price', 'Quantity', 'Transaction ID', 'Time'])
+        writer.writerow(['Item', 'Variant', 'Price', 'Discount Type', 'Discount', 'Quantity', 'Transaction ID', 'Time'])
         if reports.count() > 0:
             for report in reports:
                 for item in report.get_associated_items:
-                    writer.writerow([item.name, item.variant, item.price, item.quantity, '=HYPERLINK("https://squareup.com/receipt/preview/' + item.transaction_id + '", "View Transaction")', item.transaction_time])
+                    writer.writerow([
+                        item.name,
+                        item.variant,
+                        item.price,
+                        item.discount,
+                        item.discountcost,
+                        item.quantity,
+                        '=HYPERLINK("https://squareup.com/receipt/preview/' + item.transaction_id + '", "View Transaction")',
+                        item.transaction_time])
                 writer.writerow([])
 
         return response
