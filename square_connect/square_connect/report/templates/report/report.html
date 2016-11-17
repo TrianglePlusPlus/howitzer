@@ -28,6 +28,16 @@
             discount_select.prepend($("<option></option>")
                 .attr("value","all")
                 .text("All Discounts"));
+            discount_select.prepend($("<option></option>")
+                .attr("value","shift drink")
+                .text("All Shift Drinks"));
+            discount_select.prepend($("<option></option>")
+                .attr("value","use")
+                .text("All Use"));
+            discount_select.prepend($("<option></option>")
+                .attr("value","spoil")
+                .text("All Spoilage"));
+            
         }
 
         if ("{{ today }}" == "") {
@@ -240,6 +250,9 @@
             <th>
                 <p>Discount:
                 <select id="discount_select" name="discount">
+                    <option value="spoil">All Spoilage</option>
+                    <option value="use">All Use</option>
+                    <option value="shift drink">All Shift Drinks</option>
                     <option selected="selected" value="all">All Discounts</option>
                 </select> </p>
             </th>

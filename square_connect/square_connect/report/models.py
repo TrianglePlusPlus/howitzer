@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.timezone import now as DjangoCurrentTime
 import datetime
 # Importing models from other apps
@@ -153,11 +154,75 @@ class Report(models.Model):
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if (discount is not None) and (discount != 'all'):
+            
             if (service is not None) and (service != 'all'):
-                return Report.objects.filter(date__range=(start_date, end_date),
-                                             service__name=service, discount_label=discount)
+                if discount == 'shift drink':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(service__name=service),
+                                                 Q(discount_label='Shift Drink - UG') |
+                                                 Q(discount_label='Shift Drink - Vital Vittles') |
+                                                 Q(discount_label='Shift Drink - Accounting') |
+                                                 Q(discount_label='Shift Drink - MUG') |
+                                                 Q(discount_label='Shift Drink - Hoya Snaxa') |
+                                                 Q(discount_label='Shift Drink - ITM') |
+                                                 Q(discount_label='Shift Drink - Hilltoss') |
+                                                 Q(discount_label='Shift Drink - Catering') |
+                                                 Q(discount_label='Shift Drink - IT+M') |
+                                                 Q(discount_label='Shift Drink - Main Office') |
+                                                 Q(discount_label='Shift Drink - Seasonal'))
+                elif discount == 'use':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(service__name=service),
+                                                 Q(discount_label='Use - UG') |
+                                                 Q(discount_label='Use - Vital Vittles') |
+                                                 Q(discount_label='Use - Accounting') |
+                                                 Q(discount_label='Use - MUG') |
+                                                 Q(discount_label='Use - Hoya Snaxa') |
+                                                 Q(discount_label='Use - ITM') |
+                                                 Q(discount_label='Use - Hilltoss') |
+                                                 Q(discount_label='Use - Catering') |
+                                                 Q(discount_label='Use - Main Office') |
+                                                 Q(discount_label='Use - Storage'))
+                elif discount == 'spoil':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(service__name=service),
+                                                 Q(discount_label='Spoil') |
+                                                 Q(discount_label='Expired'))
+                else:
+                    return Report.objects.filter(date__range=(start_date, end_date),
+                                                 service__name=service, discount_label=discount)
             else:
-                return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
+                if discount == 'shift drink':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(discount_label='Shift Drink - UG') |
+                                                 Q(discount_label='Shift Drink - Vital Vittles') |
+                                                 Q(discount_label='Shift Drink - Accounting') |
+                                                 Q(discount_label='Shift Drink - MUG') |
+                                                 Q(discount_label='Shift Drink - Hoya Snaxa') |
+                                                 Q(discount_label='Shift Drink - ITM') |
+                                                 Q(discount_label='Shift Drink - Hilltoss') |
+                                                 Q(discount_label='Shift Drink - Catering') |
+                                                 Q(discount_label='Shift Drink - IT+M') |
+                                                 Q(discount_label='Shift Drink - Main Office') |
+                                                 Q(discount_label='Shift Drink - Seasonal'))
+                elif discount == 'use':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(discount_label='Use - UG') |
+                                                 Q(discount_label='Use - Vital Vittles') |
+                                                 Q(discount_label='Use - Accounting') |
+                                                 Q(discount_label='Use - MUG') |
+                                                 Q(discount_label='Use - Hoya Snaxa') |
+                                                 Q(discount_label='Use - ITM') |
+                                                 Q(discount_label='Use - Hilltoss') |
+                                                 Q(discount_label='Use - Catering') |
+                                                 Q(discount_label='Use - Main Office') |
+                                                 Q(discount_label='Use - Storage'))
+                elif discount == 'spoil':
+                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
+                                                 Q(discount_label='Spoil') |
+                                                 Q(discount_label='Expired'))
+                else:
+                    return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
         else:
             if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
