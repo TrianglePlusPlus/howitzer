@@ -5,12 +5,8 @@ class Command(BaseCommand):
     help = "Converts all the SpoilageReport data to Report data"
 
     def handle(self, *args, **options):
-        print('We have spoilage reports for these dates/services:')
         for spoilage_report in SpoilageReport.objects.all():
-            # list all the shit (TODO: delete this bit)
-            print('\n' + str(spoilage_report.service) + ' on ' + str(spoilage_report.date) + ':')
             for item in spoilage_report.get_associated_items:
-                print(item.name)
                 try:
                     try:
                         if Item.objects.filter(transaction_id=item.transaction_id,
