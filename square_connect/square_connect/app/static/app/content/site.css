@@ -137,6 +137,10 @@ body {
 }
 */
 
+#report-form-button {
+  background: url("{% static 'app/numbers_icon.png' %}") no-repeat;
+}
+
 #reports-table tbody rect {
   fill: blue;
 }
@@ -150,3 +154,4 @@ body {
 #reports-table tbody rect:hover{
     fill: red;
 }
+
