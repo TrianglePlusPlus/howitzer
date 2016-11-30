@@ -155,3 +155,8 @@ body {
     fill: red;
 }
 
+#errors p {
+    text-align: center;
+    color: red;
+    font-size: 1em;
+}
