@@ -112,6 +112,7 @@ def export_csv(request):
         start_date
         end_date
         service
+        discount
     @param request: Takes in a request query to return a CSV file of filtered transaction data.
     Queries must have a date range as well as service.
     @returns filtered transaction data based on a date range in .CSV format
@@ -146,11 +147,12 @@ def export_csv(request):
                 end_date=request.POST.get('end_date', None),
                 discount=discount_str)
         writer = csv.writer(response)
-        writer.writerow(['Item', 'Variant', 'Price', 'Discount Type', 'Discount', 'Quantity', 'Transaction ID', 'Time'])
+        writer.writerow(['Service', 'Item', 'Variant', 'Price', 'Discount Type', 'Discount', 'Quantity', 'Transaction ID', 'Time'])
         if reports.count() > 0:
             for report in reports:
                 for item in report.get_associated_items:
                     writer.writerow([
+                        item.service,
                         item.name,
                         item.variant,
                         item.price,
