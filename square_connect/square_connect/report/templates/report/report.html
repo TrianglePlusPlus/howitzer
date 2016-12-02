@@ -26,13 +26,23 @@
         var last_requested_end;
         var last_requested_discount;
 
+        // used to know whether or not to repopulate the discounts dropdown
         var changed_nondiscount_val = true;
         var discount_select = $("#discount_select");
         var discount_options = [];
         function discount_select_init() {
-            discount_select.prepend($("<option></option>")
+            discount_select.append($("<option></option>")
                 .attr("value","all")
                 .text("All Discounts"));
+            discount_select.append($("<option></option>")
+                .attr("value","spoil")
+                .text("All Spoilage"));
+            discount_select.append($("<option></option>")
+                .attr("value","shift drink")
+                .text("All Shift Drinks"));
+            discount_select.append($("<option></option>")
+                .attr("value","use")
+                .text("All Use"));
         }
 
         function select_specific_discount() {
@@ -63,6 +73,10 @@
 
         $("#service_select").change(function() {
             changed_nondiscount_val = true;
+        });
+        $("#discount_select").change(function() {
+            if (this.value == "all" || this.value == "spoil" || this.value == "shift drink" || this.value == "use")
+                changed_nondiscount_val = true;
         });
         $("#start_datepicker").change(function() {
             changed_nondiscount_val = true;
@@ -270,6 +284,9 @@
                 <p>Discount:
                 <select id="discount_select" name="discount">
                     <option selected="selected" value="all">All Discounts</option>
+                    <option value="spoil">All Spoilage</option>
+                    <option value="shift drink">All Shift Drinks</option>
+                    <option value="use">All Use</option>
                 </select> </p>
             </th>
             <th>
