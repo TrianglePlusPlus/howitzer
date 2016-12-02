@@ -13,7 +13,7 @@ import json, csv
 @login_required
 def spoilage_report(request):
     """Renders the reports page.
-	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date
+    @param request: Takes in a request query to filter through the spoilage data. Queries must have a date
     @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
     @param start_year: (GET parameter) Takes in the start year of the spoilage
     @param start_month: (GET parameter) Takes in the start month of the spoilage
@@ -22,7 +22,7 @@ def spoilage_report(request):
     @param end_month: (GET parameter) Takes in the end month of the spoilage
     @param end_day: (GET parameter) Takes in the end day of the spoilage
     @returns filtered spoilage data for today if no GET parameters, or based on date and service
-	"""
+    """
     assert isinstance(request, HttpRequest)
 
     if request.GET.get('service', None):
@@ -60,9 +60,9 @@ def request_report(request):
         start_date
         end_date
         service
-	@param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
-	@returns filtered spoilage data based on a date
-	"""
+    @param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
+    @returns filtered spoilage data based on a date
+    """
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
@@ -106,9 +106,9 @@ def export_csv(request):
         start_date
         end_date
         service
-	@param request: Takes in a request query to return a CSV file of filtered spoilage data. Queries must have a date range as well as service
-	@returns filtered spoilage data based on a date range in .CSV format
-	"""
+    @param request: Takes in a request query to return a CSV file of filtered spoilage data. Queries must have a date range as well as service
+    @returns filtered spoilage data based on a date range in .CSV format
+    """
     if request.method == "POST":
         return_data = {}
         sum_total = 0

@@ -6,7 +6,6 @@ import datetime
 from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
 
-
 class Report(models.Model):
     # TODO
     date = models.DateField()
@@ -20,7 +19,7 @@ class Report(models.Model):
         @param service: A service object correspondinng to the sales data
         @param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
-        
+
         for transaction in json_data:
             for item in transaction['itemizations']:
                 try:
@@ -39,7 +38,7 @@ class Report(models.Model):
                                 found = True
                     if found:
                         # Check to see if that item is already in the database
-                        
+
                         try:
                             if Item.objects.filter(transaction_id=transaction["id"],
                                                    name=item['name'], variant=item['item_variation_name']).count() > 0:
@@ -69,17 +68,17 @@ class Report(models.Model):
                         report_item.transaction_time = transaction_time
                         report_item.name = item['name']
                         report_item.discount = label
-                        
+
                         # Formats the service names correctly from all lower case to either all upper
                         # case (for MUG and UG) or Title Case
                         if len(str(service_name.name)) > 3:
                             report_item.service = str(service_name.name).title()
                         else:
                             report_item.service = str(service_name.name).upper()
-                        
+
                         # 1 is an arbitrary cut off, typical variants are "Pumpkin"
                         # for a muffin for example
-                        
+
                         try:
                             if len(item['item_variation_name']) > 1:
                                 report_item.variant = item['item_variation_name']
@@ -132,13 +131,13 @@ class Report(models.Model):
         for item in Item.objects.filter(report=self):
             total += item.price * item.quantity
         return total
-        
+
     @property
     def get_discount_total(self):
         """ Finds the total discounts across a report
-        @returns The total discounts (cost * quantity)        
+        @returns The total discounts (cost * quantity)
         """
-        
+
         total = 0
         for item in Item.objects.filter(report=self):
             total += item.discountcost * item.quantity
@@ -154,7 +153,7 @@ class Report(models.Model):
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if (discount is not None) and (discount != 'all'):
-            
+
             if (service is not None) and (service != 'all'):
                 if discount == 'shift drink':
                     return Report.objects.filter(Q(date__range=(start_date, end_date)),

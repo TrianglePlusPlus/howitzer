@@ -2,6 +2,7 @@
 from data.transaction import LocationsRequest
 
 service_names = {
+    "all": "All Services",
     "mug": "MUG",
     "vittles": "Vital Vittles",
     "snaxa": "Hoya Snaxa",
