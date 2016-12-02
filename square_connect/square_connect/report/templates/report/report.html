@@ -53,11 +53,14 @@
             $.ajax({
                 url : "{% url 'request_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val(), discount : 'all' }, // data sent with the post request
+                data : {
+                    service : $('#service_select').val(),
+                    start_date : $('#start_datepicker').val(),
+                    end_date : $('#end_datepicker').val()
+                },
 
                 // handle a successful response
                 success : function(json) {
-                    console.log(json);
                     var done = 0;
                     var tempEndDate, dayTemp, monthTemp;
 
@@ -85,7 +88,7 @@
                         if (startYear == endYear){
                             if (startMonth == endMonth){
                                 addToList(startDay, endDay, startYear, startMonth);
-                                done = 1; 
+                                done = 1;
                             } else { //different months
                                 tempEndDate = numDays[Number(startMonth)-1];
                                 addToList(startDay, tempEndDate, startYear, startMonth);
@@ -95,10 +98,10 @@
                         } else if (startYear < endYear){ //different years
                             tempEndDate = numDays[Number(startMonth)-1];
                             addToList(startDay, tempEndDate, startYear, startMonth);
-                            startMonth++; 
+                            startMonth++;
                             if (startMonth == 13){
                                 startYear++;
-                                startMonth = 1; 
+                                startMonth = 1;
                                 startDay = 1;
                             }
                         }
@@ -111,8 +114,8 @@
                     var startDate = $('#start_datepicker').val();
                     var endDate = $('#end_datepicker').val();
                     var parsed_data = json;
-                    var data = []; //total amount spoiled on a day
-                    var dates = []; //dates holds the day 
+                    var data = []; //total amount discounted on a day
+                    var dates = []; //dates holds the day
 
                     if (parsed_data.reports == undefined){
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -135,13 +138,13 @@
                                     for (j = 0; j < parsed_data.reports[k]['size']; j++) { //each item
                                         data[i] += parsed_data.reports[k]['items'][j]['discountcost'] * parsed_data.reports[k]['items'][j]['quantity'];
                                     }
-                                }    
+                                }
                             }
                         }
 
 
                        $("#reports-table tbody").html("\
-                            <h3>Spoilage from " + startDate + " to " + endDate +"</h3>\
+                            <h3>Discounts from " + startDate + " to " + endDate +"</h3>\
                             <canvas id='myCanvas' width='200' height='100' style='border:1px solid #000000;'>\
                             </canvas>");
                         var ctx = document.getElementById("myCanvas").getContext('2d');
@@ -151,7 +154,7 @@
                           data: {
                             labels: listOfDates,
                             datasets: [{
-                                label: 'Amount Spoiled ($)',
+                                label: 'Amount Discounted ($)',
                                 data: data,
                                     backgroundColor: "rgba(14,43,123,.5)",
                                     hoverBackgroundColor: "#0E2B7B",
@@ -163,14 +166,14 @@
                                 yAxes: [{
                                     scaleLabel: {
                                         display: true,
-                                        labelString: 'Amount Spoiled ($)'
+                                        labelString: 'Amount Discounted ($)'
 
                                         },
                                     }]
                             }
                         });
                     }
-                    
+
                 }, //end of successful response
 
                 // handle an unsuccessful response
@@ -225,7 +228,12 @@
             $.ajax({
                 url : "{% url 'request_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+                data : {
+                    service : $('#service_select').val(),
+                    discount : $('#discount_select').val(),
+                    start_date : $('#start_datepicker').val(),
+                    end_date : $('#end_datepicker').val()
+                },
 
                 // handle a successful response
                 success : function(json) {
@@ -351,6 +359,7 @@
                     last_requested_end = $('#end_datepicker').val();
                     last_requested_discount = $('#discount_select').val();
 
+                    $("#errors").empty();
                     if (success_function != null)
                         success_function();
                 },
@@ -398,13 +407,13 @@
 
         $('#generate-graph-button').click(function() {
             generate_graph();
-        });   
+        });
     });
 </script>
 
 <script>
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
+    $('[data-toggle="tooltip"]').tooltip();
 });
 </script>
 
@@ -436,8 +445,6 @@ $(document).ready(function(){
             </th>
             <th>
                 <p>Start Date: <input name="start_date" type="text" id="start_datepicker"></p>
-            </th>
-            <th>
                 <p>End Date: <input name="end_date" type="text" id="end_datepicker"></p>
             </th>
             <th>

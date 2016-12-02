@@ -13,7 +13,7 @@ import json, csv
 @login_required
 def spoilage_report(request):
     """Renders the reports page.
-	@param request: Takes in a request query to filter through the spoilage data. Queries must have a date
+    @param request: Takes in a request query to filter through the spoilage data. Queries must have a date
     @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
     @param start_year: (GET parameter) Takes in the start year of the spoilage
     @param start_month: (GET parameter) Takes in the start month of the spoilage
@@ -22,7 +22,7 @@ def spoilage_report(request):
     @param end_month: (GET parameter) Takes in the end month of the spoilage
     @param end_day: (GET parameter) Takes in the end day of the spoilage
     @returns filtered spoilage data for today if no GET parameters, or based on date and service
-	"""
+    """
     assert isinstance(request, HttpRequest)
 
     if request.GET.get('service', None):
@@ -60,9 +60,9 @@ def request_report(request):
         start_date
         end_date
         service
-	@param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
-	@returns filtered spoilage data based on a date
-	"""
+    @param request: Takes in a request query to return a JSON dump of filtered spoilage data. Queries must have a date range as well as service
+    @returns filtered spoilage data based on a date
+    """
     if request.method == "POST":
         #assert isinstance(request, HttpRequest)
 
@@ -106,9 +106,9 @@ def export_csv(request):
         start_date
         end_date
         service
-	@param request: Takes in a request query to return a CSV file of filtered spoilage data. Queries must have a date range as well as service
-	@returns filtered spoilage data based on a date range in .CSV format
-	"""
+    @param request: Takes in a request query to return a CSV file of filtered spoilage data. Queries must have a date range as well as service
+    @returns filtered spoilage data based on a date range in .CSV format
+    """
     if request.method == "POST":
         return_data = {}
         sum_total = 0
@@ -143,45 +143,3 @@ def export_csv(request):
             json.dumps({"POST method failed": "we have no data for you"}),
             content_type="application/json"
         )
-
-def generate_graph(request):
-    if request.method == "POST":
-
-        return_data = {}
-        sum_total = 0
-        
-        if request.POST.get('start_date', False) and request.POST.get('end_date', False):
-            # They are searching for a report
-            start_date = request.POST.get('start_date', None)
-            end_date = request.POST.get('end_date', None)
-            start_date = datetime.strptime(start_date, "%m/%d/%Y").date()
-            end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
-            service = request.POST.get('service', None)
-            reports = SpoilageReport.search_reports(start_date, end_date, service)
-            reports_list = []
-            if reports.count() > 0:
-                for report in reports:
-                    sum_total += report.get_total
-                    reports_list.append(report.dictionary_form())
-                return_data = {
-                    "reports": reports_list,
-                    "sum_total": sum_total
-                }
-        else:
-            reports = None # is this really necessary?
-
-        return HttpResponse(
-            json.dumps(return_data, cls=DjangoJSONEncoder),
-            content_type="application/json"
-        )
-        return request_report(request)
-        return render(
-            request,
-            'spoilage_report/generate_graph.html',
-            {
-                'report_data':json,
-                'title':'Report Viewer',
-                'year':'Remember never give up.',
-            }
-        )
-

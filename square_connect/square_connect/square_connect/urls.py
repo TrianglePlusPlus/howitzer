@@ -29,7 +29,6 @@ urlpatterns = [
     url(r'^report/$', report_views.report, name='report'),
     url(r'^request_report', report_views.request_report, name='request_report'),
     url(r'^export_csv', report_views.export_csv, name='export_csv'),
-    url(r'^generate-graph', report_views.generate_graph, name='generate-graph'),
 
     url(r'^login/$',
         django.contrib.auth.views.login,
