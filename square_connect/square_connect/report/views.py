@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
-from app.models import service_names
+from app.models import service_names, discounts
 from report.models import Report, Item
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -39,6 +39,7 @@ def report(request):
                 'end_date': end_date,
                 'service': service,
                 'discount': discount,
+                'discounts': discounts,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
             }
@@ -48,6 +49,7 @@ def report(request):
             request,
             'report/report.html',
             {
+                'discounts': discounts,
                 'today': today,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
