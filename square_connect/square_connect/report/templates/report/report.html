@@ -24,6 +24,16 @@
             }
         });
 
+        service_names = {
+            "all": "All Services",
+            "mug": "MUG",
+            "vittles": "Vital Vittles",
+            "snaxa": "Hoya Snaxa",
+            "ug": "Uncommon Grounds",
+            "midnight": "Midnight Mug",
+            "hilltoss": "Hilltoss",
+        }
+
         var last_requested_service;
         var last_requested_start;
         var last_requested_end;
@@ -276,6 +286,7 @@
                 type : "POST", // http method
                 data : {
                     service : $('#service_select').val(),
+                    discount : $('#discount_select').val(),
                     start_date : $('#start_datepicker').val(),
                     end_date : $('#end_datepicker').val()
                 },
@@ -332,6 +343,11 @@
                         runStuff();
                     }
 
+                    var service = $('#service_select').val();
+                    var discount = $('#discount_select').val();
+                    var discount_str = "";
+                    if (discount != "all")
+                        discount_str = ", filtered for the " + discount + " discount";
                     var startDate = $('#start_datepicker').val();
                     var endDate = $('#end_datepicker').val();
                     var parsed_data = json;
@@ -362,13 +378,11 @@
                                 }
                             }
 
-                            var with2Decimals = data[i].toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
-                            data[i] = with2Decimals;
+                            data[i] = data[i].toFixed(2);
                         }
 
-
                        $("#reports-table tbody").html("\
-                            <h3>Discounts from " + startDate + " to " + endDate +"</h3>\
+                            <h3>Graph for " + service_names[service] + " from " + startDate + " to " + endDate + discount_str + "</h3>\
                             <canvas id='myCanvas' width='200' height='100' style='border:1px solid #000000;'>\
                             </canvas>");
                         var ctx = document.getElementById("myCanvas").getContext('2d');
