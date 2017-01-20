@@ -2,7 +2,8 @@
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
-from app.models import Service, service_names
+from django.conf import settings # TODO: we need service_names
+from app.models import Service
 from mailer.models import MailingList, Person
 from datetime import date, timedelta
 from django.core.mail import send_mail
@@ -52,8 +53,8 @@ class Command(BaseCommand):
                 report_url = report_url.format(discount=quote(person.discount))
                 send_mail(
                     "Spoilage Report",
-                    "Hello " + person.first_name + " " + person.last_name + "! Here is the spoilage report for " + service_names[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url,
-                    "reports@thecorp.org",
+                    "Hello " + person.first_name + " " + person.last_name + "! Here is the spoilage report for " + settings.SERVICE_NAMES[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url,
+                    settings.EMAIL_HOST_USER,
                     [person.email],
                     fail_silently=False
                 )

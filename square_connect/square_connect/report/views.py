@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
-from app.models import service_names, discounts
+from django.conf import settings  # TODO: we need service_names, discounts
 from report.models import Report, Item
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -39,7 +39,7 @@ def report(request):
                 'end_date': end_date,
                 'service': service,
                 'discount': discount,
-                'discounts': discounts,
+                'discounts': settings.DISCOUNTS,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
             }
@@ -49,7 +49,7 @@ def report(request):
             request,
             'report/report.html',
             {
-                'discounts': discounts,
+                'discounts': settings.DISCOUNTS,
                 'today': today,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
@@ -144,7 +144,7 @@ def export_csv(request):
             discount_str = ', filtered for the {discount} discount'.format(discount=request.POST.get('discount'))
         response['Content-Disposition'] = ('attachment; filename="Report for {service} from {start_date} to {end_date}'
             '{discount}.csv').format(
-                service=service_names[service],
+                service=settings.SERVICE_NAMES[service],
                 start_date=request.POST.get('start_date', None),
                 end_date=request.POST.get('end_date', None),
                 discount=discount_str)

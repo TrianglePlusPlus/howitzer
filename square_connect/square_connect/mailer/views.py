@@ -7,6 +7,7 @@ from mailer.forms import MailerPersonForm
 from app.models import Service
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
+from django.conf import settings
 
 @login_required
 def mailer(request):
@@ -37,7 +38,7 @@ def mailer(request):
                 send_mail(
                     "Mailing List Notification",
                     "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + "." + discount_str,
-                    "reports@thecorp.org",
+                    settings.EMAIL_HOST_USER,
                     [email],
                     fail_silently=False
                 )

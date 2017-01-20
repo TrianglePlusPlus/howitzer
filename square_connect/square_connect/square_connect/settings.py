@@ -192,3 +192,51 @@ LOGGING = {
 
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+SERVICE_NAMES = {
+    "all": "All Services",
+    "mug": "MUG",
+    "vittles": "Vital Vittles",
+    "snaxa": "Hoya Snaxa",
+    "ug": "Uncommon Grounds",
+    "midnight": "Midnight Mug",
+    "hilltoss": "Hilltoss",
+}
+
+DISCOUNTS = [
+    ('all', 'All Discounts'),
+    ('$1.50 Off', '$1.50 Off'),
+    ('1.50 Off', '1.50 Off'),
+    ('CREDITED Spoilage', 'CREDITED Spoilage'),
+    ('Cup Reuse', 'Cup Reuse'),
+    ('Espresso 10 Drinks Card', 'Espresso 10 Drinks Card'),
+    ('Espresso Loyalty Card', 'Espresso Loyalty Card'),
+    ('Expired', 'Expired'),
+    ('Green Bag Discount', 'Green Bag Discount'),
+    ('Lau Employee Appreciation', 'Lau Employee Appreciation'),
+    ('Office Hours', 'Office Hours'),
+    ('Shift Drink - Accounting', 'Shift Drink - Accounting'),
+    ('Shift Drink - Catering', 'Shift Drink - Catering'),
+    ('Shift Drink - Hilltoss', 'Shift Drink - Hilltoss'),
+    ('Shift Drink - Hoya Snaxa', 'Shift Drink - Hoya Snaxa'),
+    ('Shift Drink - ITM', 'Shift Drink - ITM'),
+    ('Shift Drink - MUG', 'Shift Drink - MUG'),
+    ('Shift Drink - Main Office', 'Shift Drink - Main Office'),
+    ('Shift Drink - Midnight', 'Shift Drink - Midnight'),
+    ('Shift Drink - UG', 'Shift Drink - UG'),
+    ('Shift Drink - Vital Vittles', 'Shift Drink - Vital Vittles'),
+    ('Sorry Card', 'Sorry Card'),
+    ('Spoil', 'Spoil'),
+    ('Use - Catering', 'Use - Catering'),
+    ('Use - MUG', 'Use - MUG'),
+    ('Use - Vittles', 'Use - Vittles'),
+]
+
+DISCOUNTS_SHIFT = [
+    'Shift Drink - UG',
+    'Shift Drink - Vital Vittles',
+    'Shift Drink - Accounting',
+    'Shift Drink - MUG'
+    'Shift Drink - Hoya Snaxa',
+    'Shift Drink - ITM'
+]
