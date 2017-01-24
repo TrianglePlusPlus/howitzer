@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
 from django.conf import settings  # TODO: we need service_names, discounts
+import json
 from report.models import Report, Item
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -24,6 +25,7 @@ def report(request):
     assert isinstance(request, HttpRequest)
 
     today = datetime.today().strftime("%m/%d/%Y")
+    services_json = json.dumps(settings.SERVICE_NAMES)
 
     if request.GET.get('service', None):
         service = request.GET.get('service', None) # TODO: we need a better default
@@ -39,7 +41,12 @@ def report(request):
                 'end_date': end_date,
                 'service': service,
                 'discount': discount,
+                'services_json': services_json,
+                'services': settings.SERVICES,
                 'discounts': settings.DISCOUNTS,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
+                'report_relative_url': '/report',
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
             }
@@ -49,7 +56,12 @@ def report(request):
             request,
             'report/report.html',
             {
+                'services_json': services_json,
+                'services': settings.SERVICES,
                 'discounts': settings.DISCOUNTS,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
+                'report_relative_url': '/report',
                 'today': today,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',

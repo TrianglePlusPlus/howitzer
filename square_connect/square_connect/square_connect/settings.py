@@ -40,6 +40,8 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'reports@thecorp.org'
 EMAIL_HOST_PASSWORD = 'S90YhXKQfjBymCbbHmgz'
 
+REPORT_BASE_URL = 'http://reports.thecorp.org/report'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -193,15 +195,48 @@ LOGGING = {
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-SERVICE_NAMES = {
-    "all": "All Services",
-    "mug": "MUG",
-    "vittles": "Vital Vittles",
-    "snaxa": "Hoya Snaxa",
-    "ug": "Uncommon Grounds",
-    "midnight": "Midnight Mug",
-    "hilltoss": "Hilltoss",
-}
+""" Service names: exclude the * ones from the services list:
+        midnight
+        snaxa
+        vittles
+        ug
+        mug
+        hilltoss
+        *the corp
+        *storage
+        *catering
+        *students of georgetown incorporated
+        *project whiteboard
+"""
+SERVICES = [
+    ("all", "All Services"),
+    ("mug", "MUG"),
+    ("vittles", "Vital Vittles"),
+    ("snaxa", "Hoya Snaxa"),
+    ("ug", "Uncommon Grounds"),
+    ("midnight", "Midnight Mug"),
+    ("hilltoss", "Hilltoss"),
+]
+
+SERVICE_NAMES = dict(SERVICES)
+
+SERVICE_EXCLUDES = [
+    "the corp",
+    "storage",
+    "catering",
+    "students of georgetown incorporated",
+    "project whiteboard"
+]
+
+SERVICE_EXCLUDES_WEEKEND = [
+    "the corp",
+    "storage",
+    "catering",
+    "students of georgetown incorporated",
+    "project whiteboard",
+    "mug",
+    "hilltoss"
+]
 
 DISCOUNTS = [
     ('all', 'All Discounts'),
@@ -231,6 +266,15 @@ DISCOUNTS = [
     ('Use - MUG', 'Use - MUG'),
     ('Use - Vittles', 'Use - Vittles'),
 ]
+
+DISCOUNTS_UMBRELLA = [
+    ('all', 'All Discounts'),
+    ('spoil', 'All Spoilage'),
+    ('shift drink', 'All Shift Drinks'),
+    ('use', 'All Use'),
+]
+
+DISCOUNTS_UMBRELLA_VALUES = [i[0] for i in DISCOUNTS_UMBRELLA]
 
 DISCOUNTS_SHIFT = [
     'Shift Drink - UG',
