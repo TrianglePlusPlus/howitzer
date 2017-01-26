@@ -6,6 +6,7 @@ from app.models import Service
 from report.models import Report, Item
 from data.transaction import PaymentRequest
 
+
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds ___-marked items"
 

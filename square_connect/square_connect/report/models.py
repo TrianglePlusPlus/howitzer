@@ -8,7 +8,6 @@ from data.transaction import LocationsRequest, PaymentRequest, format_money
 
 
 class Report(models.Model):
-    # TODO
     date = models.DateField()
     service = models.ForeignKey("app.Service")
     discount_label = models.CharField(max_length=50, default='')
@@ -17,7 +16,7 @@ class Report(models.Model):
     def add_items_from_json_data(json_data, service_name, discount='All'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
-        @param service: A service object correspondinng to the sales data
+        @param service_name: A service object correspondinng to the sales data
         @param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
         
@@ -31,7 +30,8 @@ class Report(models.Model):
                             label = item['discounts'][0]['name']
                     else:
                         for entry in item['discounts']:
-                            if entry['name'] == discount: found = True
+                            if entry['name'] == discount:
+                                found = True
                             # This is to catch all shift drinks (unless we only want shift drinks per service?)
                             elif entry['name'] == 'Shift Drink - UG' or 'Shift Drink - Vital Vittles' or \
                                     'Shift Drink - Accounting' or 'Shift Drink - MUG' or \
@@ -233,7 +233,7 @@ class Report(models.Model):
     def get_associated_date(date_string):
         """ Gets the sales date for the input date string
         Sales before 4/5 am EST belong to the previous day
-        @param dt: The date string in question, FORMATTED IN ZULU TIME (UTC)
+        @param date_string: The date string in question, FORMATTED IN ZULU TIME (UTC)
         @returns The 'sales' date that a date string belongs to
         """
         # Get the packages we need for this

@@ -10,13 +10,15 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 # TODO: needed? from urllib.parse import unquote
 
-import json, csv
+import json
+import csv
+
 
 @login_required
 def report(request):
     """Renders the reports page.
     @param request: Takes in a request query to filter through the transaction data. Queries must have a date
-    @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
+    @param service: (GET parameter) Takes in Corp Service E.X. "mug"
     @param start_date: (GET parameter) Takes in the start date of the transactions
     @param end_date: (GET parameter) Takes in the end date of the transactions
     @returns filtered transaction data for today if no GET parameters, or based on date and service
@@ -26,7 +28,7 @@ def report(request):
     today = datetime.today().strftime("%m/%d/%Y")
 
     if request.GET.get('service', None):
-        service = request.GET.get('service', None) # TODO: we need a better default
+        service = request.GET.get('service', None)  # TODO: we need a better default
         discount = request.GET.get('discount', 'all')
         start_date = request.GET.get('start_date', today)
         end_date = request.GET.get('end_date', today)
@@ -53,6 +55,7 @@ def report(request):
                 'year': 'Remember never give up.',
             }
         )
+
 
 def request_report(request):
     """Requests the report data.
@@ -106,6 +109,7 @@ def request_report(request):
             content_type="application/json"
         )
 
+
 # TODO: specialize for discounts
 def export_csv(request):
     """Exports the report as a .CSV.
@@ -136,12 +140,12 @@ def export_csv(request):
         # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
-        if request.POST.get('discount', '') == 'all' or request.POST.get('discount', '') == None:
+        if request.POST.get('discount', '') == 'all' or request.POST.get('discount', '') is None:
             discount_str = ''
         else:
             discount_str = ', filtered for the {discount} discount'.format(discount=request.POST.get('discount'))
         response['Content-Disposition'] = ('attachment; filename="Report for {service} from {start_date} to {end_date}'
-            '{discount}.csv').format(
+                                           '{discount}.csv').format(
                 service=service_names[service],
                 start_date=request.POST.get('start_date', None),
                 end_date=request.POST.get('end_date', None),
