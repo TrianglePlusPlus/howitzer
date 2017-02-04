@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings  # TODO: we need service_names, discounts
 import json
 from report.models import Report, Item
+from app.models import Service
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder

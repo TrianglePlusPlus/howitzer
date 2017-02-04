@@ -35,8 +35,10 @@ class Report(models.Model):
                             elif entry['name'] in settings.DISCOUNTS_SHIFT:
                                 found = True
                     if found:
-                        # Check to see if that item is already in the database
+                        if not 'item_variation_name' in item:
+                            item['item_variation_name'] = ''
 
+                        # Check to see if that item is already in the database
                         try:
                             if Item.objects.filter(transaction_id=transaction["id"],
                                                    name=item['name'], variant=item['item_variation_name']).count() > 0:

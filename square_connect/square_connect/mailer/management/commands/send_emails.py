@@ -45,9 +45,14 @@ class Command(BaseCommand):
                 parameters['discount'] = person.discount
                 parameter_values = urllib.parse.unquote(urllib.parse.urlencode(parameters))
                 report_url = settings.REPORT_BASE_URL + '?' + parameter_values
+                message = (
+                    "Hello " + person.first_name + " " + person.last_name +
+                    "! Here is the discounts report for " + settings.SERVICE_NAMES[service.name] +
+                    " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url
+                )
                 send_mail(
                     "Discounts Report",
-                    "Hello " + person.first_name + " " + person.last_name + "! Here is the discounts report for " + settings.SERVICE_NAMES[service.name] + " on " + yesterday.strftime('%A, %d %B %Y') + " (yesterday):\n\n" + report_url,
+                    message,
                     settings.EMAIL_HOST_USER,
                     [person.email],
                     fail_silently=False

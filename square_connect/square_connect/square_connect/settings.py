@@ -3,44 +3,41 @@ Django settings for square_connect project.
 Refer to https://docs.djangoproject.com/en/1.9/ref/settings/ for 1.9 documentation
 """
 
+import os
 from os import path
 PROJECT_ROOT = path.dirname(path.abspath(path.dirname(__file__)))
 
 DEBUG = True
 
-ALLOWED_HOSTS = (
+ALLOWED_HOSTS = [
     'localhost',
-)
+]
 
-ADMINS = (
-    ('Nick Chapman', 'nick@thecorp.org'),
-    ('Max Kim', 'max@thecorp.org'),
-    ('Peter Johnston', 'peter@thecorp.org'),
-)
+ADMINS = list(zip(os.getenv('ADMINS_NAMES').split(','), os.getenv('ADMINS_EMAILS').split(',')))
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'square',
-        'USER': 'django',
-        'PASSWORD': '19djangomysqlpassword72',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'reports@thecorp.org'
-EMAIL_HOST_PASSWORD = 'S90YhXKQfjBymCbbHmgz'
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-REPORT_BASE_URL = 'http://reports.thecorp.org/report'
+REPORT_BASE_URL = os.getenv('REPORT_BASE_URL')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -49,7 +46,7 @@ REPORT_BASE_URL = 'http://reports.thecorp.org/report'
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = os.getenv('TIME_ZONE')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -103,7 +100,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'n(bd1f1c%e8=_xad02x5qtfn%wgwpi492e$8_erx+d)!tpeoim'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 TEMPLATES = [
@@ -195,92 +192,22 @@ LOGGING = {
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-""" Service names: exclude the * ones from the services list:
-        midnight
-        snaxa
-        vittles
-        ug
-        mug
-        hilltoss
-        *the corp
-        *storage
-        *catering
-        *students of georgetown incorporated
-        *project whiteboard
-"""
-SERVICES = [
-    ("all", "All Services"),
-    ("mug", "MUG"),
-    ("vittles", "Vital Vittles"),
-    ("snaxa", "Hoya Snaxa"),
-    ("ug", "Uncommon Grounds"),
-    ("midnight", "Midnight Mug"),
-    ("hilltoss", "Hilltoss"),
-]
+# Square specific settings
+SQUARE_ACCESS_TOKEN = os.getenv('SQUARE_ACCESS_TOKEN')
+
+SERVICES = list(zip(os.getenv('SERVICES_VALUES').split(','), os.getenv('SERVICES_NAMES').split(',')))
 
 SERVICE_NAMES = dict(SERVICES)
 
-SERVICE_EXCLUDES = [
-    "the corp",
-    "storage",
-    "catering",
-    "students of georgetown incorporated",
-    "project whiteboard"
-]
+SERVICE_EXCLUDES = os.getenv('SERVICE_EXCLUDES').split(',')
 
-SERVICE_EXCLUDES_WEEKEND = [
-    "the corp",
-    "storage",
-    "catering",
-    "students of georgetown incorporated",
-    "project whiteboard",
-    "mug",
-    "hilltoss"
-]
+SERVICE_EXCLUDES_WEEKEND = os.getenv('SERVICE_EXCLUDES_WEEKEND').split(',')
 
-DISCOUNTS = [
-    ('all', 'All Discounts'),
-    ('$1.50 Off', '$1.50 Off'),
-    ('1.50 Off', '1.50 Off'),
-    ('CREDITED Spoilage', 'CREDITED Spoilage'),
-    ('Cup Reuse', 'Cup Reuse'),
-    ('Espresso 10 Drinks Card', 'Espresso 10 Drinks Card'),
-    ('Espresso Loyalty Card', 'Espresso Loyalty Card'),
-    ('Expired', 'Expired'),
-    ('Green Bag Discount', 'Green Bag Discount'),
-    ('Lau Employee Appreciation', 'Lau Employee Appreciation'),
-    ('Office Hours', 'Office Hours'),
-    ('Shift Drink - Accounting', 'Shift Drink - Accounting'),
-    ('Shift Drink - Catering', 'Shift Drink - Catering'),
-    ('Shift Drink - Hilltoss', 'Shift Drink - Hilltoss'),
-    ('Shift Drink - Hoya Snaxa', 'Shift Drink - Hoya Snaxa'),
-    ('Shift Drink - ITM', 'Shift Drink - ITM'),
-    ('Shift Drink - MUG', 'Shift Drink - MUG'),
-    ('Shift Drink - Main Office', 'Shift Drink - Main Office'),
-    ('Shift Drink - Midnight', 'Shift Drink - Midnight'),
-    ('Shift Drink - UG', 'Shift Drink - UG'),
-    ('Shift Drink - Vital Vittles', 'Shift Drink - Vital Vittles'),
-    ('Sorry Card', 'Sorry Card'),
-    ('Spoil', 'Spoil'),
-    ('Use - Catering', 'Use - Catering'),
-    ('Use - MUG', 'Use - MUG'),
-    ('Use - Vittles', 'Use - Vittles'),
-]
+DISCOUNTS = list(zip(os.getenv('DISCOUNTS').split(','), os.getenv('DISCOUNTS').split(',')))
+DISCOUNTS.insert(0, ('all', 'All Discounts'))
 
-DISCOUNTS_UMBRELLA = [
-    ('all', 'All Discounts'),
-    ('spoil', 'All Spoilage'),
-    ('shift drink', 'All Shift Drinks'),
-    ('use', 'All Use'),
-]
+DISCOUNTS_UMBRELLA_VALUES = os.getenv('DISCOUNTS_UMBRELLA_VALUES').split(',')
 
-DISCOUNTS_UMBRELLA_VALUES = [i[0] for i in DISCOUNTS_UMBRELLA]
+DISCOUNTS_UMBRELLA = list(zip(DISCOUNTS_UMBRELLA_VALUES, os.getenv('DISCOUNTS_UMBRELLA_NAMES').split(',')))
 
-DISCOUNTS_SHIFT = [
-    'Shift Drink - UG',
-    'Shift Drink - Vital Vittles',
-    'Shift Drink - Accounting',
-    'Shift Drink - MUG'
-    'Shift Drink - Hoya Snaxa',
-    'Shift Drink - ITM'
-]
+DISCOUNTS_SHIFT = os.getenv('DISCOUNTS_SHIFT').split(',')

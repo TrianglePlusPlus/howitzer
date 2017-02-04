@@ -8,6 +8,7 @@ import locale
 # For pretty printing!
 import pprint
 
+from django.conf import settings
 from django.utils import timezone
 
 # Convert cent-based transactions to dollars and cents
@@ -26,7 +27,7 @@ class SquareRequest:
         # Shared for all requests
         self.base_path = "https://connect.squareup.com"
         # The access token can be found from our Square account's app manager dashboard
-        self.__access_token = "zLAjMnTYdAqbbN-L6bxfMQ"
+        self.__access_token = settings.SQUARE_ACCESS_TOKEN
         self.headers = {'Authorization' : 'Bearer ' + self.__access_token,
                         'Accept' : 'application/json',
                         'Content-Type' : 'application/json' }
