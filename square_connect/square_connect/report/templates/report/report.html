@@ -24,15 +24,7 @@
             }
         });
 
-        service_names = {
-            "all": "All Services",
-            "mug": "MUG",
-            "vittles": "Vital Vittles",
-            "snaxa": "Hoya Snaxa",
-            "ug": "Uncommon Grounds",
-            "midnight": "Midnight Mug",
-            "hilltoss": "Hilltoss",
-        }
+        service_names = {{ services_json|safe }};
 
         var last_requested_service;
         var last_requested_start;
@@ -44,18 +36,12 @@
         var discount_select = $("#discount_select");
         var discount_options = [];
         function discount_select_init() {
-            discount_select.append($("<option></option>")
-                .attr("value","all")
-                .text("All Discounts"));
-            discount_select.append($("<option></option>")
-                .attr("value","spoil")
-                .text("All Spoilage"));
-            discount_select.append($("<option></option>")
-                .attr("value","shift drink")
-                .text("All Shift Drinks"));
-            discount_select.append($("<option></option>")
-                .attr("value","use")
-                .text("All Use"));
+            // populate with the umbrella discount categories which should always appear at the top
+            {% for val, text in discounts_umbrella|slice:"0:" %}
+                discount_select.append($("<option></option>")
+                    .attr("value","{{ val }}")
+                    .text("{{ text }}"));
+            {% endfor %}
 
             // populate with all other discounts
             // TODO: if Nick wants, remove all instances of ever repopulating the discount dropdown
@@ -107,8 +93,9 @@
             changed_nondiscount_val = true;
         });
         $("#discount_select").change(function() {
-            if (this.value == "all" || this.value == "spoil" || this.value == "shift drink" || this.value == "use")
+            if ($.inArray(this.value, {{ discounts_umbrella_values|safe }}) > -1) {
                 changed_nondiscount_val = true;
+            }
         });
         $("#start_datepicker").change(function() {
             changed_nondiscount_val = true;
@@ -137,10 +124,22 @@
                     var end_date_input = $('#end_datepicker').val().split('/');
                     var start_date = new Date(start_date_input[2], start_date_input[0] - 1, start_date_input[1]); // -1 necessary as js months are 0-based
                     var end_date = new Date(end_date_input[2], end_date_input[0] - 1, end_date_input[1]); // see above comment
-                    var start_date_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getFullYear();
-                    var end_date_str =  (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getFullYear();
+                    var start_month_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var start_day_str = start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var start_date_str = start_month_str + '/' + start_day_str + '/' + start_date.getFullYear();
+                    var end_month_str = (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_day_str = end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_date_str =  end_month_str + '/' + end_day_str + '/' + end_date.getFullYear();
 
-                    history.replaceState(null, null, '/report?service=' + $('#service_select').val() + '&discount=' + $('#discount_select').val() + '&start_date=' + start_date_str + '&end_date=' + end_date_str);
+                    var params = {
+                        service: $('#service_select').val(),
+                        discount: $('#discount_select').val(),
+                        start_date: start_date_str,
+                        end_date: end_date_str
+                    };
+                    var params_values = $.param( params ).replace(/%2F/g, '/');
+                    var report_url = '{{ report_relative_url }}' + '?' + params_values;
+                    history.replaceState(null, null, report_url);
 
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -263,7 +262,7 @@
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);
-                    console.log("Something got fucked up.");
+                    console.log("There was an error with the report request: AJAX request failed.");
                 }
             });
         };
@@ -436,7 +435,8 @@
 
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
-                    console.log("Something got fucked up.");
+                    console.log(xhr.status + ": " + xhr.responseText);
+                    console.log("There was an error with the graph generation: AJAX request failed.");
                 }
             });
         }
@@ -461,22 +461,19 @@ $(document).ready(function(){
             <th>
                 <p>Service:
                 <select id="service_select" name="service">
-                    <option selected="selected" value="all">All Services</option>
-                    <option value="mug">MUG</option>
-                    <option value="vittles">Vital Vittles</option>
-                    <option value="snaxa">Hoya Snaxa</option>
-                    <option value="ug">Uncommon Grounds</option>
-                    <option value="midnight">Midnight Mug</option>
-                    <option value="hilltoss">Hilltoss</option>
+                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
+                    {% for val, text in services|slice:"0:" %}
+                        <option value="{{ val }}">{{ text }}</option>
+                    {% endfor %}
                 </select> </p>
             </th>
             <th>
                 <p>Discount:
                 <select id="discount_select" name="discount">
-                    <option selected="selected" value="all">All Discounts</option>
-                    <option value="spoil">All Spoilage</option>
-                    <option value="shift drink">All Shift Drinks</option>
-                    <option value="use">All Use</option>
+                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
+                    {% for val, text in discounts_umbrella|slice:"0:" %}
+                        <option value="{{ val }}">{{ text }}</option>
+                    {% endfor %}
                 </select> </p>
             </th>
             <th>

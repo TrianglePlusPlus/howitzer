@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
-from app.models import service_names
+from django.conf import settings # TODO: we need service_names
 from spoilage_report.models import SpoilageReport, SpoilageItem
 from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
@@ -127,7 +127,7 @@ def export_csv(request):
         # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="Report for ' + service_names[service] + ' from ' + request.POST.get('start_date', None) + ' to ' + request.POST.get('end_date', None) + '.csv"'
+        response['Content-Disposition'] = 'attachment; filename="Report for ' + settings.SERVICE_NAMES[service] + ' from ' + request.POST.get('start_date', None) + ' to ' + request.POST.get('end_date', None) + '.csv"'
         writer = csv.writer(response)
         writer.writerow(['Item', 'Variant', 'Price', 'Quantity', 'Transaction ID', 'Time'])
         if reports.count() > 0:
