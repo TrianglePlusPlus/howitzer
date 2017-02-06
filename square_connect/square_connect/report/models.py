@@ -109,7 +109,7 @@ class Report(models.Model):
 
     @property
     def get_associated_items(self):
-        """ Finds the SpoilageItems associated with this report
+        """ Finds the Items associated with this report
         @returns The QuerySet containing all of the items associated with this report
         """
         # TODO: Test this

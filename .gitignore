@@ -5,6 +5,7 @@ virt_env/
 .bundle/
 nohup.out
 square_connect/square_connect/report/migrations/
+square_connect/square_connect/square_connect/config.py
 
 #################################
 #		Visual Studio			#

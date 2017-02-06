@@ -19,7 +19,7 @@ class Command(BaseCommand):
         if Service.objects.count() == 0:
                 Service.regenerate_services()
 
-        # Run for each service with spoilage
+        # Run for each service with discounts
         services = Service.objects.exclude(name__in=settings.SERVICE_EXCLUDES)
 
         for service in services:
