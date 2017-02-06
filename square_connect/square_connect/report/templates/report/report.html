@@ -32,6 +32,7 @@
         var last_requested_discount;
 
         // used to know whether or not to repopulate the discounts dropdown
+        var current_discounts = [];
         var changed_nondiscount_val = true;
         var discount_select = $("#discount_select");
         var discount_options = [];
@@ -55,7 +56,7 @@
 
         function select_specific_discount() {
             // if we needed to narrow by discount, now handle that (once ajax fills out our options)
-            if (discount_options.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
+            if (current_discounts.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
                 discount_select.val("{{ discount }}");
                 request_report();
             }
@@ -179,6 +180,12 @@
                                         discount_options.push(discount);
                                     }
                                 }*/
+
+                                // accumulate a list of discounts in this particular report
+                                var discount = parsed_data.reports[i]['items'][j]['discount'];
+                                if ($.inArray(discount, current_discounts) == -1) {
+                                    current_discounts.push(discount);
+                                }
 
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
                                 $("#reports-table tbody").append("\

@@ -1,4 +1,4 @@
-""" Sends emails with generated spoilage reports to the UM of each service """
+""" Sends emails with generated reports to the UM of each service """
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
@@ -7,19 +7,18 @@ from app.models import Service
 from mailer.models import MailingList, Person
 from datetime import date, timedelta
 from django.core.mail import send_mail
-from spoilage_report.models import SpoilageReport, SpoilageItem
 import datetime
 import urllib.parse
 
 class Command(BaseCommand):
-    help = "Sends emails with generated spoilage reports to the UM of each service"
+    help = "Sends emails with generated reports to the UM of each service"
 
     def handle(self, *args, **options):
         # Refresh the Services if necessary
         if Service.objects.count() == 0:
                 Service.regenerate_services()
 
-        # Run for each service with spoilage
+        # Run for each service with discounted items
         # yesterday is the date of the reports being sent out, as they are sent out @ 4am
         yesterday = date.today() - timedelta(1)
         if yesterday.weekday() not in [5, 6]:
@@ -31,7 +30,7 @@ class Command(BaseCommand):
         for service in services:
             mailing_list = MailingList.objects.get(service=service)
 
-            # Get the spoilage report for the past day
+            # Get the report for the past day
             yesterday = date.today() - timedelta(days=1)
             parameters = {
                 'service': service.name,

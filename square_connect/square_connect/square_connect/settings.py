@@ -151,7 +151,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.apps.MainAppConfig',
     'data',
-    'spoilage_report',
     'mailer',
     'report',
     # Uncomment the next line to enable the admin:

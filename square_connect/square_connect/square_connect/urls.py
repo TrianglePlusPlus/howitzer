@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.conf.urls import include
 from django.contrib import admin
 import app.views as app_views
-import spoilage_report.views as spoilage_report_views
 import mailer.views as mailer_views
 import report.views as report_views
 admin.autodiscover()
