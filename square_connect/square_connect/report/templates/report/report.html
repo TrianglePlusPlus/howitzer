@@ -2,7 +2,10 @@
 
 {% block content %}
 {% load staticfiles %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.3.1/js/tether.min.js"></script>
 <script src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
+<link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 
 <script>
     $( document ).ready(function() {
@@ -21,35 +24,41 @@
             }
         });
 
+        service_names = {{ services_json|safe }};
+
         var last_requested_service;
         var last_requested_start;
         var last_requested_end;
         var last_requested_discount;
 
         // used to know whether or not to repopulate the discounts dropdown
+        var current_discounts = [];
         var changed_nondiscount_val = true;
         var discount_select = $("#discount_select");
         var discount_options = [];
         function discount_select_init() {
-            discount_select.append($("<option></option>")
-                .attr("value","all")
-                .text("All Discounts"));
-            discount_select.append($("<option></option>")
-                .attr("value","spoil")
-                .text("All Spoilage"));
-            discount_select.append($("<option></option>")
-                .attr("value","shift drink")
-                .text("All Shift Drinks"));
-            discount_select.append($("<option></option>")
-                .attr("value","use")
-                .text("All Use"));
+            // populate with the umbrella discount categories which should always appear at the top
+            {% for val, text in discounts_umbrella|slice:"0:" %}
+                discount_select.append($("<option></option>")
+                    .attr("value","{{ val }}")
+                    .text("{{ text }}"));
+            {% endfor %}
+
+            // populate with all other discounts
+            // TODO: if Nick wants, remove all instances of ever repopulating the discount dropdown
+            // and we'll just take care of it here once and for all
+            {% for val, text in discounts|slice:"1:" %}
+                discount_select.append($("<option></option>")
+                    .attr("value","{{ val }}")
+                    .text("{{ text }}"));
+            {% endfor %}
         }
 
         function select_specific_discount() {
             // if we needed to narrow by discount, now handle that (once ajax fills out our options)
-            if (discount_options.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
+            if (current_discounts.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
                 discount_select.val("{{ discount }}");
-                submit_form();
+                request_report();
             }
             // if we did need to narrow by discount, but that discount doesn't exist in this data
             else if ("{{ discount }}" != "all") {
@@ -64,19 +73,30 @@
             $("#end_datepicker").datepicker().val("{{ end_date }}");
             $("#service_select").val("{{ service }}");
             discount_select.val("all");
-            submit_form(select_specific_discount);
+            request_report(select_specific_discount);
+
+            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
+            discount_select.empty();
+            discount_options = [];
+            discount_select_init();
         }
         else {
             $("#start_datepicker").datepicker().val("{{ today }}");
             $("#end_datepicker").datepicker().val("{{ today }}");
+
+            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
+            discount_select.empty();
+            discount_options = [];
+            discount_select_init();
         }
 
         $("#service_select").change(function() {
             changed_nondiscount_val = true;
         });
         $("#discount_select").change(function() {
-            if (this.value == "all" || this.value == "spoil" || this.value == "shift drink" || this.value == "use")
+            if ($.inArray(this.value, {{ discounts_umbrella_values|safe }}) > -1) {
                 changed_nondiscount_val = true;
+            }
         });
         $("#start_datepicker").change(function() {
             changed_nondiscount_val = true;
@@ -86,11 +106,16 @@
         });
 
         // AJAX for requesting report
-        function submit_form(success_function) {
+        function request_report(success_function) {
             $.ajax({
                 url : "{% url 'request_report' %}",
                 type : "POST", // http method
-                data : { service : $('#service_select').val(), discount : $('#discount_select').val(), start_date : $('#start_datepicker').val(), end_date : $('#end_datepicker').val() }, // data sent with the post request
+                data : {
+                    service : $('#service_select').val(),
+                    discount : $('#discount_select').val(),
+                    start_date : $('#start_datepicker').val(),
+                    end_date : $('#end_datepicker').val()
+                },
 
                 // handle a successful response
                 success : function(json) {
@@ -100,10 +125,22 @@
                     var end_date_input = $('#end_datepicker').val().split('/');
                     var start_date = new Date(start_date_input[2], start_date_input[0] - 1, start_date_input[1]); // -1 necessary as js months are 0-based
                     var end_date = new Date(end_date_input[2], end_date_input[0] - 1, end_date_input[1]); // see above comment
-                    var start_date_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + start_date.getFullYear();
-                    var end_date_str =  (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '/' + end_date.getFullYear();
+                    var start_month_str = (start_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var start_day_str = start_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var start_date_str = start_month_str + '/' + start_day_str + '/' + start_date.getFullYear();
+                    var end_month_str = (end_date.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_day_str = end_date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+                    var end_date_str =  end_month_str + '/' + end_day_str + '/' + end_date.getFullYear();
 
-                    history.replaceState(null, null, '/report?service=' + $('#service_select').val() + '&discount=' + $('#discount_select').val() + '&start_date=' + start_date_str + '&end_date=' + end_date_str);
+                    var params = {
+                        service: $('#service_select').val(),
+                        discount: $('#discount_select').val(),
+                        start_date: start_date_str,
+                        end_date: end_date_str
+                    };
+                    var params_values = $.param( params ).replace(/%2F/g, '/');
+                    var report_url = '{{ report_relative_url }}' + '?' + params_values;
+                    history.replaceState(null, null, report_url);
 
                     if (typeof parsed_data.reports == 'undefined') {
                         $("#reports-table tbody").html("<center><b>No results found!</b></center>");
@@ -126,20 +163,28 @@
                             </tr>\
                         ");
 
-                        if (changed_nondiscount_val) {
+                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                        /*if (changed_nondiscount_val) {
                             discount_select.empty();
                             discount_options = [];
                             discount_select_init();
-                        }
+                        }*/
 
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
-                                if (changed_nondiscount_val) {
+                                // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                                /*if (changed_nondiscount_val) {
                                     // accumulate a list of discounts in this particular report
                                     var discount = parsed_data.reports[i]['items'][j]['discount'];
                                     if ($.inArray(discount, discount_options) == -1) {
                                         discount_options.push(discount);
                                     }
+                                }*/
+
+                                // accumulate a list of discounts in this particular report
+                                var discount = parsed_data.reports[i]['items'][j]['discount'];
+                                if ($.inArray(discount, current_discounts) == -1) {
+                                    current_discounts.push(discount);
                                 }
 
                                 datetime = new Date(parsed_data.reports[i]['items'][j]['transaction_time']);
@@ -172,15 +217,15 @@
                             ");
                         }
 
-
-                        if (changed_nondiscount_val) {
+                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                        /*if (changed_nondiscount_val) {
                             // fill out discounts option list
                             $.each(discount_options, function(key, value) {
                                  discount_select.append($("<option></option>")
                                     .attr("value", value)
                                     .text(value));
                             });
-                        }
+                        }*/
 
                         changed_nondiscount_val = false;
 
@@ -216,6 +261,7 @@
                     last_requested_end = $('#end_datepicker').val();
                     last_requested_discount = $('#discount_select').val();
 
+                    $("#errors").empty();
                     if (success_function != null)
                         success_function();
                 },
@@ -223,13 +269,13 @@
                 // handle an unsuccessful response
                 error : function(xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);
-                    console.log("Something got fucked up.");
+                    console.log("There was an error with the report request: AJAX request failed.");
                 }
             });
         };
 
         $('#report-form-button').click(function() {
-            submit_form();
+            request_report();
         });
 
         $('#export-csv-button').click(function() {
@@ -260,7 +306,158 @@
             }));
             form.submit();
         });
+
+        function generate_graph() {
+            $.ajax({
+                url : "{% url 'request_report' %}",
+                type : "POST", // http method
+                data : {
+                    service : $('#service_select').val(),
+                    discount : $('#discount_select').val(),
+                    start_date : $('#start_datepicker').val(),
+                    end_date : $('#end_datepicker').val()
+                },
+
+                // handle a successful response
+                success : function(json) {
+                    var done = 0;
+                    var tempEndDate, dayTemp, monthTemp;
+
+                    var startD = $('#start_datepicker').val();
+                    var endD = $('#end_datepicker').val();
+
+                    var startMonth = Number(startD.substr(0, 2));
+                    var startDay = Number(startD.substr(3, 2));
+                    var startYear = Number(startD.substr(6, 4));
+
+                    var endMonth = Number(endD.substr(0, 2));
+                    var endDay = Number(endD.substr(3, 2));
+                    var endYear = Number(endD.substr(6, 4));
+
+                    var numDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    var listOfDates = [];
+
+                    function addToList (start, end, year, month) { // works with dates within a month
+                        for (var i = start; i<=end; i++){
+                            listOfDates.push(month + "/" + i + "/" + year);
+                        }
+                    }
+
+                    function runStuff () {
+                        if (startYear == endYear){
+                            if (startMonth == endMonth){
+                                addToList(startDay, endDay, startYear, startMonth);
+                                done = 1;
+                            } else { // different months
+                                tempEndDate = numDays[Number(startMonth)-1];
+                                addToList(startDay, tempEndDate, startYear, startMonth);
+                                startMonth++;
+                                startDay = 1;
+                            }
+                        } else if (startYear < endYear){ // different years
+                            tempEndDate = numDays[Number(startMonth)-1];
+                            addToList(startDay, tempEndDate, startYear, startMonth);
+                            startMonth++;
+                            if (startMonth == 13){
+                                startYear++;
+                                startMonth = 1;
+                                startDay = 1;
+                            }
+                        }
+                    }
+
+                    while (done === 0){
+                        runStuff();
+                    }
+
+                    var service = $('#service_select').val();
+                    var discount = $('#discount_select').val();
+                    var discount_str = "";
+                    if (discount != "all")
+                        discount_str = ", filtered for the " + discount + " discount";
+                    var startDate = $('#start_datepicker').val();
+                    var endDate = $('#end_datepicker').val();
+                    var parsed_data = json;
+                    var data = []; // total amount discounted on a day
+                    var dates = []; // dates holds the day
+
+                    if (parsed_data.reports == undefined){
+                        $("#reports-table tbody").html("<center><b>No results found!</b></center>");
+                    }
+
+                    else {
+                        for (var i = 0; i < listOfDates.length; i++){
+                            data[i] = 0;
+                            for (var k = 0; k < parsed_data.reports.length; k++) { // each report (day)
+                                datetime = new Date(parsed_data.reports[k]['items'][0]['transaction_time']);
+                                var count = 0;
+                                for (var m = 0; m<datetime.toLocaleString().length; m++){
+                                    if (datetime.toLocaleString().charAt(m) != ","){
+                                        count++;
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                if (listOfDates[i] == datetime.toLocaleString().substr(0, count)){
+                                    for (j = 0; j < parsed_data.reports[k]['size']; j++) { // each item
+                                        data[i] += parsed_data.reports[k]['items'][j]['discountcost'] * parsed_data.reports[k]['items'][j]['quantity'];
+                                    }
+                                }
+                            }
+
+                            data[i] = data[i].toFixed(2);
+                        }
+
+                       $("#reports-table tbody").html("\
+                            <h3>Graph for " + service_names[service] + " from " + startDate + " to " + endDate + discount_str + "</h3>\
+                            <canvas id='myCanvas' width='200' height='100' style='border:1px solid #000000;'>\
+                            </canvas>");
+                        var ctx = document.getElementById("myCanvas").getContext('2d');
+                        Chart.defaults.global.defaultFontFamily = "'Roboto', serif";
+                        var myChart = new Chart(ctx, {
+                          type: 'bar',
+                          data: {
+                            labels: listOfDates,
+                            datasets: [{
+                                label: 'Amount Discounted ($)',
+                                data: data,
+                                    backgroundColor: "rgba(14,43,123,.5)",
+                                    hoverBackgroundColor: "#0E2B7B",
+                                    borderColor: "#0E2B7B",
+                                    borderWidth: "3",
+                            }]
+                          },
+                            options: {
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Amount Discounted ($)'
+                                        },
+                                    }]
+                            }
+                        });
+                    }
+
+                },
+
+                // handle an unsuccessful response
+                error : function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                    console.log("There was an error with the graph generation: AJAX request failed.");
+                }
+            });
+        }
+
+        $('#generate-graph-button').click(function() {
+            generate_graph();
+        });
     });
+</script>
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
 </script>
 
 
@@ -271,34 +468,40 @@
             <th>
                 <p>Service:
                 <select id="service_select" name="service">
-                    <option selected="selected" value="all">All Services</option>
-                    <option value="mug">MUG</option>
-                    <option value="vittles">Vital Vittles</option>
-                    <option value="snaxa">Hoya Snaxa</option>
-                    <option value="ug">Uncommon Grounds</option>
-                    <option value="midnight">Midnight Mug</option>
-                    <option value="hilltoss">Hilltoss</option>
+                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
+                    {% for val, text in services|slice:"0:" %}
+                        <option value="{{ val }}">{{ text }}</option>
+                    {% endfor %}
                 </select> </p>
             </th>
             <th>
                 <p>Discount:
                 <select id="discount_select" name="discount">
-                    <option selected="selected" value="all">All Discounts</option>
-                    <option value="spoil">All Spoilage</option>
-                    <option value="shift drink">All Shift Drinks</option>
-                    <option value="use">All Use</option>
+                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
+                    {% for val, text in discounts_umbrella|slice:"0:" %}
+                        <option value="{{ val }}">{{ text }}</option>
+                    {% endfor %}
                 </select> </p>
             </th>
             <th>
                 <p>Start Date: <input name="start_date" type="text" id="start_datepicker"></p>
-            </th>
-            <th>
                 <p>End Date: <input name="end_date" type="text" id="end_datepicker"></p>
             </th>
             <th>
-                <button id="report-form-button" type="submit" class="btn btn-default">Retrieve report</button>
                 <br>
-                <button id="export-csv-button" class="btn btn-default">Export CSV</button>
+                <button id="report-form-button" type="submit" class="btn btn-default" data-toggle="tooltip" title="Full Report">
+                    <span class="glyphicon glyphicon-th-list"></span>
+                </button>
+            </th>
+            <th><br>
+                <button id="export-csv-button" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="top" title="Download as CSV">
+                    <span class="glyphicon glyphicon-save"></span>
+                </button>
+            </th>
+            <th><br>
+                <button id="generate-graph-button" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="top" title="Graph">
+                    <span class="glyphicon glyphicon-stats"></span>
+                </button>
             </th>
         </tr>
     </table>

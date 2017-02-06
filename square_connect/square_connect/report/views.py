@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
-from app.models import service_names
+from django.conf import settings  # TODO: we need service_names, discounts
+import json
 from report.models import Report, Item
+from app.models import Service
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
@@ -26,6 +28,7 @@ def report(request):
     assert isinstance(request, HttpRequest)
 
     today = datetime.today().strftime("%m/%d/%Y")
+    services_json = json.dumps(settings.SERVICE_NAMES)
 
     if request.GET.get('service', None):
         service = request.GET.get('service', None)  # TODO: we need a better default
@@ -41,6 +44,12 @@ def report(request):
                 'end_date': end_date,
                 'service': service,
                 'discount': discount,
+                'services_json': services_json,
+                'services': settings.SERVICES,
+                'discounts': settings.DISCOUNTS,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
+                'report_relative_url': '/report',
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
             }
@@ -50,6 +59,12 @@ def report(request):
             request,
             'report/report.html',
             {
+                'services_json': services_json,
+                'services': settings.SERVICES,
+                'discounts': settings.DISCOUNTS,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
+                'report_relative_url': '/report',
                 'today': today,
                 'title': 'Report Viewer',
                 'year': 'Remember never give up.',
@@ -109,14 +124,13 @@ def request_report(request):
             content_type="application/json"
         )
 
-
-# TODO: specialize for discounts
 def export_csv(request):
     """Exports the report as a .CSV.
     request.POST dictionary keys:
         start_date
         end_date
         service
+        discount
     @param request: Takes in a request query to return a CSV file of filtered transaction data.
     Queries must have a date range as well as service.
     @returns filtered transaction data based on a date range in .CSV format
@@ -146,16 +160,17 @@ def export_csv(request):
             discount_str = ', filtered for the {discount} discount'.format(discount=request.POST.get('discount'))
         response['Content-Disposition'] = ('attachment; filename="Report for {service} from {start_date} to {end_date}'
                                            '{discount}.csv').format(
-                service=service_names[service],
+                service=settings.SERVICE_NAMES[service],
                 start_date=request.POST.get('start_date', None),
                 end_date=request.POST.get('end_date', None),
                 discount=discount_str)
         writer = csv.writer(response)
-        writer.writerow(['Item', 'Variant', 'Price', 'Discount Type', 'Discount', 'Quantity', 'Transaction ID', 'Time'])
+        writer.writerow(['Service', 'Item', 'Variant', 'Price', 'Discount Type', 'Discount', 'Quantity', 'Transaction ID', 'Time'])
         if reports.count() > 0:
             for report in reports:
                 for item in report.get_associated_items:
                     writer.writerow([
+                        item.service,
                         item.name,
                         item.variant,
                         item.price,

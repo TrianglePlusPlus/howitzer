@@ -2,6 +2,7 @@
 and adds any selected items to the report databse """
 
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 from app.models import Service
 from report.models import Report, Item
 from data.transaction import PaymentRequest
@@ -10,7 +11,7 @@ from data.transaction import PaymentRequest
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds ___-marked items"
 
-    # Allows input of report types to take in. Ex. spoilage and shift drinks. 
+    # Allows input of report types to take in. Ex. spoilage and shift drinks.
     def add_arguments(self, parser):
         parser.add_argument('report_type', nargs='+')
 
@@ -19,21 +20,8 @@ class Command(BaseCommand):
         if Service.objects.count() == 0:
                 Service.regenerate_services()
 
-        # Run for each service with spoilage
-        """ Service names in backend, exclude the * ones from the services list: 
-                midnight                            
-                snaxa                               
-                vittles                             
-                ug                                  
-                mug                                 
-                hilltoss
-                *the corp
-                *storage                             
-                *catering                            
-                *students of georgetown incorporated 
-        """
-        excludes = ["the corp", "storage", "catering", "students of georgetown incorporated"]
-        services = Service.objects.exclude(name__in=excludes)
+        # Run for each service with discounts
+        services = Service.objects.exclude(name__in=settings.SERVICE_EXCLUDES)
 
         for service in services:
             # Get the recent transactions for that service

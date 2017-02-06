@@ -1,5 +1,5 @@
 from django import forms
-from app.models import discounts
+from django.conf import settings # TODO: we need service_names
 from .models import Person
 
 class PersonForm(forms.ModelForm):
@@ -8,7 +8,7 @@ class PersonForm(forms.ModelForm):
         fields = ('mailing_list', 'first_name', 'last_name', 'email')
 
 class MailerPersonForm(PersonForm):
-    discount = forms.ChoiceField(choices=discounts)
+    discount = forms.ChoiceField(choices=settings.DISCOUNTS)
 
     class Meta(PersonForm.Meta):
         fields = PersonForm.Meta.fields + ('discount',)

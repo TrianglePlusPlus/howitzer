@@ -3,42 +3,41 @@ Django settings for square_connect project.
 Refer to https://docs.djangoproject.com/en/1.9/ref/settings/ for 1.9 documentation
 """
 
+import os
 from os import path
 PROJECT_ROOT = path.dirname(path.abspath(path.dirname(__file__)))
 
 DEBUG = True
 
-ALLOWED_HOSTS = (
+ALLOWED_HOSTS = [
     'localhost',
-)
+]
 
-ADMINS = (
-    ('Nick Chapman', 'nick@thecorp.org'),
-    ('Max Kim', 'max@thecorp.org'),
-    ('Peter Johnston', 'peter@thecorp.org'),
-)
+ADMINS = list(zip(os.getenv('ADMINS_NAMES').split(','), os.getenv('ADMINS_EMAILS').split(',')))
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'square',
-        'USER': 'django',
-        'PASSWORD': '19djangomysqlpassword72',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'reports@thecorp.org'
-EMAIL_HOST_PASSWORD = 'S90YhXKQfjBymCbbHmgz'
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+REPORT_BASE_URL = os.getenv('REPORT_BASE_URL')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -47,7 +46,7 @@ EMAIL_HOST_PASSWORD = 'S90YhXKQfjBymCbbHmgz'
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = os.getenv('TIME_ZONE')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -101,7 +100,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'n(bd1f1c%e8=_xad02x5qtfn%wgwpi492e$8_erx+d)!tpeoim'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 TEMPLATES = [
@@ -152,7 +151,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.apps.MainAppConfig',
     'data',
-    'spoilage_report',
     'mailer',
     'report',
     # Uncomment the next line to enable the admin:
@@ -192,3 +190,23 @@ LOGGING = {
 
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+# Square specific settings
+SQUARE_ACCESS_TOKEN = os.getenv('SQUARE_ACCESS_TOKEN')
+
+SERVICES = list(zip(os.getenv('SERVICES_VALUES').split(','), os.getenv('SERVICES_NAMES').split(',')))
+
+SERVICE_NAMES = dict(SERVICES)
+
+SERVICE_EXCLUDES = os.getenv('SERVICE_EXCLUDES').split(',')
+
+SERVICE_EXCLUDES_WEEKEND = os.getenv('SERVICE_EXCLUDES_WEEKEND').split(',')
+
+DISCOUNTS = list(zip(os.getenv('DISCOUNTS').split(','), os.getenv('DISCOUNTS').split(',')))
+DISCOUNTS.insert(0, ('all', 'All Discounts'))
+
+DISCOUNTS_UMBRELLA_VALUES = os.getenv('DISCOUNTS_UMBRELLA_VALUES').split(',')
+
+DISCOUNTS_UMBRELLA = list(zip(DISCOUNTS_UMBRELLA_VALUES, os.getenv('DISCOUNTS_UMBRELLA_NAMES').split(',')))
+
+DISCOUNTS_SHIFT = os.getenv('DISCOUNTS_SHIFT').split(',')

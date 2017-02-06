@@ -1,44 +1,6 @@
 ﻿from django.db import models
 from data.transaction import LocationsRequest
 
-service_names = {
-    "mug": "MUG",
-    "vittles": "Vital Vittles",
-    "snaxa": "Hoya Snaxa",
-    "ug": "Uncommon Grounds",
-    "midnight": "Midnight Mug",
-    "hilltoss": "Hilltoss",
-}
-
-discounts = [
-    ('all', 'All Discounts'),
-    ('$1.50 Off', '$1.50 Off'),
-    ('1.50 Off', '1.50 Off'),
-    ('CREDITED Spoilage', 'CREDITED Spoilage'),
-    ('Cup Reuse', 'Cup Reuse'),
-    ('Espresso 10 Drinks Card', 'Espresso 10 Drinks Card'),
-    ('Espresso Loyalty Card', 'Espresso Loyalty Card'),
-    ('Expired', 'Expired'),
-    ('Green Bag Discount', 'Green Bag Discount'),
-    ('Lau Employee Appreciation', 'Lau Employee Appreciation'),
-    ('Office Hours', 'Office Hours'),
-    ('Shift Drink - Accounting', 'Shift Drink - Accounting'),
-    ('Shift Drink - Catering', 'Shift Drink - Catering'),
-    ('Shift Drink - Hilltoss', 'Shift Drink - Hilltoss'),
-    ('Shift Drink - Hoya Snaxa', 'Shift Drink - Hoya Snaxa'),
-    ('Shift Drink - ITM', 'Shift Drink - ITM'),
-    ('Shift Drink - MUG', 'Shift Drink - MUG'),
-    ('Shift Drink - Main Office', 'Shift Drink - Main Office'),
-    ('Shift Drink - Midnight', 'Shift Drink - Midnight'),
-    ('Shift Drink - UG', 'Shift Drink - UG'),
-    ('Shift Drink - Vital Vittles', 'Shift Drink - Vital Vittles'),
-    ('Sorry Card', 'Sorry Card'),
-    ('Spoil', 'Spoil'),
-    ('Use - Catering', 'Use - Catering'),
-    ('Use - MUG', 'Use - MUG'),
-    ('Use - Vittles', 'Use - Vittles'),
-]
-
 class Service(models.Model):
     def __str__(self):
         return self.name

@@ -122,6 +122,35 @@ body {
     padding-bottom: 10px;
 }
 
+/*
+#reports-table tbody div {
+  font: 10px sans-serif;
+  background-color: blue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+#reports-table tbody div:hover {
+    background-color: red;
+}
+*/
+
+#reports-table tbody rect {
+  fill: blue;
+}
+
+#reports-table tbody text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+#reports-table tbody rect:hover{
+    fill: red;
+}
+
 #errors p {
     text-align: center;
     color: red;

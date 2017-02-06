@@ -12,7 +12,6 @@ from datetime import datetime
 from django.template.context_processors import csrf
 # Our imports
 from data.transaction import PaymentRequest, LocationsRequest
-from spoilage_report.models import SpoilageReport, SpoilageItem
 from app.models import Service
 
 def home(request):
@@ -20,7 +19,6 @@ def home(request):
 	@param request: Takes in a request for the home page
 	@returns home page
 	"""
-    query_results = SpoilageReport.objects.all(),
     assert isinstance(request, HttpRequest)
     return render(
         request,
