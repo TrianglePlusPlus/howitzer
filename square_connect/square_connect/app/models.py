@@ -2,6 +2,8 @@
 from data.transaction import LocationsRequest
 
 class Service(models.Model):
+    """Class representation of a Square Location."""
+
     def __str__(self):
         return self.name
 
