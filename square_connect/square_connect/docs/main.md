@@ -1,5 +1,5 @@
 [//]: # (This is the markdown file for the main page of the docs.)
-## Services
+## Howitzer
 These are the docs for the Square Connect Project, written in [Python](https://www.python.org/) using [Django](http://djangoproject.com/), by Students of Georgetown, Inc.
 
 The Django project is divided into apps:
@@ -7,10 +7,6 @@ The Django project is divided into apps:
 - __data__: houses transaction.py, the main interface with the Square Connect API.
 - __mailer__: houses models, views, and templates for the mailer that sends out scheduled reports.
 - __report__: houses models, views, and templates involved with report requests and the report viewer, including generating graphs and CSV files.
-
-### app.models
-### mailer.models
-### report.models
 
 ***
 

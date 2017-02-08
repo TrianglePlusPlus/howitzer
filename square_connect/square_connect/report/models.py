@@ -31,6 +31,7 @@ class Report(models.Model):
                         for entry in item['discounts']:
                             if entry['name'] == discount:
                                 found = True
+                            # TODO: Why do we have this here? @Max?
                             # This is to catch all shift drinks (unless we only want shift drinks per service?)
                             elif entry['name'] in settings.DISCOUNTS_SHIFT:
                                 found = True
@@ -95,8 +96,8 @@ class Report(models.Model):
                         report_item.quantity = int(float(item['quantity']))
                         report_item.discountcost = format_money(abs(item['discount_money']['amount'])/report_item.quantity)
                         report_item.save()
-                except IndexError:
-                    # There's nothing to do
+                except IndexError as e:
+                    print(e)
                     pass
 
     @staticmethod
