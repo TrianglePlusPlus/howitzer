@@ -468,7 +468,6 @@ $(document).ready(function(){
             <th>
                 <p>Service:
                 <select id="service_select" name="service">
-                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
                     {% for val, text in services|slice:"0:" %}
                         <option value="{{ val }}">{{ text }}</option>
                     {% endfor %}
@@ -477,7 +476,6 @@ $(document).ready(function(){
             <th>
                 <p>Discount:
                 <select id="discount_select" name="discount">
-                    <!-- TODO: do we need to specify that 'all' should be selected by default? doesn't seem like it -->
                     {% for val, text in discounts_umbrella|slice:"0:" %}
                         <option value="{{ val }}">{{ text }}</option>
                     {% endfor %}

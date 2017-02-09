@@ -3,42 +3,42 @@
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "mug"
+            "service": "service 1"
         }
     },
     {
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "vittles"
+            "service": "service 2"
         }
     },
     {
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "snaxa"
+            "service": "service 3"
         }
     },
     {
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "ug"
+            "service": "service 4"
         }
     },
     {
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "midnight"
+            "service": "service 5"
         }
     },
     {
         "model": "mailer.MailingList",
         "pk": 1,
         "fields": {
-            "service": "hilltoss"
+            "service": "service 6"
         }
     },
 ]

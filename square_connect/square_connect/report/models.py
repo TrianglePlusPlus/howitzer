@@ -31,8 +31,8 @@ class Report(models.Model):
                     else:
                         for entry in item['discounts']:
                             if entry['name'] == discount: found = True
-                            # This is to catch all shift drinks (unless we only want shift drinks per service?)
-                            elif entry['name'] in settings.DISCOUNTS_SHIFT:
+                            # This is to catch all discounts in a particular group
+                            elif entry['name'] in settings.DISCOUNTS_GROUP:
                                 found = True
                     if found:
                         if not 'item_variation_name' in item:
@@ -155,74 +155,26 @@ class Report(models.Model):
         if (discount is not None) and (discount != 'all'):
 
             if (service is not None) and (service != 'all'):
-                if discount == 'shift drink':
+                """ The following code shows how to bundle discount tags 
+				if discount == 'multi_discount':
                     return Report.objects.filter(Q(date__range=(start_date, end_date)),
                                                  Q(service__name=service),
-                                                 Q(discount_label='Shift Drink - UG') |
-                                                 Q(discount_label='Shift Drink - Vital Vittles') |
-                                                 Q(discount_label='Shift Drink - Accounting') |
-                                                 Q(discount_label='Shift Drink - MUG') |
-                                                 Q(discount_label='Shift Drink - Hoya Snaxa') |
-                                                 Q(discount_label='Shift Drink - ITM') |
-                                                 Q(discount_label='Shift Drink - Hilltoss') |
-                                                 Q(discount_label='Shift Drink - Catering') |
-                                                 Q(discount_label='Shift Drink - IT+M') |
-                                                 Q(discount_label='Shift Drink - Main Office') |
-                                                 Q(discount_label='Shift Drink - Seasonal'))
-                elif discount == 'use':
-                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(service__name=service),
-                                                 Q(discount_label='Use - UG') |
-                                                 Q(discount_label='Use - Vital Vittles') |
-                                                 Q(discount_label='Use - Accounting') |
-                                                 Q(discount_label='Use - MUG') |
-                                                 Q(discount_label='Use - Hoya Snaxa') |
-                                                 Q(discount_label='Use - ITM') |
-                                                 Q(discount_label='Use - Hilltoss') |
-                                                 Q(discount_label='Use - Catering') |
-                                                 Q(discount_label='Use - Main Office') |
-                                                 Q(discount_label='Use - Storage'))
-                elif discount == 'spoil':
-                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(service__name=service),
-                                                 Q(discount_label='Spoil') |
-                                                 Q(discount_label='Expired'))
+                                                 Q(discount_label='Discount_One') |
+                                                 Q(discount_label='Discount_Two'))
                 else:
                     return Report.objects.filter(date__range=(start_date, end_date),
                                                  service__name=service, discount_label=discount)
+				"""
             else:
-                if discount == 'shift drink':
+                """ The following code shows how to bundle discount tags for a particular service
+                elif discount == 'multi_discount':
                     return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(discount_label='Shift Drink - UG') |
-                                                 Q(discount_label='Shift Drink - Vital Vittles') |
-                                                 Q(discount_label='Shift Drink - Accounting') |
-                                                 Q(discount_label='Shift Drink - MUG') |
-                                                 Q(discount_label='Shift Drink - Hoya Snaxa') |
-                                                 Q(discount_label='Shift Drink - ITM') |
-                                                 Q(discount_label='Shift Drink - Hilltoss') |
-                                                 Q(discount_label='Shift Drink - Catering') |
-                                                 Q(discount_label='Shift Drink - IT+M') |
-                                                 Q(discount_label='Shift Drink - Main Office') |
-                                                 Q(discount_label='Shift Drink - Seasonal'))
-                elif discount == 'use':
-                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(discount_label='Use - UG') |
-                                                 Q(discount_label='Use - Vital Vittles') |
-                                                 Q(discount_label='Use - Accounting') |
-                                                 Q(discount_label='Use - MUG') |
-                                                 Q(discount_label='Use - Hoya Snaxa') |
-                                                 Q(discount_label='Use - ITM') |
-                                                 Q(discount_label='Use - Hilltoss') |
-                                                 Q(discount_label='Use - Catering') |
-                                                 Q(discount_label='Use - Main Office') |
-                                                 Q(discount_label='Use - Storage'))
-                elif discount == 'spoil':
-                    return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(discount_label='Spoil') |
-                                                 Q(discount_label='Expired'))
+                                                 Q(discount_label='Discount_One') |
+                                                 Q(discount_label='Discount_Two'))
                 else:
                     return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
-        else:
+		        """
+		else:
             if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
             else:

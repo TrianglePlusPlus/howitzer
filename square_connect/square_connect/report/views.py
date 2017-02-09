@@ -18,7 +18,7 @@ import json, csv
 def report(request):
     """Renders the reports page.
     @param request: Takes in a request query to filter through the transaction data. Queries must have a date
-    @param service_location: (GET parameter) Takes in Corp Service E.X. "mug"
+    @param service_location: (GET parameter) Takes in Service name E.X. "coffee_shop"
     @param start_date: (GET parameter) Takes in the start date of the transactions
     @param end_date: (GET parameter) Takes in the end date of the transactions
     @returns filtered transaction data for today if no GET parameters, or based on date and service
@@ -29,7 +29,7 @@ def report(request):
     services_json = json.dumps(settings.SERVICE_NAMES)
 
     if request.GET.get('service', None):
-        service = request.GET.get('service', None) # TODO: we need a better default
+        service = request.GET.get('service', None)
         discount = request.GET.get('discount', 'all')
         start_date = request.GET.get('start_date', today)
         end_date = request.GET.get('end_date', today)
