@@ -45,7 +45,7 @@
             {% endfor %}
 
             // populate with all other discounts
-            // TODO: if Nick wants, remove all instances of ever repopulating the discount dropdown
+            // OPTIONAL: remove all instances of ever repopulating the discount dropdown
             // and we'll just take care of it here once and for all
             {% for val, text in discounts|slice:"1:" %}
                 discount_select.append($("<option></option>")
@@ -75,7 +75,7 @@
             discount_select.val("all");
             request_report(select_specific_discount);
 
-            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
+            // OPTIONAL: remove to dynamically populate the discount dropdown
             discount_select.empty();
             discount_options = [];
             discount_select_init();
@@ -84,7 +84,7 @@
             $("#start_datepicker").datepicker().val("{{ today }}");
             $("#end_datepicker").datepicker().val("{{ today }}");
 
-            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
+            // OPTIONAL: remove to dynamically populate the discount dropdown
             discount_select.empty();
             discount_options = [];
             discount_select_init();
@@ -163,7 +163,7 @@
                             </tr>\
                         ");
 
-                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                        // OPTIONAL: to dynamically populate the discount dropdown
                         /*if (changed_nondiscount_val) {
                             discount_select.empty();
                             discount_options = [];
@@ -172,7 +172,7 @@
 
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
-                                // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                                // OPTIONAL: uncomment to dynamically populate the discount dropdown
                                 /*if (changed_nondiscount_val) {
                                     // accumulate a list of discounts in this particular report
                                     var discount = parsed_data.reports[i]['items'][j]['discount'];
@@ -217,7 +217,7 @@
                             ");
                         }
 
-                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
+                        // OPTIONAL: uncomment to dynamically populate the discount dropdown
                         /*if (changed_nondiscount_val) {
                             // fill out discounts option list
                             $.each(discount_options, function(key, value) {
