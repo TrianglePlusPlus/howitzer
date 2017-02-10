@@ -1,12 +1,14 @@
-""" Gets the most recent transactions from the 6 primary storefronts
-and adds any selected items to the report databse """
+"""
+@package square_connect.report.management.commands.get_recent_transactions
+Gets the most recent transactions from the 6 primary storefronts and adds any selected items to the report database.
+We recommend that you run it in a cron job.
+"""
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from app.models import Service
 from report.models import Report, Item
 from data.transaction import PaymentRequest
-
 
 class Command(BaseCommand):
     help = "Gets the last 200 transactions at each service and finds ___-marked items"
