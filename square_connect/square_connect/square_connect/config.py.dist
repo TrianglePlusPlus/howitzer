@@ -1,14 +1,25 @@
+# Do not include config.py in the repository
+
 import os
 
-os.environ['ADMINS_NAMES'] = 'Jonny Appleseed,Jane Doe'
-os.environ['ADMINS_EMAILS'] = 'jon@apple.co,jane@doe.me'
+# Define lists as a string with elements separated by commas
+os.environ['ADMINS_NAMES'] = (
+    'Jonny Appleseed,' +
+    'Jane Doe'
+)
+os.environ['ADMINS_EMAILS'] = (
+    'jon@apple.co,' +
+    'jane@doe.me' +
+)
 
+# Database information
 os.environ['DATABASE_NAME'] = 'square'
 os.environ['DATABASE_USER'] = 'django'
 os.environ['DATABASE_PASSWORD'] = 'my_django_db_password'
 os.environ['DATABASE_HOST'] = 'localhost'
 os.environ['DATABASE_PORT'] = '1234'
 
+# Used for sending emails
 os.environ['EMAIL_USE_TLS'] = str(True)
 os.environ['EMAIL_HOST'] = 'smtp.gmail.com'
 os.environ['EMAIL_PORT'] = str(587)
@@ -19,10 +30,13 @@ os.environ['REPORT_BASE_URL'] = 'http://www.example.org/square_reports'
 
 os.environ['TIME_ZONE'] = 'America/New_York'
 
+# Update with your project's own secret key
 os.environ['SECRET_KEY'] = '2j38aj$830fj0#8jflkjflsk'
 
+# Update with your Square Connect API access token
 os.environ['SQUARE_ACCESS_TOKEN'] = 'blahblah123-woohoo'
 
+# From here down are project specific location and discount values, used for the Reports page
 """ Service names: exclude the * ones from the services list:
         store1
         store2
@@ -30,6 +44,7 @@ os.environ['SQUARE_ACCESS_TOKEN'] = 'blahblah123-woohoo'
         *deprecated store
 """
 
+# For the services dropdown on the Reports page
 os.environ['SERVICES_VALUES'] = (
     "store1," +
     "store2," +
@@ -41,15 +56,18 @@ os.environ['SERVICES_NAMES'] = (
     "Store Three"
 )
 
+# Any services you don't want to collect/search/view transactions for
 os.environ['SERVICE_EXCLUDES'] = (
     "deprecated store"
 )
 
+# Any services you don't want to collect transactions from on the weekend
 os.environ['SERVICE_EXCLUDES_WEEKEND'] = (
     "store2," +
     "store3"
 )
 
+# For the discounts dropdown on the Reports page
 os.environ['DISCOUNTS'] = (
     '50% Off,' +
     '$1.00 Off,' +
@@ -58,18 +76,19 @@ os.environ['DISCOUNTS'] = (
     'Shift Drink - Store 2'
 )
 
+# Discount categories, defined in report/models.py -> search_reports
 os.environ['DISCOUNTS_UMBRELLA_VALUES'] = (
     'all,' +
     'spoil,' +
     'shift drink'
 )
-
 os.environ['DISCOUNTS_UMBRELLA_NAMES'] = (
     'All Discounts,' +
     'All Spoilage,' +
     'All Shift Drinks'
 )
 
+# TODO? confused (see report/models.py:34)
 os.environ['DISCOUNTS_SHIFT'] = (
     'Shift Drink - Store 1,' +
     'Shift Drink - Store 2'

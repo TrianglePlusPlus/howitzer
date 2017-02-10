@@ -7,7 +7,7 @@ from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
 
 class Report(models.Model):
-    # TODO
+    """ A collection of Items. Used to construct reports data from Squares Connect API JSON and to pull reports when searching. """
     date = models.DateField()
     service = models.ForeignKey("app.Service")
     discount_label = models.CharField(max_length=50, default='')
@@ -16,7 +16,7 @@ class Report(models.Model):
     def add_items_from_json_data(json_data, service_name, discount='All'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
-        @param service: A service object correspondinng to the sales data
+        @param service_name: A service object correspondinng to the sales data
         @param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
 
@@ -30,7 +30,9 @@ class Report(models.Model):
                             label = item['discounts'][0]['name']
                     else:
                         for entry in item['discounts']:
-                            if entry['name'] == discount: found = True
+                            if entry['name'] == discount:
+                                found = True
+                            # TODO: Why do we have this here? @Max?
                             # This is to catch all shift drinks (unless we only want shift drinks per service?)
                             elif entry['name'] in settings.DISCOUNTS_SHIFT:
                                 found = True
@@ -95,8 +97,8 @@ class Report(models.Model):
                         report_item.quantity = int(float(item['quantity']))
                         report_item.discountcost = format_money(abs(item['discount_money']['amount'])/report_item.quantity)
                         report_item.save()
-                except IndexError:
-                    # There's nothing to do
+                except IndexError as e:
+                    print(e)
                     pass
 
     @staticmethod
@@ -232,7 +234,7 @@ class Report(models.Model):
     def get_associated_date(date_string):
         """ Gets the sales date for the input date string
         Sales before 4/5 am EST belong to the previous day
-        @param dt: The date string in question, FORMATTED IN ZULU TIME (UTC)
+        @param date_string: The date string in question, FORMATTED IN ZULU TIME (UTC)
         @returns The 'sales' date that a date string belongs to
         """
         # Get the packages we need for this
@@ -266,8 +268,7 @@ class Discounts(models.Model):
 
 
 class Item(models.Model):
-    """ A single item
-    Part of a report """
+    """ A single item. Part of a report. """
     name = models.CharField(max_length=50, default='')
     variant = models.CharField(max_length=100, default='')
     sku = models.CharField(max_length=12, default='')

@@ -1,7 +1,7 @@
 from django.db import models
 
 class MailingList(models.Model):
-    """ A collection of Persons
+    """ A collection of Persons.
     Emails are sent to all members of a MailingList """
     def __str__(self):
         return '%s mailing list' % self.service
@@ -13,7 +13,7 @@ class MailingList(models.Model):
         return Person.objects.filter(mailing_list=self)
 
 class Person(models.Model):
-    """ A single user
+    """ A single user.
     Part of a mailing list """
     def __str__(self):
         return self.first_name + ' ' + self.last_name
