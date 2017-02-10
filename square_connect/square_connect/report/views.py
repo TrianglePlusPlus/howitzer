@@ -15,7 +15,6 @@ from django.contrib.auth.decorators import login_required
 import json
 import csv
 
-
 @login_required
 def report(request):
     """Renders the reports page.

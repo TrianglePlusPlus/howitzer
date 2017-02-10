@@ -7,6 +7,7 @@ from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
 
 class Report(models.Model):
+    """ A collection of Items. Used to construct reports data from Squares Connect API JSON and to pull reports when searching. """
     date = models.DateField()
     service = models.ForeignKey("app.Service")
     discount_label = models.CharField(max_length=50, default='')
@@ -267,8 +268,7 @@ class Discounts(models.Model):
 
 
 class Item(models.Model):
-    """ A single item
-    Part of a report """
+    """ A single item. Part of a report. """
     name = models.CharField(max_length=50, default='')
     variant = models.CharField(max_length=100, default='')
     sku = models.CharField(max_length=12, default='')
