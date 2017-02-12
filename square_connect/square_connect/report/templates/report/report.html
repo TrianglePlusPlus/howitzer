@@ -56,7 +56,8 @@
 
         function select_specific_discount() {
             // if we needed to narrow by discount, now handle that (once ajax fills out our options)
-            if (current_discounts.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") {
+            if ((current_discounts.indexOf("{{ discount }}") != -1 && "{{ discount }}" != "all") ||
+                ($.inArray("{{ discount }}", {{ discounts_umbrella_values|safe }}) > -1)) {
                 discount_select.val("{{ discount }}");
                 request_report();
             }
