@@ -149,7 +149,6 @@ def export_csv(request):
             discount = request.POST.get('discount', None)
             reports = Report.search_reports(start_date, end_date, service, discount)
 
-        # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
         if request.POST.get('discount', '') == 'all' or request.POST.get('discount', '') is None:

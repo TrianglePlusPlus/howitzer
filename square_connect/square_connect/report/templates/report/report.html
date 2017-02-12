@@ -33,7 +33,6 @@
 
         // used to know whether or not to repopulate the discounts dropdown
         var current_discounts = [];
-        var changed_nondiscount_val = true;
         var discount_select = $("#discount_select");
         var discount_options = [];
         function discount_select_init() {
@@ -45,8 +44,6 @@
             {% endfor %}
 
             // populate with all other discounts
-            // TODO: if Nick wants, remove all instances of ever repopulating the discount dropdown
-            // and we'll just take care of it here once and for all
             {% for val, text in discounts|slice:"1:" %}
                 discount_select.append($("<option></option>")
                     .attr("value","{{ val }}")
@@ -76,7 +73,6 @@
             discount_select.val("all");
             request_report(select_specific_discount);
 
-            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
             discount_select.empty();
             discount_options = [];
             discount_select_init();
@@ -85,26 +81,10 @@
             $("#start_datepicker").datepicker().val("{{ today }}");
             $("#end_datepicker").datepicker().val("{{ today }}");
 
-            // TODO: remove if Nick wants us to dynamically populate the discount dropdown
             discount_select.empty();
             discount_options = [];
             discount_select_init();
         }
-
-        $("#service_select").change(function() {
-            changed_nondiscount_val = true;
-        });
-        $("#discount_select").change(function() {
-            if ($.inArray(this.value, {{ discounts_umbrella_values|safe }}) > -1) {
-                changed_nondiscount_val = true;
-            }
-        });
-        $("#start_datepicker").change(function() {
-            changed_nondiscount_val = true;
-        });
-        $("#end_datepicker").change(function() {
-            changed_nondiscount_val = true;
-        });
 
         // AJAX for requesting report
         function request_report(success_function) {
@@ -164,24 +144,8 @@
                             </tr>\
                         ");
 
-                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
-                        /*if (changed_nondiscount_val) {
-                            discount_select.empty();
-                            discount_options = [];
-                            discount_select_init();
-                        }*/
-
                         for (i = 0; i < parsed_data.reports.length; i++) {
                             for (j = 0; j < parsed_data.reports[i]['size']; j++) {
-                                // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
-                                /*if (changed_nondiscount_val) {
-                                    // accumulate a list of discounts in this particular report
-                                    var discount = parsed_data.reports[i]['items'][j]['discount'];
-                                    if ($.inArray(discount, discount_options) == -1) {
-                                        discount_options.push(discount);
-                                    }
-                                }*/
-
                                 // accumulate a list of discounts in this particular report
                                 var discount = parsed_data.reports[i]['items'][j]['discount'];
                                 if ($.inArray(discount, current_discounts) == -1) {
@@ -217,18 +181,6 @@
                                 </tr>\
                             ");
                         }
-
-                        // TODO: uncomment if Nick wants us to dynamically populate the discount dropdown
-                        /*if (changed_nondiscount_val) {
-                            // fill out discounts option list
-                            $.each(discount_options, function(key, value) {
-                                 discount_select.append($("<option></option>")
-                                    .attr("value", value)
-                                    .text(value));
-                            });
-                        }*/
-
-                        changed_nondiscount_val = false;
 
                         // Sum Total row
                         $("#reports-table tbody").append("\
