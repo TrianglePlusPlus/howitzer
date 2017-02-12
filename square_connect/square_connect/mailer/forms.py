@@ -1,5 +1,5 @@
 from django import forms
-from django.conf import settings # TODO: we need service_names
+from django.conf import settings
 from .models import Person
 
 class PersonForm(forms.ModelForm):
