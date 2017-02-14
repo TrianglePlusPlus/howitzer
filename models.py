@@ -5,6 +5,9 @@ import datetime
 # Importing models from other apps
 from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
+# This is my first python edit!
+""" Horray! """
+integer = 3
 
 class Report(models.Model):
     """ A collection of Items. Used to construct reports data from Squares Connect API JSON and to pull reports when searching. """
