@@ -174,7 +174,7 @@ class Report(models.Model):
                 else:
                     return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
 		        """
-		else:
+        else:
             if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
             else:
