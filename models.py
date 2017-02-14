@@ -5,7 +5,7 @@ import datetime
 # Importing models from other apps
 from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
-
+"""this is a comment on Models to learn how to use it - Jordan"""
 class Report(models.Model):
     """ A collection of Items. Used to construct reports data from Squares Connect API JSON and to pull reports when searching. """
     date = models.DateField()
