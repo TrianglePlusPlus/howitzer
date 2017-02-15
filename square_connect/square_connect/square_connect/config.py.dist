@@ -87,9 +87,3 @@ os.environ['DISCOUNTS_UMBRELLA_NAMES'] = (
     'All Spoilage,' +
     'All Shift Drinks'
 )
-
-# TODO? confused (see report/models.py:34)
-os.environ['DISCOUNTS_SHIFT'] = (
-    'Shift Drink - Store 1,' +
-    'Shift Drink - Store 2'
-)

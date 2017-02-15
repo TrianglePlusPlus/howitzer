@@ -1,6 +1,6 @@
 """
 @package square_connect.report.management.commands.get_recent_transactions
-Gets the most recent transactions from the 6 primary storefronts and adds any selected items to the report database.
+Gets the most recent transactions from the primary storefronts and adds any selected items to the report database.
 We recommend that you run it in a cron job.
 """
 

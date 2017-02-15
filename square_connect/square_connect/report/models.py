@@ -32,10 +32,6 @@ class Report(models.Model):
                         for entry in item['discounts']:
                             if entry['name'] == discount:
                                 found = True
-                            # TODO: Why do we have this here? @Max?
-                            # This is to catch all shift drinks (unless we only want shift drinks per service?)
-                            elif entry['name'] in settings.DISCOUNTS_SHIFT:
-                                found = True
                     if found:
                         if not 'item_variation_name' in item:
                             item['item_variation_name'] = ''
