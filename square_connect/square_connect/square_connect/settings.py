@@ -207,4 +207,10 @@ DISCOUNTS.insert(0, ('all', 'All Discounts'))
 
 DISCOUNTS_UMBRELLA_VALUES = os.getenv('DISCOUNTS_UMBRELLA_VALUES').split(',')
 
-DISCOUNTS_UMBRELLA = list(zip(DISCOUNTS_UMBRELLA_VALUES, os.getenv('DISCOUNTS_UMBRELLA_NAMES').split(',')))
+DISCOUNTS_UMBRELLA_NAMES = list(zip(DISCOUNTS_UMBRELLA_VALUES, os.getenv('DISCOUNTS_UMBRELLA_NAMES').split(',')))
+
+DISCOUNTS_BY_CATEGORY = {}
+DISCOUNT_CATEGORIES = DISCOUNTS_UMBRELLA_VALUES[:]
+DISCOUNT_CATEGORIES.remove('all')
+for discount in DISCOUNT_CATEGORIES:
+    DISCOUNTS_BY_CATEGORY[discount] = os.getenv('DISCOUNTS_' + discount.upper().replace(' ', '_') + '_VALUES').split(',')
