@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from django.db import models
-from django.conf import settings  # TODO: we need service_names, discounts
+from django.conf import settings
 import json
 from report.models import Report, Item
 from app.models import Service
@@ -10,7 +10,6 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
-# TODO: needed? from urllib.parse import unquote
 
 import json
 import csv
@@ -29,8 +28,8 @@ def report(request):
     today = datetime.today().strftime("%m/%d/%Y")
     services_json = json.dumps(settings.SERVICE_NAMES)
 
-    if request.GET.get('service', None):
-        service = request.GET.get('service', None)  # TODO: we need a better default
+    if request.GET.get('service') or request.GET.get('discount') or request.GET.get('start_date') or request.GET.get('end_date'):
+        service = request.GET.get('service', 'all')
         discount = request.GET.get('discount', 'all')
         start_date = request.GET.get('start_date', today)
         end_date = request.GET.get('end_date', today)
@@ -46,7 +45,7 @@ def report(request):
                 'services_json': services_json,
                 'services': settings.SERVICES,
                 'discounts': settings.DISCOUNTS,
-                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA_NAMES,
                 'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
                 'report_relative_url': '/report',
                 'title': 'Report Viewer',
@@ -61,7 +60,7 @@ def report(request):
                 'services_json': services_json,
                 'services': settings.SERVICES,
                 'discounts': settings.DISCOUNTS,
-                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA,
+                'discounts_umbrella': settings.DISCOUNTS_UMBRELLA_NAMES,
                 'discounts_umbrella_values': settings.DISCOUNTS_UMBRELLA_VALUES,
                 'report_relative_url': '/report',
                 'today': today,
@@ -82,9 +81,9 @@ def request_report(request):
     Queries must have a date range as well as service.
     @returns filtered transaction data based on a date
     """
-    if request.method == "POST":
-        # assert isinstance(request, HttpRequest)
+    assert isinstance(request, HttpRequest)
 
+    if request.method == "POST":
         return_data = {}
         sum_total = 0
         discount_sum_total = 0
@@ -96,8 +95,8 @@ def request_report(request):
             end_date = request.POST.get('end_date', None)
             start_date = datetime.strptime(start_date, "%m/%d/%Y").date()
             end_date = datetime.strptime(end_date, "%m/%d/%Y").date()
-            service = request.POST.get('service', None)
-            discount = request.POST.get('discount', None)
+            service = request.POST.get('service', 'all')
+            discount = request.POST.get('discount', 'all')
             reports = Report.search_reports(start_date, end_date, service, discount)
             reports_list = []
             if reports.count() > 0:
@@ -110,8 +109,6 @@ def request_report(request):
                     "sum_total": sum_total,
                     "discount_sum_total": discount_sum_total
                 }
-        else:
-            reports = None  # is this really necessary?
 
         return HttpResponse(
             json.dumps(return_data, cls=DjangoJSONEncoder),
@@ -134,6 +131,8 @@ def export_csv(request):
     Queries must have a date range as well as service.
     @returns filtered transaction data based on a date range in .CSV format
     """
+    assert isinstance(request, HttpRequest)
+
     if request.method == "POST":
         return_data = {}
         sum_total = 0
@@ -150,7 +149,6 @@ def export_csv(request):
             discount = request.POST.get('discount', None)
             reports = Report.search_reports(start_date, end_date, service, discount)
 
-        # TODO: use dictionary_form and csv.DictWriter?
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
         if request.POST.get('discount', '') == 'all' or request.POST.get('discount', '') is None:
