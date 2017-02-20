@@ -1,18 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-class MailingList(models.Model):
-    """ A collection of Persons.
-    Emails are sent to all members of a MailingList """
-    def __str__(self):
-        return '%s mailing list' % self.service
-
-    service = models.ForeignKey('app.Service')
-
-    @property
-    def members(self):
-        return Person.objects.filter(mailing_list=self)
-
 class Person(models.Model):
     """ A single user.
     Has any number of subscriptions. """
