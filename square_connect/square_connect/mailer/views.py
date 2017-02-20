@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
-from mailer.models import MailingList, Person
-from mailer.forms import MailerPersonForm
+from mailer.models import Person, Subscription
+from mailer.forms import PersonForm, SubscriptionForm
 from app.models import Service
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
@@ -20,63 +20,66 @@ def mailer(request):
     assert isinstance(request, HttpRequest)
 
     if request.method == 'POST':
+        # if it's a PersonForm
         if request.POST.get('person') == None:
-            form = MailerPersonForm(request.POST)
-            if form.is_valid():
+            person_form = PersonForm(request.POST)
+            if person_form.is_valid():
                 # add to mailing list
-                form.save()
-                mailing_list = form.cleaned_data['mailing_list']
-                service = mailing_list.service
-                service_name = service.name
-                first_name = form.cleaned_data['first_name']
-                last_name = form.cleaned_data['last_name']
-                email = form.cleaned_data['email']
-                discount = form.cleaned_data['discount']
+                person_form.save()
+
+                person_form = PersonForm()
+                subscription_form = SubscriptionForm()
+        # if it's a person deletion
+        elif request.POST.get('service') == None and request.POST.get('subscription') == None:
+            # remove from mailing list
+            Person.objects.get(pk=request.POST.get('person')).delete()
+
+            person_form = PersonForm()
+            subscription_form = SubscriptionForm()
+        # if it's a SubscriptionForm
+        elif request.POST.get('subscription') == None:
+            subscription_form = SubscriptionForm(request.POST)
+            if subscription_form.is_valid():
+                # add subscription to person
+                sub = subscription_form.save()
+                person = Person.objects.get(pk=request.POST.get('person'))
+                person.subscriptions.add(sub)
+
+                # notification email
                 discount_str = ''
-                if discount != 'all':
-                    discount_str = ' Your results will be filtered for the ' + discount + ' discount.'
+                if sub.discount != 'all':
+                    discount_str = ' Your results will be filtered for the ' + sub.discount + ' discount.'
                 send_mail(
                     "Mailing List Notification",
-                    "Hello " + first_name + " " + last_name + "! You were added to the mailing list of " + service_name + "." + discount_str,
+                    "Hello " + str(person) + "! You were added to the mailing list of " + settings.SERVICE_NAMES[sub.service] + "." + discount_str,
                     settings.EMAIL_HOST_USER,
-                    [email],
+                    [person.email],
                     fail_silently=False
                 )
 
-                form = MailerPersonForm()
+                person_form = PersonForm()
+                subscription_form = SubscriptionForm()
+        # if it's a subscription deletion
         else:
-            # remove from mailing list
-            Person.objects.get(pk=request.POST.get('person')).delete()
-            form = MailerPersonForm()
-    else:
-        form = MailerPersonForm()
+            # remove subscription from person
+            Person.objects.get(pk=request.POST.get('person')).subscriptions.remove(Subscription.objects.get(pk=request.POST.get('subscription')))
 
-    mailing_lists = MailingList.objects.all()
+            person_form = PersonForm()
+            subscription_form = SubscriptionForm()
+    else:
+        person_form = PersonForm()
+        subscription_form = SubscriptionForm()
+
+    persons = Person.objects.all()
 
     return render(
         request,
         'mailer/mailer.html',
         {
-            'mailing_lists': mailing_lists,
+            'persons': persons,
             'title':'Report Viewer',
             'year':'Remember never give up.',
-            'form': form,
+            'person_form': person_form,
+            'subscription_form': subscription_form,
         }
-    )
-
-@staff_member_required
-def mailer_admin(request, retcode=None):
-    # if retcode:
-    #     return render(
-    #         request,
-    #         'common/rt_update.html',
-    #         context = RequestContext(request,
-    #         {
-    #             'retcode':retcode,
-    #         })
-    #     )
-    # else:
-    return render(
-        request,
-        'mailer/mailer_admin.html'
     )

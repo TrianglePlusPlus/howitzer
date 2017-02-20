@@ -9,19 +9,13 @@
         <table class="table">
             <tr>
                 <th>
-                    <p>Mailing List: {{ form.mailing_list }}</p>
+                    <p>First Name: {{ person_form.first_name }}</p>
                 </th>
                 <th>
-                    <p>Discount Filter: {{ form.discount }}</p>
+                    <p>Last Name: {{ person_form.last_name }}</p>
                 </th>
                 <th>
-                    <p>First Name: {{ form.first_name }}</p>
-                </th>
-                <th>
-                    <p>Last Name: {{ form.last_name }}</p>
-                </th>
-                <th>
-                    <p>Email: {{ form.email }}</p>
+                    <p>Email: {{ person_form.email }}</p>
                 </th>
                 <th>
                     <button type="submit" class="btn btn-default">Add person</button>
@@ -29,19 +23,34 @@
             </tr>
         </table>
     </form>
-    <h2>Mailing Lists</h2>
+    <h2>People</h2>
     <ul>
-    {% for mailing_list in mailing_lists %}
-        <h3>{{ mailing_list.service }}</h3>
+    {% for person in persons %}
+        <h3><button type="button" class="btn btn-default delete-person-submit" data-person="{{ person.id }}">X</button> {{ person }}: {{ person.email }}</h3>
         <ul>
-        {% for person in mailing_list.members %}
-            <li><button type="button" class="btn btn-default delete-person-submit" data-person="{{ person.id }}">X</button> {{ person.first_name }} {{ person.last_name }}: {{ person.email }}{% if person.discount != 'all' %}, filtered for the {{ person.discount }} discount{% endif %}</li>
+        {% for subscription in person.subscriptions.all %}
+            <li><button type="button" class="btn btn-default delete-subscription-submit" data-person="{{ person.id }}" data-subscription="{{ subscription.id }}">X</button> {{ subscription.service_name }}{% if subscription.discount != 'all' %}, filtered for the {{ subscription.discount }} discount{% endif %}</li>
         {% endfor %}
+            <li>
+                <form id="new-subscription-form" method="post">
+                    {% csrf_token %}
+                    <p>Service: {{ subscription_form.service }}</p>
+                    <p>Discount: {{ subscription_form.discount }}</p>
+                    <input type="hidden" name="person" value="{{ person.id }}">
+                    <p><button type="submit" class="btn btn-default">New Subscription</button></p>
+                </form>
+            </li>
         </ul>
     {% endfor %}
+    </ul>
     <form id="delete-person-form" method="post">
         {% csrf_token %}
         <input type="hidden" id="delete-person-input" name="person">
+    </form>
+    <form id="delete-subscription-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="delete-subscription-person-input" name="person">
+        <input type="hidden" id="delete-subscription-input" name="subscription">
     </form>
 </div>
 
@@ -50,6 +59,11 @@ $(document).ready(function() {
     $(".delete-person-submit").click(function() {
         $("#delete-person-input").val(event.target.dataset.person);
         $("#delete-person-form").submit();
+    });
+    $(".delete-subscription-submit").click(function() {
+        $("#delete-subscription-person-input").val(event.target.dataset.person);
+        $("#delete-subscription-input").val(event.target.dataset.subscription);
+        $("#delete-subscription-form").submit();
     });
 });
 </script>
