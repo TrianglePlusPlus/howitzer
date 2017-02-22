@@ -31,4 +31,4 @@ class Command(BaseCommand):
 
             # Pass the sales to the report model so it can do its magic
             for report_type in options['report_type']:
-                Report.add_items_from_json_data(sales_json, service)
+                Report.add_items_from_json_data(sales_json, service, discount=report_type)
