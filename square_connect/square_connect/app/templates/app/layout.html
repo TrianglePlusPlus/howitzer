@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - Corp Reports</title>
+    <title>{{ title }} - Reports</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -11,7 +11,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <link rel="icon" href="{% static 'app/site.ico' %}">
+    <link rel="icon" href="{% static 'app/FAVICON_REPLACE_THIS.ico' %}">
     <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
 
 </head>
@@ -25,7 +25,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="{% url 'home' %}"><img id="logo" src="{% static 'app/corp_logo_white.png' %}"></a>
+                <a href="{% url 'home' %}"><img id="logo" src="{% static 'app/LOGO_REPLACE_THIS.png' %}"></a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -44,7 +44,7 @@
 {% block content %}{% endblock %}
         <hr/>
         <footer>
-            <p>&copy; {{ year }} - <3 Corp IT</p>
+            <p>&copy; {{ year }}</p>
         </footer>
     </div>
 

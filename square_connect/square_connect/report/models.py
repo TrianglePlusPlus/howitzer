@@ -152,6 +152,7 @@ class Report(models.Model):
         """
         if (discount is not None) and (discount != 'all'):
             if (service is not None) and (service != 'all'):
+                """ The following code bundles discount tags """
                 if discount in settings.DISCOUNT_CATEGORIES:
                     # For all of the discounts in that category:
                     # Turn list of values into a query, made up of OR'd Q objects
@@ -169,6 +170,7 @@ class Report(models.Model):
                     return Report.objects.filter(date__range=(start_date, end_date),
                                                  service__name=service, discount_label=discount)
             else:
+                """ The following code shows how to bundle discount tags for a particular service """
                 if discount in settings.DISCOUNT_CATEGORIES:
                     # For all of the discounts in that category:
                     # Turn list of values into a query, made up of OR'd Q objects
