@@ -1,8 +1,12 @@
-""" Sends emails with generated reports to the UM of each service """
+"""
+@package square_connect.mailer.management.commands.send_emails
+Sends emails with generated reports to the UM of each service.
+We recommend that you run it in a cron job.
+"""
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
-from django.conf import settings # TODO: we need service_names
+from django.conf import settings
 from app.models import Service
 from mailer.models import MailingList, Person
 from datetime import date, timedelta

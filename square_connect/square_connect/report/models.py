@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.conf import settings
 from django.utils.timezone import now as DjangoCurrentTime
 import datetime
 # Importing models from other apps
@@ -7,7 +8,7 @@ from app.models import Service
 from data.transaction import LocationsRequest, PaymentRequest, format_money
 
 class Report(models.Model):
-    # TODO
+    """ A collection of Items. Used to construct reports data from Squares Connect API JSON and to pull reports when searching. """
     date = models.DateField()
     service = models.ForeignKey("app.Service")
     discount_label = models.CharField(max_length=50, default='')
@@ -16,7 +17,7 @@ class Report(models.Model):
     def add_items_from_json_data(json_data, service_name, discount='All'):
         """ Extracts items from sales json and saves to a report
         @param json_data: The JSON object containing all of the transaction data
-        @param service: A service object correspondinng to the sales data
+        @param service_name: A service object correspondinng to the sales data
         @param discount: The discount tag that is being searched for. For example: 'Spoil', 'Cup Reuse'
         """
 
@@ -30,9 +31,7 @@ class Report(models.Model):
                             label = item['discounts'][0]['name']
                     else:
                         for entry in item['discounts']:
-                            if entry['name'] == discount: found = True
-                            # This is to catch all discounts in a particular group
-                            elif entry['name'] in settings.DISCOUNTS_GROUP:
+                            if entry['name'] == discount:
                                 found = True
                     if found:
                         if not 'item_variation_name' in item:
@@ -95,8 +94,8 @@ class Report(models.Model):
                         report_item.quantity = int(float(item['quantity']))
                         report_item.discountcost = format_money(abs(item['discount_money']['amount'])/report_item.quantity)
                         report_item.save()
-                except IndexError:
-                    # There's nothing to do
+                except IndexError as e:
+                    print(e)
                     pass
 
     @staticmethod
@@ -112,7 +111,6 @@ class Report(models.Model):
         """ Finds the Items associated with this report
         @returns The QuerySet containing all of the items associated with this report
         """
-        # TODO: Test this
         return Item.objects.filter(report=self).order_by('transaction_time')
 
     @property
@@ -153,27 +151,40 @@ class Report(models.Model):
         @returns A QuerySet containing all of the reports from the date range (for a specified service)
         """
         if (discount is not None) and (discount != 'all'):
-
             if (service is not None) and (service != 'all'):
-                """ The following code shows how to bundle discount tags 
-				if discount == 'multi_discount':
+                """ The following code bundles discount tags """
+                if discount in settings.DISCOUNT_CATEGORIES:
+                    # For all of the discounts in that category:
+                    # Turn list of values into a query, made up of OR'd Q objects
+                    queries = [Q(discount_label=d) for d in settings.DISCOUNTS_BY_CATEGORY[discount]]
+                    query = Q()
+                    for q in queries:
+                        query |= q
+
+                    # Query the model
                     return Report.objects.filter(Q(date__range=(start_date, end_date)),
                                                  Q(service__name=service),
-                                                 Q(discount_label='Discount_One') |
-                                                 Q(discount_label='Discount_Two'))
+                                                 query)
                 else:
+                    # If discount is not an umbrella category
                     return Report.objects.filter(date__range=(start_date, end_date),
                                                  service__name=service, discount_label=discount)
-				"""
             else:
-                """ The following code shows how to bundle discount tags for a particular service
-                elif discount == 'multi_discount':
+                """ The following code shows how to bundle discount tags for a particular service """
+                if discount in settings.DISCOUNT_CATEGORIES:
+                    # For all of the discounts in that category:
+                    # Turn list of values into a query, made up of OR'd Q objects
+                    queries = [Q(discount_label=d) for d in settings.DISCOUNTS_BY_CATEGORY[discount]]
+                    query = Q()
+                    for q in queries:
+                        query |= q
+
+                    # Query the model
                     return Report.objects.filter(Q(date__range=(start_date, end_date)),
-                                                 Q(discount_label='Discount_One') |
-                                                 Q(discount_label='Discount_Two'))
+                                                 query)
                 else:
+                    # If discount is not an umbrella category
                     return Report.objects.filter(date__range=(start_date, end_date), discount_label=discount)
-		        """
         else:
             if (service is not None) and (service != 'all'):
                 return Report.objects.filter(date__range=(start_date, end_date), service__name=service)
@@ -184,7 +195,7 @@ class Report(models.Model):
     def get_associated_date(date_string):
         """ Gets the sales date for the input date string
         Sales before 4/5 am EST belong to the previous day
-        @param dt: The date string in question, FORMATTED IN ZULU TIME (UTC)
+        @param date_string: The date string in question, FORMATTED IN ZULU TIME (UTC)
         @returns The 'sales' date that a date string belongs to
         """
         # Get the packages we need for this
@@ -218,8 +229,7 @@ class Discounts(models.Model):
 
 
 class Item(models.Model):
-    """ A single item
-    Part of a report """
+    """ A single item. Part of a report. """
     name = models.CharField(max_length=50, default='')
     variant = models.CharField(max_length=100, default='')
     sku = models.CharField(max_length=12, default='')
